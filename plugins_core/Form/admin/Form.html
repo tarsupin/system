@@ -1,0 +1,34 @@
+<html>
+<head>
+	<title>NAMEOFPLUGIN Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+
+</body>
+</html>
+
+/****** Form Class ******
+* This class provides simple functionality to forms to secure them.
+* 
+****** How To Use This Class ******
+
+// Check if the form was submitted successfully (with Form::submitted())
+if(Form::submitted())
+{
+	echo "Your name was submitted successfully!";
+}
+
+// Display the form (and add Form::prepare())
+echo '
+<form action="thispage.php" method="post">
+	' . Form::prepare() . '
+	Name: <input type="text" name="user" value="" />
+	Submit: <input type="submit" name="submit" value="Submit" />
+</form>';
+
+****** Methods Available ******
+* Form::prepare($uniqueIdentifier = "", $expiresInMinutes = 300)	// Prepares hidden tags to protect a form.
+* Form::submitted($uniqueIdentifier = "")							// Validates if the form submission was successful.
+*/

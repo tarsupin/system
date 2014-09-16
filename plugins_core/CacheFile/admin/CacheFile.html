@@ -1,0 +1,55 @@
+<html>
+<head>
+	<title>CacheFile Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+<h2>About the CacheFile Class</h2>
+
+<p>This class is used to cache an entire chunk of text, such as a block of HTML. This can greatly reduce the load time of dynamic pages if they don't have to be updated constantly.</p>
+
+<p>An example of why this function is useful is a "Today's Highlights" module on the site. The content needs to be updated every day, but the actual process of updating it might be somewhat intensive due to how many articles you need to parse through for the algorithm to complete.</p>
+
+<p>Thus, rather than running the algorithm every single page view, we just run it once a day and cache the results in a text file that we can request.</p>
+
+
+<h2>How to save the text into a file cache</h2>
+
+<p>Saving the text is easy. Just decide on the name of the cache you'd like to save, and then add the data you want to cache. The code for this looks like this:</p>
+<pre>
+	// Get the text that you want to save
+	$textData = someAlgorithm(time());
+	
+	// Add the text to a cached file
+	// In this case, save it with the "highlights_today" key
+	CacheFile::save("highlights_today", $textData);
+</pre>
+	
+<h2>Loading your file cache</h2>
+
+<p>The purpose of caching your data is so that you can refresh it every once in a while to prevent it from going stale. Therefore, you must set the "refresh" duration of the Cache. The "refresh" duration is how many seconds until the cache goes stale and will no longer serve content. When this happens, you need to run the algorithm again to save new content into the file.</p>
+
+<p>Here's an example of how loading a file cache works in practice:</p>
+<textarea style="min-height:180px;">
+// Load a cache page that regenerates after 15 seconds
+if(!$cacheData = CacheFile::load("testCache", 15))
+{
+	CacheFile::save("testCache", "Save this value: " . md5(mt_rand()));
+	
+	$cachedData = CacheFile::load("testCache");
+}
+</textarea>
+	
+<h2>Method Loaded</h2>
+<pre>
+// Saves the HTML chunk to a cached file
+CacheFile::save($cacheName, $html)
+
+// Loads cache if &lt; $refresh time passed
+// A $refresh value of 0 means it will persist indefinitely
+CacheFile::load($cacheName, $refresh = 0)
+</pre>
+
+</body>
+</html>

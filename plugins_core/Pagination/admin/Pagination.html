@@ -1,0 +1,49 @@
+<html>
+<head>
+	<title>NAMEOFPLUGIN Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+
+</body>
+</html>
+
+
+
+
+/****** Pagination Class ******
+* This class provides methods to return common pagination values.
+* 
+***** Example of using this class ******
+	
+// Prepare Pagination
+$showNumRows = 20;
+$currentPage = (isset($_POST['page']) && is_numeric($_POST['page']) ? $_POST['page'] + 0 : 1);;
+
+// Get Total Rows
+$totalRows = Database::selectOne("SELECT COUNT(*) as getCount FROM table WHERE column=?", array("value"));
+
+// Get the Pagination
+list($currentPage, $highestPage, $limitSQL, $pageArray) = Pagination::run($showNumRows, $totalRows['getCount'], $currentPage, "range", 4);
+
+// Get Rows
+$fetchRows = Database::selectMultiple("SELECT * FROM table WHERE column=? ORDER BY id DESC " . $limitSQL, array("value"));
+
+// Display Rows
+foreach($fetchRows as $row)
+{
+	echo "<br />" . $row['someData'];
+}
+
+// Display Pagination
+foreach($pageArray as $page)
+{
+	echo '<a class="' . ($page == $currentPage ? "disabled" : "") . '" href="/myActiveLink?page=' . $page . '">' . $page . '</a>';
+}
+	
+****** Methods Available ******
+* $pages = Pagination::draw($highestPage, $currentPage, [$type], [$range]);
+* 
+* Pagination::run($showLimit, $rowsCounted, $currentPage, $typeUse, $typeRange)
+*/

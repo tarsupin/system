@@ -1,0 +1,68 @@
+<html>
+<head>
+	<title>NAMEOFPLUGIN Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+
+</body>
+</html>
+
+
+
+/****** FormValdiate Class ******
+* This class provides common validations to a variety of form elements. These validations will use the default settings
+* for phpTesla. The validations will automatically apply the appropriate Alerts (such as errors).
+* 
+****** How To Use This Class ******
+
+// Make sure the form was submitted correctly before processing the input
+if(Form::submitted())
+{
+	// Check if all of the input you sent is valid: 
+	FormValidate::number("Year of Birth", $_POST['birthYear'], 1900, 2012);
+	
+	FormValidate::number_float("Percent of Interest", $_POST['interest'], 0.00, 100.00);
+	
+	FormValidate::variable("Username", $_POST['username'], 1, 22);		// Length between 1 and 22 (variable)
+	FormValidate::text("Display Name", $_POST['displayName'], 1, 22);	// Length between 1 and 22 (text)
+	FormValidate::text("My Biography", $_POST['biography']);			// No length requirements
+	
+	FormValidate::confirmation("Terms of Service", $_POST['tos']);
+	
+	// You may have custom checks that aren't handled by FormValidate()
+	if($_POST['myAge'] < 13)
+	{
+		Alert::error("Age", "You must be at least 13 to use this site.");
+	}
+	
+	// Now check if the form has passed
+	if(FormValidate::pass())
+	{
+		echo "Everything checks out. Update the database and redirect to the success page!";
+		
+		header("Location: /login-success"); exit;
+	}
+	
+	// If the form fails, output the alerts:
+	else
+	{
+		echo Alert::display();
+	}
+}
+
+****** Methods Available ******
+* FormValidate::input($name, $value, $minLen, $maxLen = 0)			// Validates a simple text input field.
+* FormValidate::text($name, $value, $minLen, $maxLen = 0)			// Validates a text input (converts HTML entities).
+* FormValidate::variable($name, $value, $minLen, $maxLen, $extra)	// Validates a variable with $extra characters
+* FormValidate::url($name, $value, $minLen, $maxLen)				// Validates a url
+* FormValidate::number($name, $value, $minVal, $maxVal = 0)			// Validates a field that must be a number.
+* FormValidate::confirmation($name, $value)							// Validates a confirmation field.
+* 
+* FormValidate::pass()		// Returns true if there are no errors.
+* 
+* FormValidate::username($username);					// Validates a username.
+* FormValidate::email($email);							// Validates that your email is acceptable.
+* FormValidate::password($password, $confirm = false);	// Validates that your password is secure enough.
+*/

@@ -1,0 +1,77 @@
+<html>
+<head>
+	<title>Benchmark Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+<h2>About the Benchmark Class</h2>
+
+<p>This class provides simple benchmarking functions to track the amount of time that passes between calls. It is not a comprehensive benchmarking for the entire system.</p>
+
+
+<h2>A simple example of benchmarking the duration of an algorithm</h2>
+
+<p>A good example of how this class is used is to identify how fast your different algorithms take, thus helping you decide which to use on your page.</p>
+<textarea style="height:360px;">
+// Start the Benchmark
+Benchmark::get();
+
+// Run a long algorithm	
+myLongFunction();
+
+// Run the next benchmark, which tracks the duration of myLongFunction();
+Benchmark::get();
+
+// Run another long algorithm	
+mySecondLongFunction();
+
+// Tracks the duration of mySecondLongFunction();
+Benchmark::get();
+
+// Shows a graph on the screen with results of the benchmarks.
+Benchmark::graph();
+</textarea>
+	
+<p>The Benchmark::get() method automatically knows what the last benchmark time was, so this is the only code you need.
+
+<p>If the Benchmark SQL was added to your database, the benchmark will automatically be tracked in the database for review later as well.
+
+
+<h2>Advanced Benchmarking Options</h2>
+	
+<p>If you require more advanced benchmarking options, there are other features you can use.
+<ol>
+<li>The Benchmark::get() method has a return value equal to the duration since the last Benchmark::get(). This would allow you to have custom benchmarking tracking if you like.</li>
+
+<pre>
+// Retrieves the duration since the last benchmark
+$duration = Benchmark::get()
+</pre>
+
+<li>If you add the Benchmark SQL to your database, the benchmarks you run will automatically be added to the database. This will allow you to track many more results across more pages and in different scenarios.</li>
+	
+<li>The Benchmark::get() method accepts additional parameters for naming the benchmark and tracking modifiers that apply to it. This is very useful when combined with the benchmark database, since it allows you to identify categories of benchmarks, or indicate what values were passed.</li>
+</ol>
+
+	<p>For example, if you're running benchmarks on a profile page on a live server, you could run this code:</p>
+	<pre>	Benchmark::get("profile-page", "page-visited: " . $userProfile, "visitor: " . $userVisiting);</pre>
+	<p>This would allow you to sort the results of your benchmarking tests, even filtering them by which user profiles were being visited.</p>
+
+
+<h2>Methods Available</h2>
+<pre>
+// Returns seconds between now and the last benchmark (or page start)
+Benchmark::get()
+
+// Displays a benchmark graph with a baseline benchmark in milliseconds
+Benchmark::graph($baseline = 30);
+
+// Displays recorded benchmark graph
+Benchmark::graphRecords($name, [$modifier1], [$modifier2]);
+
+// Stores your benchmarks in the database, and is automatically activated when you run Benchmarks
+Benchmark::record()
+</pre>
+</body>
+</html>

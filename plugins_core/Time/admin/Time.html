@@ -1,0 +1,82 @@
+<html>
+<head>
+	<title>Time Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+<h2>About the Time Plugin</h2>
+
+<p>This plugin provides you with tools to keep track of times for different purposes. It includes time that will be accurately synced between servers, times that are easy to read by humans (fuzzy time), conversions of time, etc.</p>
+
+<p>This plugin is relied upon by other critical plugins, such as the API plugin.</p>
+
+<h2>Using Fuzzy Time</h2>
+<p>The Time::fuzzy() method is very useful for providing simple, human-readable strings from timestamp conversions. Most people won't know that the timestamp "1400376805" refers to early morning on May 18th in UTC, despite how useful the value is while programming. This is why converting timestamps to fuzzy time can be so helpful.</p>
+
+<p>When you convert a timestamp to fuzzy time a string is returned that describes how soon (or how long ago) the timestamp was, such as "in two minutes" or "yesterday".</p>
+
+<p>Using fuzzy time is very easy. You just run the timestamp through the Time::fuzzy($timestamp) method.</p>
+
+<pre>
+	// Returns "in one hour"
+	echo Time::fuzzy(time() + 3600);
+	
+	// Returns "in ten minutes"
+	echo Time::fuzzy(time() + 600);
+	
+	// Returns "five minutes ago"
+	echo Time::fuzzy(time() - 300);
+</pre>
+
+
+<h2>Time Conversions</h2>
+
+<p>Another useful feature of the Time plugin is the ability to convert words into time-based numerical values, similar to php's strtotime() function.</p>
+
+<pre>
+	// Returns numbers for each month
+	echo Time::convertMonthToNumber("January");		// 1
+	echo Time::convertMonthToNumber("September");	// 10
+	
+	// Returns numbers of week days
+	echo Time::convertDayOfWeekToNumber("Monday");		// 1
+	echo Time::convertDayOfWeekToNumber("Saturday");	// 6
+	
+	// Returns numbers of hours
+	echo Time::convertHourToNumber("10 am");	// 10
+	echo Time::convertHourToNumber("10 pm");	// 22
+	echo Time::convertHourToNumber("2PM");		// 14
+	echo Time::convertHourToNumber("1AM");		// 1
+</pre>
+
+<h2>Methods Available</h2>
+<pre>
+// Returns the month as a valid number
+$month		= Time::convertMonthToNumber($month)
+
+// Returns the day of week as a valid number
+$dayOfWeek	= Time::convertDayOfWeekToNumber($day)
+
+// Returns an hour as a valid number
+$hour		= Time::convertHourToNumber($hour)
+
+// Returns the current swatch time
+$swatchTime	= Time::swatch()
+
+// Returns unique timestamp for the current time
+$uniqueTime	= Time::unique()
+
+// TRUE if $match is within $range minutes of current unique()
+$uniqueTime	= Time::unique($match, $range = 2)
+
+// Returns a list of timezones
+$timezones	= Time::timezones()
+
+// Returns fuzzy time (e.g. "four hours ago")
+$fuzzy		= Time::fuzzy($timestamp, [$relative])
+</pre>
+
+</body>
+</html>
+

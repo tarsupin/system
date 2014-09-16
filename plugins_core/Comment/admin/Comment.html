@@ -1,0 +1,77 @@
+<html>
+<head>
+	<title>CacheFile Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+<h2>About the Comment Class</h2>
+
+<p>This system works like a universal chat program of sorts - it is designed so that everyone can comment through a universal commenting system. If you process a comment through this class, it will automatically process itself through UniFaction with all of the features that UniFaction provides.</p>
+
+<p>Some of the features of the comment system include:</p>
+<ol>
+	<li>Comments will automatically register with the Hashtag system.</li>
+	<li>Comments will automatically handle user handles and useer notifications.</li>
+	<li>Comments can be used to process tips.</li>
+</ol>
+
+<h2>How to process a Comment</h2>
+
+<p>The way your comments work on your own site may vary, so this plugin runs AFTER you have uploaded your comment to your site. Your comments may already be saved in your database before processing these comments with the UniFaction system. To process a commment, run the comment through the Comment::process() method:</p>
+<pre>
+	// Generic Call
+	Comment::process($uniID, $comment);
+	
+	// Example of what it looks like
+	Comment::process($user['uni_id'], "Hey @joeSmith, did you see #ThemApples");
+</pre>
+<p>There are optional parameters that you can set to make the comment more valuable, including setting a return URL that will allow others to find the specific page of where the comment originated. You can also set the UniID of the person the comment is replying to, which can activate reply functionality (such as notifications to the original poster, tips, etc.).</p>
+<pre>
+	// The UniID posting the comment
+	$user['uni_id'] = 532483;
+	
+	// The comment to process through phpTesla / UniFaction
+	$comment = "Hey @joeSmith, did you see #themApples?";
+	
+	// The URL that links back to this comment (optional)
+	$sourceURL = "http://site.com/this-page#com-14";
+	
+	// The UniID that the comment is a reply to (if applicable)
+	$reply['uni_id'] = 320123;
+	
+	// Process the comment
+	Comment::process($user['uni_id'], $comment, $sourceURL, $reply['uni_id']);
+</pre>
+	
+<h2>Show the syntax of comments</h2>
+
+<p>There are two major syntax features for comments: linking to user profiles if their handle was shown, and linking to hashtags that were provided by the comment. For example, the comment below has two user handles and a hashtag:</p>
+<pre>
+	"@joeSmith, @friendOfMine, I just read the #HarryPotter series. It was pretty awesome."
+</pre>
+<p>If the comment syntax is shown, both of the user handles will link to those user's profiles. Clicking on the hashtag will direct the user to #HarryPotter hashtag.</p>
+
+<p>To show comment syntax with your comments, you just need to run your comment through the ::showSyntax() method:</p>
+<pre>
+	$comment = Comment::showSyntax($comment);
+</pre>
+<p>It will be converted into HTML with the appropriate links set.</p>
+
+<h2>Methods Available</h2>
+<pre>
+// Processes the comment through UniFaction
+Comment::process($uniID, $comment, $link, $toUniID);
+
+// Updates the comment syntax with links to users and hashtags
+$comment = Comment::showSyntax($comment);
+
+// Returns true if a comment has any @handles in it
+Comment::hasUsers($comment);
+
+// Returns a list of all @handles from a comment
+$users = Comment::getUsers($comment);
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<html>
+<head>
+	<title>NAMEOFPLUGIN Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+
+</body>
+</html>
+
+
+
+
+/****** TimeTracker Class ******
+* The TimeTracker is designed to keep track of several units of time simultaneously and keep them syncronized when you
+* change a value.
+* 
+* For example, lets say you set a TimeTracker to the timestamp of 28800 using $tracker->setTimestamp(28800).
+* The TimeTracker would automatically syncronize all of its units to January 1st, 1970 at 12 AM.
+* 
+*	echo $tracker->year;		// prints "1970"
+*	echo $tracker->month;		// prints "1"
+* 
+* Now, if you set the month to "March" using $tracker->setMonth("March"), it would syncronize the timestamp to the
+* value that corresponds with March 1st, 1970 at 12 AM.
+* 
+*	echo $tracker->timestamp;	// prints "5126400"
+* 
+****** Example of using this class ******
+	
+	$tracker = new TimeTracker($timestamp);
+	
+	// Assign the time units to the tracker 
+	$tracker
+		->setYear(2014)
+		->setMonth("February")
+		->setDay(15)
+		->setHour("10 pm")
+		->setMinute(22)
+		->setSecond(30)
+		;
+	
+	// Print the tracker data
+	echo $tracker->timestamp;		// prints the tracker's timestamp
+	echo $tracker->month;			// prints the tracker's month
+	echo $tracker->dayOfWeek;		// prints the tracker's day of the week
+	...
+	
+****** Methods Available ******
+* $tracker	= new TimeTracker()						// Build tracker from current time
+* $tracker	= new TimeTracker($timestamp)			// Build tracker from a desired timestamp
+* $tracker	= new TimeTracker($year, [$month], [$day], [$hour], ...)		// Build tracker from time units
+* 
+* $tracker
+*	->setYear($year)			// Sets the "Year" time unit
+*	->setMonth($month)			// Sets the "Month" time unit (can use "March", "nov", etc)
+*	->setDay($day)				// Sets the "Day" time unit
+*	->setHour($hour)			// Sets the "Hour" time unit (can use "10 pm", "5 am" etc.)
+*	->setMinute($minute)		// Sets the "Minute" time unit
+*	->setSecond($second)		// Sets the "Second" time unit
+* 
+* $tracker->setMultiple($year, $month, $day, $hour, $minute, $second);		// Sets several units at once
+* 
+* $tracker->setTimestamp($timestamp);		// Updates the timestamp for the tracker (and syncs all time units to it)
+* 
+* $tracker->syncUnits();		// Syncs time units to the timestamp (runs automatically when you update the timestamp)
+* $tracker->syncTimestamp();	// Syncs timestmap (runs automatically when you change a time unit)
+*/

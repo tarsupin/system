@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>Metadata Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+<h2>About the Metadata Plugin</h2>
+<p>This plugin is used to inject scripts or text like an include, most commonly being used to inject META data into the &lt;meta&gt; tag in the HTML header. It is primarily used to add css files or scripts and load them only on the appropriate pages to save on the number of assets that need to be generated.</p>
+
+<p>In addition to the META tags that it works with, it can also inject data into the footer, near or around the &lt;/body&gt; ending tag. This is used to load non-blocking scripts at the end of the page.</p>
+
+<h2>Using the Metadata Plugin</h2>
+<p>In order to use the Metadata plugin, you must make sure that your active theme uses the Metadata::header() and Metadata::footer() methods in their expected locations. The Metadata::header() method belongs inside of the &lt;head&gt; tag, and the Metadata::footer() method belongs at the end of the html script just before the &lt;/body&gt; tag.</p>
+
+<p>Then, on pages that you need to load a specific javascript library or css file, you can run the following line:</p>
+
+<pre>
+	Metadata::addHeader("&lt;desired-tag&gt;line to add to the META tag&lt;/desired-tag&gt;");
+</pre>
+
+<p>You must run the line BEFORE the theme is loaded.</p>
+
+<h2>Methods Available</h2>
+<pre>
+Metadata::addHeader("line to add in metaheader")
+Metadata::addFooter("line to add in footer")
+
+Metadata::robots($index = true, $follow = true)
+Metadata::openGraph($title, $image, $url, $desc, $type = "article")
+
+Metadata::header()		// Adds the page's header metadata
+Metadata::footer()		// Adds the page's footer metadata
+</pre>
+
+</body>
+</html>
+

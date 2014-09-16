@@ -1,0 +1,35 @@
+<html>
+<head>
+	<title>NAMEOFPLUGIN Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+
+</body>
+</html>
+
+
+
+
+/****** Security Class ******
+* This class provides methods for security handling, such as fingerprinting, password hashing, etc.
+* 
+****** Methods Available ******
+* $padValue	= Security::pad($stringToPad, $paddingstring);			// Pads the string
+* $strValue	= Security::unpad($stringToUnpad, $paddingString);		// Unpads the string
+* 
+* $passHash	= Security::setPassword("myPassword");					// Creates a password hash
+* $success	= Security::getPassword("myPassword", $passHash);		// Returns TRUE if the password validates
+* 
+* $hash		= Security::hash($value, $length = 64, $base = 64)		// Hashes a value (and returns $length characters)
+* 
+* $randInt	= Security::randInt($length = 32);						// Return random numbers as a string
+* $hash		= Security::randHash($length, $base = 64);				// Returns random hash of length $length
+* 
+* $convert	= Security::convertBaseArbitrary($value, $fromBase, $toBase);	// Converts from one base to another
+* 
+* $safeHTML	= Security::purify($unsafeHTML);						// Returns safe HTML (prevents XSS attacks)
+* 
+* Security::fingerprint()					// Run this to help resist fake sessions.
+*/

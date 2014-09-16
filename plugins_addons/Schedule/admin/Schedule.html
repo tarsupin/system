@@ -1,0 +1,116 @@
+<html>
+<head>
+	<title>Schedule Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+<h2>About the Schedule Plugin</h2>
+
+<p>This plugin allows you to perform advanced scheduling techniques. You can build a schedule to run events on specific hours of the night, during special events, for automatic backups, and more.</p>
+
+<p>Schedules require you to set the time units of when the schedule should activate. For example, you can set a schedule to activate only on the months of January, February, March, and October. You can also set other units, such as to only activate at 1 in the morning or only on Saturdays.</p>
+
+<p>A default schedule triggers once per day at midnight, but you can modify the schedule with the methods available. This will update the trigger array, which contains the list of units to indicate when the scheduled events will trigger. Every time there is an event with an available match, the trigger can activate its scheduled event.</p>
+	
+<p>A trigger would resemble something like this:</p>
+
+<pre>
+	$triggers = array(
+		'years'				=> array(2014, 2015, 2019)
+		'months'			=> array("January", 2, 3, "October")
+		'days_of_month'		=> array(5, 10, 15, 20, 25, 30)
+		'days_of_week'		=> array("Monday", "Tuesday", 5, 6)
+		'hours'				=> array(0, 2, 3, 5, 10, 20)
+		'minutes'			=> array(0, 20, 40)
+		'seconds'			=> array(0, 30)
+	);
+</pre>
+
+<p>Note that you do not have to include every option. However, some options will include ALL options by default (such as the month and days of the month), and others will only run ONCE (such as hours, minutes, and seconds).</p>
+
+<p>To build the schedule's trigger array, use the appropriate functions provided by the class.</p>
+
+<pre>
+// For example, this schedule would FIRST activate on January 15th, 2014 at exactly midnight.
+// It would activate a total of 8 times, the final time being on October 15th, 2015 at midnight.
+$schedule = new Schedule();
+$schedule
+	->setYears(2014, 2015)
+	->setMonths("January", "April", "July", "October")
+	->setDaysOfMonth(15);
+</pre>
+	
+<h2>Examples of building a schedule</h2>
+	
+<textarea style="min-height:220px;">
+// Sets a Schedule for every 5 minutes on every Sunday during the month of August
+// Note that every hour has to be set here (otherwise it defaults to just midnight)
+$schedule = new Schedule();
+$schedule->setMonths("August")
+		->setDaysOfWeek("Sunday")
+		->setHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
+		->setMinutes(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55);
+</textarea>
+
+<textarea style="min-height:220px;">
+// Sets a schedule for 11 pm on the 3rd of each month
+// Note that every hour has to be set here (otherwise it defaults to just midnight)
+$schedule = new Schedule();
+$schedule->setDaysOfMonth(3)
+		->setHours("11 pm")
+		->setMinutes(0);
+</textarea>
+
+<h2>Saving and Loading Schedules</h2>
+
+<p>Schedules won't matter unless you can keep track of them. For this reason, there are functions provided to save schedules and load them at a later time.</p>
+	
+<p>The $schedule->save() method will return a serialized value that you can store. You can load this later when initializing the plugin.</p>
+	
+<pre>
+	// Save the Schedule for later
+	$saveData = $schedule->save();
+	
+	// Load an earlier Schedule that you saved
+	$oldSchedule = new Schedule($saveData);
+</pre>
+	
+<h2>Methods Available</h2>
+<pre>
+// Creates a new schedule that you can edit
+$schedule = new Schedule()
+
+// Restores a schedule that you saved earlier
+$schedule = new Schedule($saveData)
+
+// Saves a schedule as a serialized value
+$saveData = $schedule->save()
+
+$schedule
+	->startTime($timestamp)		// Schedule can't start before this
+	->endTime($timestamp)		// Schedule won't run after this
+
+// Set the years, months, etc, that a schedule will activate on.
+	->setYears($year, $year, $year...)
+	->setMonths($month, $month, $month...)
+	->setDaysOfMonth($day, $day, $day...)
+	->setDaysOfWeek($day, $day, $day...)
+	->setHours($hour, $hour, $hour...)
+	->setMinutes($minute, $minute, $minute...)
+	->setSeconds($second, $second, $second...)
+	
+// Notes:
+	->setMonths() can recognize words, e.g. "March"
+	->setDaysOfWeek() can recognize words, e.g. "Thursday"
+	->setHours() can recognize "am" and "pm", e.g. "3 pm", etc.
+	->setHours() defaults to "0" (midnight)
+	->setMinutes() defaults to "0" (start of the hour)
+	->seetSeconds() defaults to "0" (start of the minute)
+</pre>
+
+</body>
+</html>
+
+
+

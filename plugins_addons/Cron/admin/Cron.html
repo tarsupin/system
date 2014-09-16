@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>NAMEOFPLUGIN Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+
+</body>
+</html>
+
+
+
+
+/****** Cron Class ******
+* This class sets up and handles cron tasks, automating them at designated times.
+* 
+* When a cron script is called, it checks to see if the site has a "MyTasks" class. If it does, it will call the
+* appropriate method (e.g. MyTasks::{method}). Otherwise, it will attempt to call the "Task" class in the system.
+* 
+* Cron scripts are stored in /assets/cron, and touched at /cron (e.g. "/controller/cron.php")
+* 
+****** Methods Available ******
+* $cronList = Cron::getList();
+* $cronData = Cron::getData($cronID);
+* 
+* Cron::create($title, $method, $args, [$run_cycle], [$date_start], [$date_end])	// Creates a routine task
+* Cron::once($title, $method, $args, [$date_start])									// Creates a task to be run once
+* 
+* Cron::delete($cronID)			// Deletes a task
+* Cron::runQueue()				// Run the task queue.
+* Cron::run($id, [$reset])		// Runs a specific task.
+* 
+* $args = Cron::getArgs($cronID);
+* 
+* Cron::process($task, [$reset]);
+* Cron::reset($cronID, $date_nextRun, $run_cycle, $date_start, $date_end);
+*/

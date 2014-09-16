@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title>NAMEOFPLUGIN Plugin</title>
+	<link rel="stylesheet" href="../../../assets/stylesheets/documentation.css" />
+</head>
+<body class="tesla-documentation">
+
+
+</body>
+</html>
+
+
+
+/****** Image Class ******
+* This class provides several methods for manipulating images.
+* 
+****** Example of Use ******
+
+// Display an image using special effects
+$image = new Image(APP_PATH . "/images/image.png");
+$image->multiply(APP_PATH . "/images/image2.jpg", 50, 50, 50, 50, 150, 150);
+$image->thumb(150, 200);
+$image->changeHue(80);
+$image->display();
+
+// Copy the image to a new location
+$image = new Image(APP_PATH . "/images/image.png");
+$image->save(APP_PATH . "/images/new_image.png");
+
+****** Methods Available ******
+* $image = new Image($filePath)						// Creates an image resource from an image path.
+* $image = new Image($mime, $width, $height)		// Creates a blank image resource based on custom parameters.
+* 
+* $image->width 	// The width of the image
+* $image->height	// The height of the image
+* 
+* $image->paste("/path/to/image.png", !!!);			// Pastes a layer on top.
+* $image->darken("/path/to/image.png", !!!);		// Use darken layering effect.
+* $image->lighten("/path/to/image.png", !!!);		// Use lighten layering effect.
+* $image->multiply("/path/to/image.png", !!!);		// Use multiply layering effect.
+* $image->screen("/path/to/image.png", !!!);		// Use screen layering effect.
+* $image->overlay("/path/to/image.png", !!!);		// Use overlay layering effect.
+* $image->difference("/path/to/image.png", !!!);	// Use difference layering effect.
+* 
+* $image->layer("/path/to/image.png", !!!);				// Places another layer on top of the image (transparency).
+* $image->shadow("/path/to/image.png", !!!);			// Places a shadow layer above the image (50% transparency).
+* $image->blend("/path/to/image.png", !!!);				// Places a blended layer above the image.
+* $image->overlay_original("/path/to/image.png", !!!);	// Places a overlay layer on an image. Original version.
+* $image->multiply_original("/path/to/image.png", !!!);	// Places a multiply layer on an image. Original version.
+* 
+* $image->crop($x, y, $toX, $toY)					// Crops an image based on the dimensions provided
+* $image->autoCrop($width, $height)					// Automatically crops & centers an image
+* $image->autoWidth($width, $maxHeight = 0)			// Crops to forced width and flexible height.
+* $image->autoHeight($height, $maxWidth = 0)		// Crops to forced height and flexible width.
+* $image->thumb($width = 100, $height = 100)		// Generates a thumbnail from an image.
+* $image->trimTransparency()						// Crops off any transparent edges
+* $image->scale($newWidth, $newHeight, $x, $y, $x2, $y2);	// Scales the image.
+* 
+* $image->colorize(150, 20, 20, 0);					// Uses the colorize effect on an image.
+* $image->pixelate(3);								// Uses the pixelate effect on an image.
+* 
+* Image::hexToRGB($hexValue)						// Changes a hex color value to RGB (array)
+* Image::rgbToHex($red, $green, $blue)				// Changes an rgb color value to hex.
+* 
+* $image->swapColors($swapFrom, $swapTo)			// Switch colors from one to another on an image.
+* $image->changeHue($angle)							// Changes the hue of the image up to 360 degrees.
+* 
+* $image->display(&$image)							// Displays the image directly to the screen
+* $image->save($filename)							// Saves the Image to the filename provided
+*/
