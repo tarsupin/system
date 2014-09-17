@@ -186,6 +186,11 @@ abstract class Sync {
 		// Get the plugin's tracker data
 		$tracker = self::getTracker($plugin);
 		
+		// Recognize Variables
+		$tracker['tracker_time'] = (int) $tracker['tracker_time'];
+		$tracker['delay'] = (int) $tracker['delay'];
+		$tracker['sync_time'] = (int) $tracker['sync_time'];
+		
 		// Check if it's a valid time to check for updates
 		if(!$force and $tracker['tracker_time'] + $tracker['delay'] < time())
 		{

@@ -138,7 +138,12 @@ abstract class Metadata {
 		}
 		
 		// Prepare the robots tag
-		if(!self::$index or !self::$follow)
+		if(ENVIRONMENT == "production")
+		{
+			$html .= '
+			<meta name="robots" content="noindex, nofollow">';
+		}
+		else if(!self::$index or !self::$follow)
 		{
 			$html .= '
 			<meta name="robots" content="' . (self::$index == true ? "index" : "noindex") . ', ' . (self::$follow == true ? "follow" : "nofollow") . '">';

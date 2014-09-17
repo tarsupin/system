@@ -61,7 +61,7 @@ class AuthSync extends API {
 		if(Network::setData($this->data['handle'], $this->data['name'], $this->data['url'], $this->data['key']))
 		{
 			// Update the network clearance level
-			if(Network::setClearance($this->data['handle'], $this->data['clearance']))
+			if(Network::setClearance($this->data['handle'], (int) $this->data['clearance']))
 			{
 				return true;
 			}

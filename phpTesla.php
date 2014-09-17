@@ -56,13 +56,6 @@ require(dirname(SYS_PATH) . "/global-config.php");	// Loads the Global Configura
 require(CONF_PATH . "/config.php");					// Loads the Application Configuration File
 
 
-// Run the local development panel
-if(ENVIRONMENT == "local")
-{
-	register_shutdown_function(array('LocalDev', 'showPanel'));
-}
-
-
 /****** Session Preparation ******/
 session_start();
 
@@ -132,11 +125,15 @@ function customErrorHandler($errorNumber, $errorString, $errorFile, $errorLine)
 		// Log this error in the database
 		Debug::logError($importance, $errorType, $class, $function, $argString, $filePath, $fileLine, $urlData['full'], Me::$id, $filePathNext, $fileLineNext);
 		
-		if(ENVIRONMENT != "production")
+		//if(ENVIRONMENT != "production")
 		{
 			Debug::$verbose = true;
 			
 			Debug::scriptError($errorString, $class, $function, $argString, $filePath, $fileLine, $filePathNext, $fileLineNext);
+		}
+		//else
+		{
+			return false;
 		}
 	}
 	
@@ -147,7 +144,6 @@ function customErrorHandler($errorNumber, $errorString, $errorFile, $errorLine)
 
 // Register our custom error handler
 set_error_handler("customErrorHandler");
-
 
 /****** Set up System Configurations & Data ******/
 

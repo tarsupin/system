@@ -392,11 +392,6 @@ abstract class Debug {
 	
 	// Debug::logError($importance, $errorType, $class, $function, $argString, $filePath, $fileLine, $url, $uniID, $filePathNext, $fileLineNext);
 	{
-		if(!Database::$database)
-		{
-			return false;
-		}
-		
 		try
 		{
 			// Insert the Error Log
