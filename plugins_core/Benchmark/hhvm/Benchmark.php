@@ -216,6 +216,18 @@ abstract class Benchmark {
 	}
 	
 	
+/****** Retrieve Duration Since Script Began ******/
+	public static function sinceStart (
+	)					// RETURNS <float> The duration (in seconds) since the script began.
+	
+	// Benchmark::sinceStart();
+	{
+		$benchmark = (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']);
+		
+		return (float) number_format($benchmark, 4);
+	}
+	
+	
 /****** Benchmark Graph ******/
 	public static function graph
 	(

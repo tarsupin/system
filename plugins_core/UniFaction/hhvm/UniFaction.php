@@ -62,8 +62,10 @@ abstract class UniFaction {
 		}
 		else
 		{
+			$value = $siteData['site_url'] . "/login?site=" . SITE_HANDLE . "&shk=" . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . "&conf=" . Security::hash(SITE_HANDLE . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . $siteData['site_key'], 20, 62) . "&ret=" . rawurlencode($linkback) . ($logMode != "" ? '&logMode=' . Sanitize::variable($logMode) : '') . "&chooseID=" . ((int) $chosenID) . '&logAct=' . ($logAct != "" ? Sanitize::variable($logAct) : "");
+			
 			// Redirect to the Universal Login Page - get credentials and return
-			header("Location: " . $siteData['site_url'] . "/login?site=" . SITE_HANDLE . "&shk=" . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . "&conf=" . Security::hash(SITE_HANDLE . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . $siteData['site_key'], 20, 62) . "&ret=" . rawurlencode($linkback) . ($logMode != "" ? '&logMode=' . Sanitize::variable($logMode) : '') . '&logAct=' . ($logAct != "" ? Sanitize::variable($logAct) : "") . ($chosenID != 0 ? "&chooseID=" . $chosenID : "")); exit;
+			header("Location: " . $value); exit;
 		}
 		
 		return array();

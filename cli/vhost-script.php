@@ -140,8 +140,8 @@ foreach($confList as $configPage)
 			// Prepare the contents to save to the virtual host directory
 			$virtualHostContent = '
 server {
-	#listen   80; ## listen for ipv4; this line is default and implied
-	#listen   [::]:80 default_server ipv6only=on; ## listen for ipv6
+	listen   80; ## listen for ipv4; this line is default and implied
+	listen   [::]:80; ## default_server ipv6only=on; ## listen for ipv6
 	
 	server_name ' . $domain . ';
 	root ' . $uniDirectory . ';

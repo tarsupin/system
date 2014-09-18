@@ -133,7 +133,7 @@ abstract class Me {
 		unset($_SESSION[SITE_HANDLE]);
 		
 		// Prepare the return value
-		$_SESSION[SITE_HANDLE]['return_to'] = '/' . ($url_relative != "" ? $url_relative : "login");
+		$_SESSION[SITE_HANDLE]['return_to'] = '/' . ($url_relative != "" ? $url_relative : "");
 		
 		// Login with Auth
 		UniFaction::login(SITE_URL . "/login", "", "", $chooseID); exit;

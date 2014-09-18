@@ -103,7 +103,7 @@ abstract class Cookie {
 	public static function set
 	(
 		string $cookieName				// <str> The name of the cookie you're trying to remember.
-	,	string $valueToRemember		// <str> The value you want to remember.
+	,	mixed $valueToRemember		// <mixed> The value you want to remember.
 	,	string $salt = ""				// <str> The unique salt you want to use to keep the cookie safe.
 	,	int $expiresInDays = 30		// <int> The amount of time the cookie should last, in days.
 	): void							// RETURNS <void>
@@ -125,17 +125,6 @@ abstract class Cookie {
 		// Set the cookie
 		setcookie($cookieName, $valueToRemember, $timestamp + (86400 * $expiresInDays), "/", $parsedURL['host']);
 		setcookie($cookieName . "_key", $token, $timestamp + (86400 * $expiresInDays), "/", $parsedURL['host']);
-		
-		/*
-		echo "<br /><br /> Token String: " . $valueToRemember . SITE_SALT . $salt;
-		echo "<br /><br /> COOKIE: " . json_encode($_COOKIE);
-		echo "<br /><br /> Cookie Name: " . $cookieName;
-		echo "<br /><br /> Token: " . $token;
-		echo "<br /><br /> Parsed URL: " . json_encode($parsedURL);
-		echo "<br /><br /> Value to Remember: " . $valueToRemember;
-		echo "<br /><br /> SITE SALT: " . SITE_SALT;
-		echo "<br /><br /> Salt: " . $salt;
-		*/
 	}
 	
 	
