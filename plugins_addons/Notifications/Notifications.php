@@ -209,21 +209,21 @@ abstract class Notifications {
 			{
 				$html = '
 				<div class="panel-box">
-					<a href="/user-panel/notifications" class="panel-head">Notifications<span class="icon-circle-right nav-arrow"></span></a>
+					<a href="/notifications" class="panel-head">Notifications<span class="icon-circle-right nav-arrow"></span></a>
 					<ul class="panel-notes">';
 				
 				// Show Global Updates (if any new available)
 				if(Me::$vals['has_notifications'] > 1)
 				{
 					$html .= '
-					<li class="nav-note"><a href="/user-panel/notifications"><span style="color:#ee6060;">Global Updates</span></a></li>';
+					<li class="nav-note"><a href="/notifications"><span style="color:#ee6060;">Global Updates</span></a></li>';
 				}
 				
 				// Show list of Standard Notifications
 				foreach($sideBarNotes as $cat => $count)
 				{
 					$html .= '
-					<li class="nav-note"><a href="/user-panel/notifications"><span>' . $cat . ' <span style="color:#ee6060;">(' . $count . ')</span></span></a></li>';
+					<li class="nav-note"><a href="/notifications"><span>' . $cat . ' <span style="color:#ee6060;">(' . $count . ')</span></span></a></li>';
 				}
 				
 				$html .= '

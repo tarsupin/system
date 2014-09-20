@@ -35,8 +35,8 @@ abstract class ModuleHashtags {
 /****** Retrieve a list of hashtags assigned to a Content Entry ******/
 	public static function get
 	(
-		$contentID				// <int> The ID of the content entry to retrieve hashtags from.
-	)							// RETURNS <int:str> The list of hashtags assigned to the content entry.
+		$contentID		// <int> The ID of the content entry to retrieve hashtags from.
+	)					// RETURNS <int:str> The list of hashtags assigned to the content entry.
 	
 	// $hashtags = ModuleHashtags::get($contentID);
 	{

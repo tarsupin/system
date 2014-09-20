@@ -3,7 +3,7 @@
 // Make sure you're logged in
 if(!Me::$loggedIn)
 {
-	Me::redirectLogin("/user-panel/notifications");
+	Me::redirectLogin("/notifications");
 }
 
 // Get Notifications

@@ -97,7 +97,7 @@ abstract class ModuleText {
 		echo '
 		<form class="uniform" action="' . $formClass->baseURL . '?content=' . ($formClass->contentID + 0) . '&t=' . $formClass->type . '&block=' . ($formClass->blockID + 0) . '" method="post">' . Form::prepare(SITE_HANDLE . "-modText") . '
 			<p><select name="class">' . $dropdownOptions . '</select></p>
-			<p><input type="text" name="title" value="' . $result['title'] . '" placeholder="Title . . ." size="64" maxlength="120" tabindex="10" autocomplete="off" autofocus /></p>
+			<p><input type="text" name="title" value="' . htmlspecialchars($result['title']) . '" placeholder="Title . . ." size="64" maxlength="120" tabindex="10" autocomplete="off" autofocus /></p>
 			<p>
 				' . UniMarkup::buttonLine() . '
 				<textarea id="core_text_box" name="body" placeholder="Body or paragraph . . ." tabindex="20" style="height:120px; width:95%;">' . $result['body'] . '</textarea>
@@ -120,12 +120,20 @@ abstract class ModuleText {
 		// Prepare Values
 		$_POST['class'] = (isset($_POST['class']) ? $_POST['class'] : '');
 		$_POST['title'] = (isset($_POST['title']) ? $_POST['title'] : '');
-		$_POST['body'] = (isset($_POST['body']) ? $_POST['body'] : '');
+		$_POST['body'] = (isset($_POST['body']) ? Text::convertWindowsText($_POST['body']) : '');
 		
 		// Validate the Form Values
 		FormValidate::variable("Class", $_POST['class'], 0, 22, "-");
-		FormValidate::safeword("Title", $_POST['title'], 0, 120, "'?");
-		FormValidate::text("Body", $_POST['body'], 10, 4500);
+		FormValidate::safeword("Title", $_POST['title'], 0, 120, "'?\"");
+		
+		if(strlen($_POST['body']) < 10)
+		{
+			Alert::error("Body Length", "The length of your content is too short.");
+		}
+		else if(strlen($_POST['body']) > 4500)
+		{
+			Alert::error("Body Length", "The length of your content is too long.");
+		}
 		
 		// Update the Text Block
 		if(FormValidate::pass())

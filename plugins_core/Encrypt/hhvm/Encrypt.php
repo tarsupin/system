@@ -130,7 +130,7 @@ abstract class Encrypt {
 			
 			// Get the initialization vector (appends a public salt)
 			$vectorSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-			$vector = mcrypt_create_iv($vectorSize, MCRYPT_DEV_RANDOM);
+			$vector = mcrypt_create_iv($vectorSize, MCRYPT_RAND);
 			
 			// Encrypt the data
 			$encData = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $encData, MCRYPT_MODE_CBC, $vector);

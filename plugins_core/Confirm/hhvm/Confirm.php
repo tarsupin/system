@@ -54,7 +54,7 @@ abstract class Confirm {
 	public static function create
 	(
 		string $type					// <str> The type of confirmation you're creating.
-	,	string $uniqueIdentifier		// <str> A string to uniquely identify the user or link being generated.
+	,	mixed $uniqueIdentifier		// <mixed> A string to uniquely identify the user or link being generated.
 	,	array <str, mixed> $extraArgs = array()	// <str:mixed> Extra arguments that you would like to pass.
 	,	int $expireInHours = 24		// <int> Hours until it becomes invalid. Setting to 0 allows it forever.
 	,	string $extraSalt = ""			// <str> Any extra salt that you would like to add to this confirmation.
@@ -117,7 +117,7 @@ abstract class Confirm {
 	public static function createLink
 	(
 		string $type					// <str> The type of confirmation you're creating.
-	,	string $uniqueIdentifier		// <str> A string to uniquely identify the user or link being generated.
+	,	mixed $uniqueIdentifier		// <mixed> A string to uniquely identify the user or link being generated.
 	,	array <mixed, mixed> $extraArgs = array()	// <mixed:mixed> Extra arguments that you would like to pass.
 	,	int $expireInHours = 24		// <int> Hours until it becomes invalid. Setting to 0 allows it forever.
 	,	string $extraSalt = ""			// <str> Any extra salt that you would like to add to this confirmation.

@@ -22,7 +22,7 @@ $hashtagList = Database::selectMultiple("SELECT * FROM content_site_hashtags ORD
 
 // Sanitize & Prepare Data
 $_POST['hashtag'] = (isset($_POST['hashtag']) ? Sanitize::variable($_POST['hashtag']) : '');
-$_POST['title'] = (isset($_POST['title']) ? Sanitize::safeword($_POST['title']) : '');
+$_POST['title'] = (isset($_POST['title']) ? Sanitize::safeword($_POST['title'], "()-") : '');
 
 // Form Submission
 if(Form::submitted("manage-hash-art"))

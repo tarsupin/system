@@ -100,7 +100,7 @@ abstract class Me {
 		{
 			if($url[0] != "user-panel" or $url[1] != "banned")
 			{
-				header("Location: /user-panel/banned"); exit;
+				header("Location: /banned"); exit;
 			}
 		}
 		

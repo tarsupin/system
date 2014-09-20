@@ -387,6 +387,11 @@ abstract class Content {
 		// Prepare Values
 		$scanData['body'] = html_entity_decode($scanData['body'], ENT_QUOTES);
 		
+		if(strlen($scanData['body']) > 250)
+		{
+			$scanData['body'] = substr($scanData['body'], 0, 247) . "...";
+		}
+		
 		// Return Core Data
 		return $scanData;
 	}

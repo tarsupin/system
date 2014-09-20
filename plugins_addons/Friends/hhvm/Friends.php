@@ -44,7 +44,7 @@ This plugin also receives sync instructions from UniFaction when the Sync plugin
 	
 There can be any number of $uniID's provided, each with any number of $friendID's provided.
 
-	
+
 -------------------------------
 ------ Methods Available ------
 -------------------------------
@@ -81,19 +81,16 @@ abstract class Friends {
 	(
 		int $uniID			// <int> The UniID of the user.
 	,	int $friendID		// <int> The UniID of the friend.
-	): array <str, int>					// RETURNS <str:int> the relationship role, FALSE on failure.
+	): array <int, int>					// RETURNS <int:int> the clearance levels, array() on failure.
 	
 	// $clearance = Friends::getClearance($uniID, $friendID);
 	{
 		if(!$request = Database::selectOne("SELECT view_clearance, interact_clearance FROM users_friends WHERE uni_id=? AND friend_id=? LIMIT 1", array($uniID, $friendID)))
 		{
-			return array();
+			return array(0, 0);
 		}
 		
-		$request['view_clearance'] = (int) $request['view_clearance'];
-		$request['interact_clearance'] = (int) $request['interact_clearance'];
-		
-		return $request;
+		return array((int) $request['view_clearance'], (int) $request['interact_clearance']);
 	}
 	
 	

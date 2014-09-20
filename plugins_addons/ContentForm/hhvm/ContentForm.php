@@ -783,8 +783,8 @@ class ContentForm {
 		$datePosted = 0;
 		$minSlugLen = 0;
 		
-		$comments = (isset($_POST['comments']) ? ($_POST['comments'] + 0) : Content::COMMENTS_STANDARD);
-		$voting = (isset($_POST['voting']) ? ($_POST['voting'] + 0) : Content::VOTING_STANDARD);
+		$comments = (isset($_POST['comments']) ? (int) $_POST['comments'] : Content::COMMENTS_STANDARD);
+		$voting = (isset($_POST['voting']) ? (int) $_POST['voting'] : Content::VOTING_STANDARD);
 		
 		// If you're not an editor (or otherwise have appropriate permissions)
 		if(Me::$clearance < 6)
@@ -940,7 +940,7 @@ class ContentForm {
 	,	int $clearanceView = 0	// <int> The clearance required to view this entry.
 	,	int $clearanceEdit = 0	// <int> The clearance required to edit this entry.
 	,	int $datePosted = 0		// <int> The date that this entry has been posted (0 is ignore this).
-	,	int $primeHashtag = ""	// <int> Assigns a primary hashtag, if applicable ("" to ignore).
+	,	string $primeHashtag = ""	// <str> Assigns a primary hashtag, if applicable ("" to ignore).
 	,	int $comments = 2		// <int> The type of comments to set.
 	,	int $voting = 2			// <int> The type of voting to set.
 	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
@@ -954,6 +954,7 @@ class ContentForm {
 		}
 		
 		// Recognize Integers
+		$entry['uni_id'] = (int) $entry['uni_id'];
 		$entry['status'] = (int) $entry['status'];
 		$entry['clearance_view'] = (int) $entry['clearance_view'];
 		$entry['clearance_edit'] = (int) $entry['clearance_edit'];
@@ -961,105 +962,112 @@ class ContentForm {
 		$entry['voting'] = (int) $entry['voting'];
 		$entry['date_posted'] = (int) $entry['date_posted'];
 		
+		// Prepare Values
+		$skipUpdate = false;
+		
 		// Check if you're updating values that are already set
 		if($entry['title'] == $title and $entry['url_slug'] == $urlSlug and $entry['status'] == $status and $entry['clearance_view'] == $clearanceView and $entry['clearance_edit'] == $clearanceEdit and $entry['comments'] == $comments and $entry['voting'] == $voting and $entry['primary_hashtag'] == $primeHashtag)
 		{
 			if($datePosted == 0 or $entry['date_posted'] == $datePosted)
 			{
-				return true;
+				$skipUpdate = true;
+				$success = true;
 			}
 		}
 		
 		// Everything seems okay to continue - process the update
-		Database::startTransaction();
-		
-		$pass = true;
-		
-		// Check if you've already been published on the current URL Slug
-		if(Database::selectValue("SELECT url_slug FROM content_by_url WHERE url_slug=? LIMIT 1", array($entry['url_slug'])))
+		if(!$skipUpdate)
 		{
-			if($entry['url_slug'] != $urlSlug)
-			{
-				$pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($entry['url_slug']));
-			}
-		}
-		
-		// If hashtags are being used, check if the entry is already posted there
-		// Delete any old version so that we can update to a new value later
-		if($pass and ($primeHashtag or $entry['primary_hashtag']))
-		{
-			if($entry['primary_hashtag'] != $primeHashtag)
-			{
-				Database::query("UPDATE IGNORE content_entries SET primary_hashtag=? WHERE id=? LIMIT 1", array($primeHashtag, $contentID));
-				
-				$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
-			}
+			Database::startTransaction();
 			
-			else if($status < Content::STATUS_OFFICIAL)
+			$pass = true;
+			
+			// Check if you've already been published on the current URL Slug
+			if(Database::selectValue("SELECT url_slug FROM content_by_url WHERE url_slug=? LIMIT 1", array($entry['url_slug'])))
 			{
-				$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
-			}
-		}
-		
-		// If search archetypes are allowed and updated
-		if($pass and isset($entry['search_archetype']))
-		{
-			// If the update is official, we need to set the search data to live
-			if($status >= Content::STATUS_OFFICIAL and $entry['search_archetype'])
-			{
-				ModuleSearch::liveSubmission($contentID, $entry['search_archetype']);
-			}
-			else
-			{
-				ModuleSearch::guestSubmission($contentID);
-			}
-		}
-		
-		// Update the entry
-		if($pass)
-		{
-			if($pass = Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, url_slug=?, status=?, clearance_view=?, clearance_edit=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($title, $primeHashtag, $urlSlug, $status, $clearanceView, $clearanceEdit, $comments, $voting, ($datePosted == 0 ? $entry['date_posted'] : $datePosted), $contentID)))
-			{
-				// Set the URL Slug if necessary
 				if($entry['url_slug'] != $urlSlug)
 				{
-					$pass = Database::query("INSERT INTO content_by_url (url_slug, content_id) VALUES (?, ?)", array($urlSlug, $contentID));
+					$pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($entry['url_slug']));
+				}
+			}
+			
+			// If hashtags are being used, check if the entry is already posted there
+			// Delete any old version so that we can update to a new value later
+			if($pass and ($primeHashtag or $entry['primary_hashtag']))
+			{
+				if($entry['primary_hashtag'] != $primeHashtag)
+				{
+					Database::query("UPDATE IGNORE content_entries SET primary_hashtag=? WHERE id=? LIMIT 1", array($primeHashtag, $contentID));
+					
+					$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
 				}
 				
-				// Update the hashtag handler, if applicable
-				if($pass and $status >= Content::STATUS_OFFICIAL and $primeHashtag)
+				else if($status < Content::STATUS_OFFICIAL)
 				{
-					if($pass = ModuleHashtags::setHashtag($contentID, $primeHashtag))
+					$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
+				}
+			}
+			
+			// If search archetypes are allowed and updated
+			if($pass and isset($entry['search_archetype']))
+			{
+				// If the update is official, we need to set the search data to live
+				if($status >= Content::STATUS_OFFICIAL and $entry['search_archetype'])
+				{
+					ModuleSearch::liveSubmission($contentID, $entry['search_archetype']);
+				}
+				else
+				{
+					ModuleSearch::guestSubmission($contentID);
+				}
+			}
+			
+			// Update the entry
+			if($pass)
+			{
+				if($pass = Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, url_slug=?, status=?, clearance_view=?, clearance_edit=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($title, $primeHashtag, $urlSlug, $status, $clearanceView, $clearanceEdit, $comments, $voting, ($datePosted == 0 ? $entry['date_posted'] : $datePosted), $contentID)))
+				{
+					// Set the URL Slug if necessary
+					if($entry['url_slug'] != $urlSlug)
 					{
-						$pass = Database::query("REPLACE INTO content_by_hashtag (hashtag, content_id) VALUES (?, ?)", array($primeHashtag, $contentID));
+						$pass = Database::query("INSERT INTO content_by_url (url_slug, content_id) VALUES (?, ?)", array($urlSlug, $contentID));
+					}
+					
+					// Update the hashtag handler, if applicable
+					if($pass and $status >= Content::STATUS_OFFICIAL and $primeHashtag)
+					{
+						if($pass = ModuleHashtags::setHashtag($contentID, $primeHashtag))
+						{
+							$pass = Database::query("REPLACE INTO content_by_hashtag (hashtag, content_id) VALUES (?, ?)", array($primeHashtag, $contentID));
+						}
 					}
 				}
 			}
-		}
-		
-		// Run custom update methods
-		if($pass)
-		{
-			// Prepare Custom Data
-			$customData = array(
-				'content_id'		=> $contentID
-			,	'status'			=> $status
-			,	'title'				=> $title
-			,	'url_slug'			=> $urlSlug
-			,	'primary_hashtag'	=> $primeHashtag
-			);
 			
-			$pass = $this->customUpdate($customData);
+			// Run custom update methods
+			if($pass)
+			{
+				// Prepare Custom Data
+				$customData = array(
+					'content_id'		=> $contentID
+				,	'status'			=> $status
+				,	'title'				=> $title
+				,	'url_slug'			=> $urlSlug
+				,	'primary_hashtag'	=> $primeHashtag
+				);
+				
+				$pass = $this->customUpdate($customData);
+			}
+			
+			// Add the entry to a queue if it is a guest post
+			if($pass and $status == Content::STATUS_GUEST)
+			{
+				Content::queue($contentID);
+			}
+			
+			// Finalize the update
+			$success = Database::endTransaction($pass);
 		}
-		
-		// Add the entry to a queue if it is a guest post
-		if($pass and $status == Content::STATUS_GUEST)
-		{
-			Content::queue($contentID);
-		}
-		
-		// Finalize the update
-		$success = Database::endTransaction($pass);
 		
 		// Submit hashtags, if applicable
 		if($success and isset($this->modules["Hashtags"]) and ($status >= Content::STATUS_OFFICIAL or ($status >= Content::STATUS_GUEST and Content::$openPost == true)))
@@ -1295,7 +1303,7 @@ class ContentForm {
 	public static function deleteSegment
 	(
 		int $contentID		// <int> The ID of the content entry assigned to this segment piece.
-	,	int $type = 0		// <int> The type of the segment.
+	,	string $type = ""		// <str> The type of the segment.
 	,	int $blockID = 0	// <int> The ID of the block associated with this segment piece.
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
@@ -1321,7 +1329,7 @@ class ContentForm {
 	public static function moveUp
 	(
 		int $contentID		// <int> The ID of the content entry assigned to this segment piece.
-	,	int $type = 0		// <int> The type of the segment.
+	,	string $type = ""		// <str> The type of the segment.
 	,	int $blockID = 0	// <int> The ID of the block associated with this segment piece.
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	

@@ -218,7 +218,7 @@ abstract class Benchmark {
 	
 /****** Retrieve Duration Since Script Began ******/
 	public static function sinceStart (
-	)					// RETURNS <float> The duration (in seconds) since the script began.
+	): float					// RETURNS <float> The duration (in seconds) since the script began.
 	
 	// Benchmark::sinceStart();
 	{

@@ -23,7 +23,7 @@ if(Form::submitted())
 	FormValidate::text("Display Name", $_POST['displayName'], 1, 22);	// Length between 1 and 22 (text)
 	FormValidate::text("My Biography", $_POST['biography']);			// No length requirements
 	
-	FormValidate::confirmation("Terms of Service", $_POST['tos']);
+	FormValidate::confirmation("Terms of Service", isset($_POST['tos']));
 	
 	// You may have custom checks that aren't handled by FormValidate()
 	if($_POST['myAge'] < 13)
@@ -143,6 +143,7 @@ abstract class FormValidate {
 	{
 		// Prepare Values
 		$originalLength = strlen($value);
+		
 		$value = Text::safe($value);
 		
 		// Check String Length
@@ -392,13 +393,13 @@ abstract class FormValidate {
 /****** Validate a Confirmation Field (such as checkbox) ******/
 	public static function confirmation
 	(
-		string $name			// <str> The name of the checkbox.
-	,	string &$value			// <str> The value to validate (should be set to true or false).
-	): void					// RETURNS <void>
+		string $name		// <str> The name of the checkbox.
+	,	bool $bool		// <bool> Whether or not the value is set
+	): void				// RETURNS <void>
 	
-	// FormValidate::confirmation("Terms of Service", $_POST['tos']);
+	// FormValidate::confirmation("Terms of Service", isset($_POST['tos']));
 	{
-		if(!$value)
+		if(!$bool)
 		{
 			Alert::error($name, "You must confirm " . $name);
 		}

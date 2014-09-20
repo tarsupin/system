@@ -107,7 +107,7 @@ abstract class ModuleImage {
 		<form class="uniform" action="' . $formClass->baseURL . '?content=' . ($formClass->contentID + 0) . '&t=' . $formClass->type . '&block=' . ($formClass->blockID + 0) . '" enctype="multipart/form-data" method="post">' . Form::prepare(SITE_HANDLE . "-modImage") . '
 			<p><select name="class">' . $dropdownOptions . '</select></p>
 			<p>Upload Image: <input type="file" name="image" value="" tabindex="30" /></p>
-			<p><input type="text" name="title" value="' . $result['title'] . '" placeholder="Caption or Title of Image" size="64" maxlength="120"  tabindex="10" autocomplete="off" autofocus /></p>
+			<p><input type="text" name="title" value="' . htmlspecialchars($result['title']) . '" placeholder="Caption or Title of Image" size="64" maxlength="120"  tabindex="10" autocomplete="off" autofocus /></p>
 			<p>
 				' . UniMarkup::buttonLine() . '
 				<textarea id="core_text_box" name="body" style="width:95%; height:130px;" placeholder="Text or Paragraph for the Image" tabindex="20">' . $result['body'] . '</textarea>
@@ -144,12 +144,16 @@ abstract class ModuleImage {
 		
 		$_POST['class'] = (isset($_POST['class']) ? $_POST['class'] : '');
 		$_POST['title'] = (isset($_POST['title']) ? $_POST['title'] : '');
-		$_POST['body'] = (isset($_POST['body']) ? $_POST['body'] : '');
+		$_POST['body'] = (isset($_POST['body']) ? Text::convertWindowsText($_POST['body']) : '');
 		
 		// Validate the Form Values
 		FormValidate::variable("Class", $_POST['class'], 0, 22, "-");
-		FormValidate::safeword("Title", $_POST['title'], 0, 120, "'?");
-		FormValidate::text("Body", $_POST['body'], 0, 4500);
+		FormValidate::safeword("Title", $_POST['title'], 0, 120, "'?\"");
+		
+		if(strlen($_POST['body']) > 4500)
+		{
+			Alert::error("Body Length", "The length of your content is too long.");
+		}
 		
 		// Load an image, if one was submitted
 		if($subImage)

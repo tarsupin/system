@@ -90,4 +90,27 @@ abstract class Text {
 		return $newText;
 	}
 	
+	
+/****** Convert Windows Text ******/
+	public static function convertWindowsText
+	(
+		$text		// <str> The text that you want to convert windows text from.
+	)				// RETURNS <str> The converted text.
+	
+	// $fixText = Text::convertWindowsText($text);
+	{
+		$text = htmlentities($text);
+		
+		$map = array(
+			"&lsquo;" => "'"
+		,	"&rsquo;" => "'"
+		,	"&sbquo;" => ","
+		,	"&ldquo;" => '"'
+		,	"&rdquo;" => '"'
+		,	"&ndash;" => '-'
+		);
+		
+		return strtr($text, $map);
+	}
+	
 }

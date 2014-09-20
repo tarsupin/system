@@ -42,13 +42,15 @@ abstract class ModuleAuthor {
 	
 	// ModuleAuthor::drawForm($formClass);
 	{
+		$uniID = (int) $formClass->contentData['uni_id'];
+		
 		// Retrieve the Author's Data
-		$authorData = self::get($formClass->contentData['uni_id']);
+		$authorData = self::get($uniID);
 		
 		// Display the Form
 		echo '
 		<span style="font-weight:bold;">The Author, @' . $authorData['handle'] . ':</span><br />
-		<img src="' . ProfilePic::image($formClass->contentData['uni_id'], "large") . '" style="margin-bottom:22px;" />
+		<img src="' . ProfilePic::image($uniID, "large") . '" style="margin-bottom:22px;" />
 		
 		<form class="uniform" action="' . $formClass->baseURL . '?action=meta&content=' . ($formClass->contentID + 0) . '&t=' . self::$type . '" method="post">' . Form::prepare(SITE_HANDLE . "-modAuthor") . '
 			<p>
@@ -72,7 +74,7 @@ abstract class ModuleAuthor {
 		
 		if(isset($_POST['author_blurb']) and $_POST['author_blurb'])
 		{
-			if(self::set($formClass->contentData['uni_id'], $_POST['author_blurb']))
+			if(self::set((int) $formClass->contentData['uni_id'], $_POST['author_blurb']))
 			{
 				Alert::success("Author Updated", "The author has been updated.");
 			}

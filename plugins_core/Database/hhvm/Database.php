@@ -132,7 +132,7 @@ Database::exec($query)							// Runs a static query (no preparation - must be tr
 Database::startTransaction()					// Starts transaction: validates multiple changes at once, much faster
 Database::endTransaction($commit = true)		// Confirms a transaction and commits it.
 
-Database::$lastID							// Returns the last insert ID.
+Database::$lastID								// Returns the last insert ID.
 Database::showQuery($query, $inputArray)		// Show what the query would look like.
 
 */
