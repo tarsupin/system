@@ -113,22 +113,22 @@ abstract class Feed {
 		$authorID			// <int> The UniID of the original author of the content.
 	,	$url				// <str> The source URL for where this content exists; the URL to visit it.
 	,	$title				// <str> The title of the content.
-	,	$blurb				// <str> The blurb or short description of the content.
-	,	$imageURL = ""		// <str> The URL of the image to use for this content, if applicable (generally mobile sized)
+	,	$description		// <str> The description of the content.
+	,	$thumbnail = ""		// <str> The URL of the thumbnail.
 	,	$siteHandle = ""	// <str> The site handle that this entry belongs to.
 	,	$primeHashtag = ""	// <str> The primary hashtag of the article.
 	,	$hashtags = array()	// <int:str> The list of hashtags that are pointed to this feed entry.
 	)						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Feed::submit($authorID, $url, $title, $blurb, $imageURL, $siteHandle, $primeHashtag, $hashtags);
+	// Feed::submit($authorID, $url, $title, $description, $thumbnail, $siteHandle, $primeHashtag, $hashtags);
 	{
 		// Prepare Values
 		self::$feedID = 0;
 		
 		$url = Sanitize::url($url);
 		$title = Sanitize::safeword($title, "?");
-		$blurb = Sanitize::safeword($blurb, "?");
-		$imageURL = Sanitize::url($imageURL);
+		$description = Sanitize::safeword($description, "?");
+		$thumbnail = Sanitize::url($thumbnail);
 		$siteHandle = ($siteHandle ? Sanitize::variable($siteHandle) : SITE_HANDLE);
 		$primeHashtag = Sanitize::variable($primeHashtag);
 		$hashtagList = array();
@@ -144,8 +144,8 @@ abstract class Feed {
 		,	"author_id"			=> $authorID		// The user's handle that posted the original content
 		,	"url"				=> $url				// The URL source to access this content
 		,	"title"				=> $title			// The title of the feed content
-		,	"blurb"				=> $blurb			// The blurb associated with the feed to give a description about it
-		,	"image_url"			=> $imageURL		// The small image (mobile sized) to accompany this content feed
+		,	"description"		=> $description		// The description associated with the feed
+		,	"thumbnail"			=> $thumbnail		// The thumbnail for this feed
 		,	"primary_hashtag"	=> $primeHashtag	// The primary hashtag associated with this feed.
 		,	"hashtags"			=> $hashtagList		// The list of hashtags being submitted to the feed system
 		);

@@ -16,22 +16,6 @@ abstract class ModuleHashtags {
 	public static $type = "Hashtags";		// <str>
 	
 	
-/****** Run behavior tests for this module ******/
-	public static function behavior
-	(
-		$formClass		// <mixed> The form class.
-	)					// RETURNS <void>
-	
-	// ModuleHashtags::behavior($formClass);
-	{
-		// Delete a hashtag from this content entry
-		if($formClass->action == "meta" and isset($_GET['delete']))
-		{
-			self::delete($formClass->contentID, Sanitize::variable($_GET['delete']));
-		}
-	}
-	
-	
 /****** Retrieve a list of hashtags assigned to a Content Entry ******/
 	public static function get
 	(
@@ -56,8 +40,9 @@ abstract class ModuleHashtags {
 /****** Retrieve a list of submitted hashtags vs. non-submited hashtags ******/
 	public static function getBySub
 	(
-		$contentID		// <int> The ID of the content entry to retrieve hashtags from.
-	)					// RETURNS <int:[int:str]> The list of hashtags assigned to the content entry.
+		$contentID				// <int> The ID of the content entry to retrieve hashtags from.
+	,	$primaryHashtag = ""	// <str> The primary hashtag assigned to the system.
+	)							// RETURNS <int:[int:str]> The list of hashtags assigned to the content entry.
 	
 	// list($submittedHashtags, $unsubmittedHashtags) = ModuleHashtags::getBySub($contentID);
 	{
@@ -81,17 +66,26 @@ abstract class ModuleHashtags {
 			}
 		}
 		
+		// Handle the primary hashtag
+		if($primaryHashtag)
+		{
+			if(!in_array($primaryHashtag, $sub) and !in_array($primaryHashtag, $unsub))
+			{
+				$unsub[] = $primaryHashtag;
+			}
+		}
+		
 		return array($sub, $unsub);
 	}
 	
 	
 /****** Draw the form for the Hashtags Module ******/
-	public static function drawForm
+	public static function draw
 	(
 		$formClass		// <mixed> The form class.
 	)					// RETURNS <void> outputs the appropriate data.
 	
-	// ModuleHashtags::drawForm($formClass);
+	// ModuleHashtags::draw($formClass);
 	{
 		// Retrieve the list of hashtags from this content entry
 		list($submittedHashtags, $unsubmittedHashtags) = self::getBySub($formClass->contentID);
@@ -125,25 +119,14 @@ abstract class ModuleHashtags {
 		{
 			echo '<div style="margin-bottom:22px;">
 					<span style="font-weight:bold;">Queued Hashtags:</span><br />';
-					
-			if($formClass->contentData['status'] >= Content::STATUS_OFFICIAL or Content::$openPost == true)
-			{
-				echo '
-					<span style="font-size:0.85em; color:red;">Note: The content has not been submitted to these hashtags yet. To submit them, go to "Settings" and click "Update".</span><br /><br />';
-			}
-			else
-			{
-				echo '
-					<span style="font-size:0.85em; color:red;">Note: This content will be published to these hashtags once it is accepted as official.</span><br /><br />';
-			}
 			
 			foreach($unsubmittedHashtags as $hashtag)
 			{
 				echo '
-				<div class="hashtag"><a href="' . $hashtagURL . '/' . $hashtag . '">#' . $hashtag . '</a> <a href="' . $formClass->baseURL . '?action=meta&content=' . ($formClass->contentID + 0) . '&t=' . self::$type . '&delete=' . $hashtag . '&' . Link::prepare($formClass->contentData['uni_id'] . ":" . $formClass->contentID) . '">[X]</a></div>';
+				<div class="hashtag"><a href="' . $hashtagURL . '/' . $hashtag . '">#' . $hashtag . '</a> <a href="' . $formClass->baseURL . '?id=' . ($formClass->contentID + 0) . '&delHash=' . $hashtag . '">[X]</a></div>';
 			}
 			
-			echo '</div>';
+			echo ' <input type="submit" name="confirm_hashtags" value="Confirm Hashtags" /></div>';
 		}
 		
 		// If there are no hashtags available
@@ -155,13 +138,27 @@ abstract class ModuleHashtags {
 		
 		// Create the hashtag form
 		echo '
-			<form class="uniform" action="' . $formClass->baseURL . '?action=meta&content=' . ($formClass->contentID + 0) . '&t=' . self::$type . '" method="post">' . Form::prepare(SITE_HANDLE . "-modHashtags") . '
-				<p>
-					<input type="text" name="hashtag" value="' . (isset($_POST['hashtag']) ? Sanitize::variable($_POST['hashtag']) : '') . '" placeholder="Assign Hashtag . . ." size="22" maxlength="22" autocomplete="off" tabindex="10" autofocus />
-					<input type="submit" name="add_hashtag" value="Add" />
-				</p>
-			</form>
+			<p>
+				<input type="text" name="hashtag" value="' . (isset($_POST['hashtag']) ? Sanitize::variable($_POST['hashtag']) : '') . '" placeholder="#ExampleHashtag" size="22" maxlength="22" autocomplete="off" tabindex="10" />
+				<input type="submit" name="add_hashtag" value="Add Hashtag" />
+			</p>
 		</div>';
+	}
+	
+	
+/****** Run Behavior Checks ******/
+	public static function behavior
+	(
+		$formClass		// <mixed> The class data.
+	)					// RETURNS <void>
+	
+	// ModuleHashtags::behavior($formClass);
+	{
+		// Delete a hashtag, if applicable
+		if(isset($_GET['delHash']))
+		{
+			self::delete($formClass->contentID, $_GET['delHash']);
+		}
 	}
 	
 	
@@ -173,22 +170,65 @@ abstract class ModuleHashtags {
 	
 	// ModuleHashtags::interpret($formClass);
 	{
-		if(!Form::submitted(SITE_HANDLE . "-modHashtags")) { return; }
-		
-		// Prepare Values
-		$_POST['hashtag'] = (isset($_POST['hashtag']) ? $_POST['hashtag'] : '');
-		
-		// Validate the Form Values
-		FormValidate::variable("Hashtag", $_POST['hashtag'], 3, 22);
-		
-		// Update the Hashtag Data
-		if(FormValidate::pass())
+		// Insert a hashtag, if applicable
+		if(isset($_POST['hashtag']) and $_POST['hashtag'])
 		{
-			if(self::setHashtag($formClass->contentID, $_POST['hashtag']))
+			$_POST['hashtag'] = Sanitize::variable($_POST['hashtag']);
+			
+			// Validate the length
+			$len = strlen($_POST['hashtag']);
+			
+			if($len > 22)
 			{
-				$_POST['hashtag'] = '';
+				Alert::error("Hashtag Length", "Hashtags cannot be more than 22 characters in length.");
+			}
+			else if($len < 2)
+			{
+				Alert::error("Hashtag Length", "Hashtags must be at least two characters in length.");
+			}
+			
+			// Update the Hashtag Data
+			if(FormValidate::pass())
+			{
+				if(self::setHashtag($formClass->contentID, $_POST['hashtag']))
+				{
+					Alert::success("Hashtags Added", "The hashtag #" . $_POST['hashtag'] . " has been added to the hashtag queue.");
+					$_POST['hashtag'] = '';
+				}
+			}
+		}
+		
+		// Confirm Hashtags
+		if(isset($_POST['confirm_hashtags']))
+		{
+			// Submit hashtags, if applicable
+			if($formClass->contentData['status'] >= Content::STATUS_OFFICIAL or ($formClass->contentData['status'] >= Content::STATUS_GUEST and $formClass->openPost == true))
+			{
+				// Get the list of hashtags for this content ID
+				list($submittedHashtags, $unsubmittedHashtags) = self::getBySub($formClass->contentID, $formClass->contentData['primary_hashtag']);
 				
-				Alert::success("Hashtags Added", "The hashtag has been prepared for official submission.");
+				// If we've already submitted hashtags for this system, we're actually just building upon an existing set.
+				// This means we can set the type to 'resubmitted' and reuse the attachments already there.
+				$resubmit = ($submittedHashtags ? true : false);
+				
+				// Make sure there are hashtags that actually need to be submitted
+				if($unsubmittedHashtags)
+				{
+					// Get the core data that the hashtag system will require
+					$coreData = Content::scanForCoreData($formClass->contentID);
+					
+					// Submit the hashtags
+					if(self::setSubmitted($formClass->contentID, $unsubmittedHashtags))
+					{
+						ContentHashtags::tagEntry($formClass->contentID, $unsubmittedHashtags);
+						
+						Hashtag::submitContentEntry($formClass->contentData['uni_id'], $formClass->contentType, $formClass->contentData['title'], $coreData['body'], $unsubmittedHashtags, SITE_URL . "/" . trim($formClass->contentData['url_slug'], "/"), $coreData['image_url'], $coreData['mobile_url'], $coreData['video_url'], $resubmit);
+					}
+				}
+			}
+			else
+			{
+				Alert::error("Hashtags Not Allowed", "Hashtags can only be finalized in official posts.");
 			}
 		}
 	}

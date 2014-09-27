@@ -24,34 +24,6 @@ abstract class ModuleVideo {
 	);
 	
 	
-/****** Run Behavior Tests for this module ******/
-	public static function behavior
-	(
-		$formClass		// <mixed> The form class.
-	)					// RETURNS <void>
-	
-	// ModuleVideo::behavior($formClass);
-	{
-		// Generate a new image block
-		if($formClass->action == "segment" and !$formClass->blockID)
-		{
-			self::create($formClass);
-		}
-		
-		// Delete a content block if that is being specified
-		else if($formClass->action == "delete" and $formClass->contentID and $formClass->blockID)
-		{
-			self::purgeBlock($formClass->blockID, $formClass->contentID);
-		}
-		
-		// Check for movement behaviors
-		else if($formClass->action == "moveUp" and $formClass->contentID and $formClass->blockID)
-		{
-			ContentForm::moveUp($formClass->contentID, self::$type, $formClass->blockID);
-		}
-	}
-	
-	
 /****** Retrieve the Video Block Contents ******/
 	public static function get
 	(
@@ -61,10 +33,8 @@ abstract class ModuleVideo {
 	
 	// $blockContent = ModuleVideo::get($blockID, [$parse]);
 	{
-		if(!$result = Database::selectOne("SELECT class, video_url, caption FROM content_block_video WHERE id=? LIMIT 1", array($blockID)))
-		{
-			return;
-		}
+		// Prepare Values
+		$result = Database::selectOne("SELECT * FROM content_block_video WHERE id=?", array($blockID));
 		
 		// Get the Embed Value
 		$embed = Attachment::getVideoEmbedFromURL($result['video_url']);
@@ -79,65 +49,50 @@ abstract class ModuleVideo {
 	
 	
 /****** Draw the Form for the active Video Block ******/
-	public static function drawForm
+	public static function draw
 	(
-		$formClass		// <mixed> The form class.
+		$blockID		// <int> The ID of the block.
 	)					// RETURNS <void> outputs the appropriate data.
 	
-	// ModuleVideo::drawForm($formClass);
+	// ModuleVideo::draw($blockID);
 	{
-		// Get the video block being edited
-		if(!$result = Database::selectOne("SELECT class, video_url, caption FROM content_block_video WHERE id=? LIMIT 1", array($formClass->blockID)))
-		{
-			return;
-		}
+		// Prepare Values
+		$result = Database::selectOne("SELECT * FROM content_block_video WHERE id=?", array($blockID));
 		
 		// Get the embed value for this URL
-		$embed = Attachment::getVideoEmbedFromURL($result['video_url']);
+		$embed = Attachment::getVideoEmbedFromURL($result['video_url'][$blockID]);
 		
 		// Create the options for the class dropdown
 		$dropdownOptions = StringUtils::createDropdownOptions(self::$videoStyles, $result['class']);
 		
 		// Display the Form
 		echo '
-		<form class="uniform" action="' . $formClass->baseURL . '?content=' . ($formClass->contentID + 0) . '&t=' . $formClass->type . '&block=' . ($formClass->blockID + 0) . '" method="post">' . Form::prepare(SITE_HANDLE . "-modVideo") . '
-			<p><select name="class">' . $dropdownOptions . '</select></p>
-			<p>
-				' . UniMarkup::buttonLine() . '
-				<textarea id="core_text_box" name="caption" style="width:95%; height:100px;" placeholder="Caption or text for this video" tabindex="20">' . $result['caption'] . '</textarea>
-			</p>
-			<p>' . $embed . '</p>
-			<p>Set Video URL: <input type="text" name="video_url" value="' . $result['video_url'] . '" tabindex="10" autocomplete="off" autofocus /></p>
-			<p><input type="submit" name="submit" value="Submit" tabindex="30" /></p>
-		</form>';
+		<p><select name="class[' . $blockID . ']">' . $dropdownOptions . '</select></p>
+		<p>
+			' . UniMarkup::buttonLine() . '
+			<textarea id="video_caption_' . $blockID . '" name="caption[' . $blockID . ']" style="width:95%; height:100px;" placeholder="Caption or text for this video" tabindex="20" maxlength="255">' . $result['caption'] . '</textarea>
+		</p>
+		<p>' . $embed . '</p>
+		<p>Set Video URL: <input type="text" name="video_url[' . $blockID . ']" value="' . $result['video_url'] . '" tabindex="10" autocomplete="off" autofocus maxlength="72" /></p>';
 	}
 	
 	
 /****** Run the interpreter for Video Blocks ******/
 	public static function interpret
 	(
-		$formClass		// <mixed> The class data.
+		$contentID		// <int> The ID of the content entry.
+	,	$blockID		// <int> The ID of the block to interpret.
 	)					// RETURNS <void>
 	
-	// ModuleVideo::interpret($formClass);
+	// ModuleVideo::interpret($contentID, $blockID);
 	{
-		if(!Form::submitted(SITE_HANDLE . "-modVideo")) { return; }
-		
-		// Prepare Values
-		$_POST['class'] = (isset($_POST['class']) ? $_POST['class'] : '');
-		$_POST['caption'] = (isset($_POST['caption']) ? $_POST['caption'] : '');
-		$_POST['video_url'] = (isset($_POST['video_url']) ? $_POST['video_url'] : '');
-		
-		// Validate the Form Values
-		FormValidate::variable("Class", $_POST['class'], 0, 22, "-");
-		FormValidate::text("Caption", $_POST['caption'], 0, 255);
-		FormValidate::url("Video URL", $_POST['video_url'], 0, 72);
+		// Sanitize Values
+		$_POST['class'][$blockID] = Sanitize::variable($_POST['class'][$blockID], "-");
+		$_POST['caption'][$blockID] = Sanitize::safeword($_POST['title'][$blockID], "'?\"");
+		$_POST['video_url'][$blockID] = Sanitize::url($_POST['title'][$blockID]);
 		
 		// Update the Video Block
-		if(FormValidate::pass())
-		{
-			self::update($formClass->contentID, $formClass->blockID, $_POST['video_url'], $_POST['caption'], $_POST['class']);
-		}
+		self::update($contentID, $blockID, $_POST['video_url'][$blockID], $_POST['caption'][$blockID], $_POST['class'][$blockID]);
 	}
 	
 	
@@ -169,21 +124,21 @@ abstract class ModuleVideo {
 /****** Create a Video Block ******/
 	public static function create
 	(
-		$formClass		// <mixed> The class data.
+		$contentID		// <int> The content entry ID.
 	)					// RETURNS <int> the ID of the image block, or 0 on failure.
 	
-	// ModuleVideo::create($formClass);
+	// ModuleVideo::create($contentID);
 	{
 		// Create the Content Block
 		if(!Database::query("INSERT INTO content_block_video (class, video_url, caption) VALUES (?, ?, ?)", array(self::$defaultClass, "", "")))
 		{
-			return false;
+			return 0;
 		}
 		
 		$lastID = Database::$lastID;
 		
 		// Assign it to a Content Segment
-		return (ContentForm::createSegment($formClass->contentID, self::$type, $lastID) ? $lastID : 0);
+		return (ContentForm::createSegment($contentID, self::$type, $lastID) ? $lastID : 0);
 	}
 	
 	

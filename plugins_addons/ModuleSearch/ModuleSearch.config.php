@@ -27,10 +27,10 @@ class ModuleSearch_config {
 		CREATE TABLE IF NOT EXISTS `content_search`
 		(
 			`content_id`			int(10)			unsigned	NOT NULL	DEFAULT '0',
-			`keywords`				text						NOT NULL	DEFAULT '',
+			`hashtags`				varchar(255)				NOT NULL	DEFAULT '',
 			
 			UNIQUE (`content_id`),
-			FULLTEXT (`keywords`)
+			FULLTEXT (`hashtags`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		");
 		
@@ -44,7 +44,7 @@ class ModuleSearch_config {
 		CREATE TABLE IF NOT EXISTS `content_search_draft`
 		(
 			`content_id`			int(10)			unsigned	NOT NULL	DEFAULT '0',
-			`keywords`				text						NOT NULL	DEFAULT '',
+			`hashtags`				varchar(255)				NOT NULL	DEFAULT '',
 			
 			UNIQUE (`content_id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -81,10 +81,10 @@ class ModuleSearch_config {
 		(
 			`filter_id`				smallint(5)		unsigned	NOT NULL	DEFAULT '0',
 			
-			`keyword`				varchar(22)					NOT NULL	DEFAULT '',
+			`hashtag`				varchar(22)					NOT NULL	DEFAULT '',
 			`title`					varchar(32)					NOT NULL	DEFAULT '',
 			
-			UNIQUE (`filter_id`, `keyword`)
+			UNIQUE (`filter_id`, `hashtag`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		");
 		
@@ -102,10 +102,10 @@ class ModuleSearch_config {
 	// $plugin->isInstalled();
 	{
 		// Make sure the newly installed tables exist
-		$pass1 = DatabaseAdmin::columnsExist("content_search", array("content_id", "keywords"));
-		$pass2 = DatabaseAdmin::columnsExist("content_search_draft", array("content_id", "keywords"));
+		$pass1 = DatabaseAdmin::columnsExist("content_search", array("content_id", "hashtags"));
+		$pass2 = DatabaseAdmin::columnsExist("content_search_draft", array("content_id", "hashtags"));
 		$pass3 = DatabaseAdmin::columnsExist("content_search_filters", array("archetype", "filter_name"));
-		$pass4 = DatabaseAdmin::columnsExist("content_search_filter_opts", array("filter_id", "keyword"));
+		$pass4 = DatabaseAdmin::columnsExist("content_search_filter_opts", array("filter_id", "hashtag"));
 		
 		// Make sure the new table structure was updated
 		$pass5 = DatabaseAdmin::columnExists("content_entries", "search_archetype");

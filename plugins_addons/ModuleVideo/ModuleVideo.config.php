@@ -30,7 +30,7 @@ class ModuleVideo_config {
 			`class`					varchar(22)					NOT NULL	DEFAULT '',
 			
 			`video_url`				varchar(72)					NOT NULL	DEFAULT '',
-			`caption`				varchar(255)				NOT NULL	DEFAULT '',
+			`caption`				varchar(180)				NOT NULL	DEFAULT '',
 			
 			PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8 PARTITION BY KEY(id) PARTITIONS 5;

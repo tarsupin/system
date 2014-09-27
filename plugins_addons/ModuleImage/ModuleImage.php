@@ -19,40 +19,14 @@ abstract class ModuleImage {
 	public static $defaultClass = "content-img";	// <str> The default style to apply for this block.
 	
 	public static $imageStyles = array(	// <str:str> A list of styles associated with the image content blocks.
-		"content-img"			=> "Image with Text"
-	,	"content-img-left"		=> "Image on Left"
-	,	"content-img-right"		=> "Image on Right"
-	,	"content-img-cent"		=> "Centered Image, Small"
-	,	"content-img-caption"	=> "Centered Image with Caption"
+		"content-img"				=> "Centered Image, 100% Width"
+	,	"content-img-mid"			=> "Centered Image, 70% Width"
+	,	"content-img-sm"			=> "Centered Image, 40% Width"
+	,	"content-img-left"			=> "Image on Left, 40% Width"
+	,	"content-img-left-sm"		=> "Image on Left, 25% Width"
+	,	"content-img-right"			=> "Image on Right, 40% Width"
+	,	"content-img-right-sm"		=> "Image on Right, 25% Width"
 	);
-	
-	
-/****** Run Behavior Tests for this module ******/
-	public static function behavior
-	(
-		$formClass		// <mixed> The form class.
-	)					// RETURNS <void>
-	
-	// ModuleImage::behavior($formClass);
-	{
-		// Generate a new image block
-		if($formClass->action == "segment" and !$formClass->blockID)
-		{
-			self::create($formClass);
-		}
-		
-		// Delete a content block if that is being specified
-		else if($formClass->action == "delete" and $formClass->contentID and $formClass->blockID)
-		{
-			self::purgeBlock($formClass->blockID, $formClass->contentID);
-		}
-		
-		// Check for movement behaviors
-		else if($formClass->action == "moveUp" and $formClass->contentID and $formClass->blockID)
-		{
-			ContentForm::moveUp($formClass->contentID, self::$type, $formClass->blockID);
-		}
-	}
 	
 	
 /****** Retrieve the Image Block Contents ******/
@@ -64,10 +38,8 @@ abstract class ModuleImage {
 	
 	// $blockContent = ModuleImage::get($blockID, [$parse]);
 	{
-		if(!$result = Database::selectOne("SELECT class, title, body, image_url, mobile_url FROM content_block_image WHERE id=? LIMIT 1", array($blockID)))
-		{
-			return "";
-		}
+		// Prepare Values
+		$result = Database::selectOne("SELECT * FROM content_block_image WHERE id=?", array($blockID));
 		
 		// Get the image's class
 		$photoClass = ($result['mobile_url'] != "" ? "post-image" : "post-image-mini");
@@ -75,26 +47,23 @@ abstract class ModuleImage {
 		// Display the Image Block
 		return '
 		<div class="' . ($result['class'] == "" ? "content-img" : $result['class']) . '">
+			' . ($result['credits'] == "" ? "" : '<div class="block-credits">' . $result['credits'] . '</div>') . '
 			' . (($result['image_url'] or $result['mobile_url']) ? Photo::responsive($result['image_url'], $result['mobile_url'], 450, "", 450, $photoClass) : '') . '
-			' . ($result['title'] == "" ? "" : '<div class="block-title">' . $result['title'] . '</div>') . '
-			<div class="block-body">' . ($parse ? nl2br(UniMarkup::parse($result['body'])) : nl2br($result['body'])) . '</div>
+			' . ($result['caption'] == "" ? "" : '<div class="block-caption">' . $result['caption'] . '</div>') . '
 		</div>';
 	}
 	
 	
 /****** Draw the Form for the active Image Block ******/
-	public static function drawForm
+	public static function draw
 	(
-		$formClass		// <mixed> The form class.
+		$blockID		// <int> The ID of the block.
 	)					// RETURNS <void> outputs the appropriate data.
 	
-	// ModuleImage::drawForm($formClass);
+	// ModuleImage::draw($blockID);
 	{
-		// Get the image block being edited
-		if(!$result = Database::selectOne("SELECT class, title, body, image_url, mobile_url FROM content_block_image WHERE id=? LIMIT 1", array($formClass->blockID)))
-		{
-			return;
-		}
+		// Prepare Values
+		$result = Database::selectOne("SELECT * FROM content_block_image WHERE id=?", array($blockID));
 		
 		// Get the image's class
 		$photoClass = ($result['mobile_url'] != "" ? "post-image" : "post-image-mini");
@@ -104,62 +73,55 @@ abstract class ModuleImage {
 		
 		// Display the Form
 		echo '
-		<form class="uniform" action="' . $formClass->baseURL . '?content=' . ($formClass->contentID + 0) . '&t=' . $formClass->type . '&block=' . ($formClass->blockID + 0) . '" enctype="multipart/form-data" method="post">' . Form::prepare(SITE_HANDLE . "-modImage") . '
-			<p><select name="class">' . $dropdownOptions . '</select></p>
-			<p>Upload Image: <input type="file" name="image" value="" tabindex="30" /></p>
-			<p><input type="text" name="title" value="' . htmlspecialchars($result['title']) . '" placeholder="Caption or Title of Image" size="64" maxlength="120"  tabindex="10" autocomplete="off" autofocus /></p>
-			<p>
-				' . UniMarkup::buttonLine() . '
-				<textarea id="core_text_box" name="body" style="width:95%; height:130px;" placeholder="Text or Paragraph for the Image" tabindex="20">' . $result['body'] . '</textarea>
-			</p>';
+		<div>';
 		
 		// Show the Current Image for this Image Block (if it's already been uploaded)
 		if($result['image_url'])
 		{
 			echo '
-			<p>' . Photo::responsive($result['image_url'], $result['mobile_url'], 450, "", 450, $photoClass) . '</p>';
+			<div style="float:left; max-width:25%">' . Photo::responsive($result['image_url'], $result['mobile_url'], 450, "", 450, $photoClass) . '</div>
+			<div style="margin-left:26%;">';
+		}
+		else
+		{
+			echo '<div>';
 		}
 		
 		echo '
-			<p><input type="submit" name="submit" value="Submit" tabindex="40" /></p>
-		</form>';
+				<p><select name="class[' . $blockID . ']">' . $dropdownOptions . '</select></p>
+				<p>Upload Image: <input type="file" name="image[' . $blockID . ']" value="" tabindex="30" /></p>
+				<p><input type="text" name="caption[' . $blockID . ']" value="' . htmlspecialchars($result['caption']) . '" placeholder="Write caption here . . ." size="64" maxlength="120" tabindex="10" autocomplete="off" /></p>
+				<p>Image credit: <input type="text" name="credits[' . $blockID . ']" value="' . $result['credits'] . '" placeholder="" size="64" maxlength="120" tabindex="10" autocomplete="off" /></p>
+			</div>
+		</div>';
 	}
 	
 	
 /****** Run the interpreter for Image Blocks ******/
 	public static function interpret
 	(
-		$formClass		// <mixed> The class data.
+		$contentID		// <int> The ID of the content entry.
+	,	$blockID		// <int> The ID of the block to interpret.
 	)					// RETURNS <void>
 	
-	// ModuleImage::interpret($formClass);
+	// ModuleImage::interpret($contentID, $blockID);
 	{
-		if(!Form::submitted(SITE_HANDLE . "-modImage")) { return; }
-		
 		// Prepare Values
-		$subImage = (isset($_FILES['image']) and $_FILES['image']['tmp_name'] != "") ? true : false;
+		$subImage = (isset($_FILES['image']) and $_FILES['image']['tmp_name'][$blockID] != "") ? true : false;
 		
 		$imageURL = "";
 		$mobileURL = "";
 		
-		$_POST['class'] = (isset($_POST['class']) ? $_POST['class'] : '');
-		$_POST['title'] = (isset($_POST['title']) ? $_POST['title'] : '');
-		$_POST['body'] = (isset($_POST['body']) ? Text::convertWindowsText($_POST['body']) : '');
-		
-		// Validate the Form Values
-		FormValidate::variable("Class", $_POST['class'], 0, 22, "-");
-		FormValidate::safeword("Title", $_POST['title'], 0, 120, "'?\"");
-		
-		if(strlen($_POST['body']) > 4500)
-		{
-			Alert::error("Body Length", "The length of your content is too long.");
-		}
+		// Sanitize Values
+		$_POST['class'][$blockID] = Sanitize::variable($_POST['class'][$blockID], '-');
+		$_POST['credits'][$blockID] = Sanitize::safeword($_POST['credits'][$blockID], "'\"");
+		$_POST['caption'][$blockID] = Sanitize::safeword($_POST['caption'][$blockID], "'?\"");
 		
 		// Load an image, if one was submitted
 		if($subImage)
 		{
 			// Initialize the plugin
-			$imageUpload = new ImageUpload($_FILES['image']);
+			$imageUpload = new ImageUpload($_FILES['image'], $blockID);
 			
 			// Set your image requirements
 			$imageUpload->maxWidth = 4200;
@@ -170,7 +132,7 @@ abstract class ModuleImage {
 			$imageUpload->saveMode = Upload::MODE_OVERWRITE;
 			
 			// Set the image directory
-			$srcData = Upload::fileBucketData($formClass->contentID, 10000);
+			$srcData = Upload::fileBucketData($contentID, 10000);
 			$bucketDir = '/assets/content/' . $srcData['main_directory'] . '/' . $srcData['second_directory'];
 			$imageDir = CONF_PATH . $bucketDir;
 			
@@ -185,7 +147,7 @@ abstract class ModuleImage {
 					$origWidth = ($imageUpload->width < 900) ? $imageUpload->width : 900;
 					
 					// Prepare the filename for this image
-					$imageUpload->filename = $formClass->contentID . "-" . $formClass->blockID;
+					$imageUpload->filename = $contentID . "-" . $blockID;
 					
 					// Save the original image
 					$image->autoWidth($origWidth, (int) ($origWidth / $imageUpload->scale));
@@ -208,10 +170,7 @@ abstract class ModuleImage {
 		}
 		
 		// Update the Image Block
-		if(FormValidate::pass())
-		{
-			self::update($formClass->contentID, $formClass->blockID, $imageURL, $_POST['title'], $_POST['body'], $_POST['class'], $mobileURL);
-		}
+		self::update($contentID, $blockID, $imageURL, $_POST['caption'][$blockID], $_POST['credits'][$blockID], $_POST['class'][$blockID], $mobileURL);
 	}
 	
 	
@@ -221,13 +180,13 @@ abstract class ModuleImage {
 		$contentID		// <int> The ID of the content entry.
 	,	$blockID		// <int> The ID of the block.
 	,	$imageURL		// <str> The URL of the image.
-	,	$title			// <str> The title to set for the block.
-	,	$body			// <str> The body / message to set for the block.
+	,	$caption		// <str> The caption to set for the block.
+	,	$credits		// <str> The credits to set for the block.
 	,	$class			// <str> The class to assign to the block.
 	,	$mobileURL = ""	// <str> The URL of the mobile image, if applicable.
 	)					// RETURNS <int> the ID of the image block, or 0 on failure.
 	
-	// ModuleImage::update($contentID, $blockID, $imageURL, $title, $body, $class, $mobileURL);
+	// ModuleImage::update($contentID, $blockID, $imageURL, $caption, $credits, $class, $mobileURL);
 	{
 		// Prove that the active block is owned by the content
 		if(!Database::selectOne("SELECT block_id FROM content_block_segment WHERE content_id=? AND type=? AND block_id=? LIMIT 1", array($contentID, self::$type, $blockID)))
@@ -238,13 +197,13 @@ abstract class ModuleImage {
 		// If no image was provided, don't update the image values
 		if(!$imageURL)
 		{
-			Database::query("UPDATE content_block_image SET class=?, title=?, body=? WHERE id=? LIMIT 1", array($class, $title, $body, $blockID));
+			Database::query("UPDATE content_block_image SET class=?, caption=?, credits=? WHERE id=? LIMIT 1", array($class, $caption, $credits, $blockID));
 		}
 		
 		// Update the Image Block
 		else
 		{
-			Database::query("UPDATE content_block_image SET class=?, title=?, body=?, image_url=?, mobile_url=? WHERE id=? LIMIT 1", array($class, $title, $body, $imageURL, $mobileURL, $blockID));
+			Database::query("UPDATE content_block_image SET class=?, caption=?, credits=?, image_url=?, mobile_url=? WHERE id=? LIMIT 1", array($class, $caption, $credits, $imageURL, $mobileURL, $blockID));
 		}
 		
 		return $blockID;
@@ -254,13 +213,13 @@ abstract class ModuleImage {
 /****** Create an Image Block ******/
 	public static function create
 	(
-		$formClass		// <mixed> The class data.
+		$contentID		// <int> The content entry ID.
 	)					// RETURNS <int> the ID of the image block, or 0 on failure.
 	
-	// ModuleImage::create($formClass);
+	// ModuleImage::create($contentID);
 	{
 		// Create the Content Block
-		if(!Database::query("INSERT INTO content_block_image (class, title, body, image_url, mobile_url) VALUES (?, ?, ?, ?, ?)", array(self::$defaultClass, "", "", "", "")))
+		if(!Database::query("INSERT INTO content_block_image (class, caption, credits, image_url, mobile_url) VALUES (?, ?, ?, ?, ?)", array(self::$defaultClass, "", "", "", "")))
 		{
 			return 0;
 		}
@@ -268,7 +227,7 @@ abstract class ModuleImage {
 		$lastID = Database::$lastID;
 		
 		// Assign it to a Content Segment
-		return (ContentForm::createSegment($formClass->contentID, self::$type, $lastID) ? $lastID : 0);
+		return (ContentForm::createSegment($contentID, self::$type, $lastID) ? $lastID : 0);
 	}
 	
 	

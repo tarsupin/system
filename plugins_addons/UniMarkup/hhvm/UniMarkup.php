@@ -98,10 +98,10 @@ abstract class UniMarkup {
 		string $elementID = "core_text_box"	// <str> The ID of the element that these buttons will affect.
 	): string									// RETURNS <str> OUTPUTS the HTML of a line of UniMarkup buttons.
 	
-	// echo UniMarkup::buttonLine();
+	// echo UniMarkup::buttonLine($elementID);
 	{
 		$html = '
-		<div style="font-size:1.3em;">';
+		<div style="font-size:1.3em; display:inline-block; vertical-align:bottom;">';
 		
 		// Draw Text Formatting Options
 		$html .= '

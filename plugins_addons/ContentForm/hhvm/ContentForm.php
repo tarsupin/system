@@ -4,60 +4,62 @@
 ------ About the ContentForm Plugin ------
 ------------------------------------------
 
-The ContentForm Plugin allows for the creation and modification of content, such as with articles, blogs, wiki pages, site pages, and so forth. This plugin will allow the entire form to be generated and interpreted without the need to rebuild elaborate controllers for each system.
+The ContentForm Plugin allows the user to create content, such as articles, blogs, wiki pages, site pages, and so forth.
 
 To load the plugin and provide the form interpreter and behavior, run these lines:
 	
-	$contentForm = new ContentForm("/base-url", $contentID);
-	$contentForm->runBehavior();
-	$contentForm->runInterpreter();
+	// Prepare the Class and Values
+	$contentForm = new ContentForm((int) $_GET['id']);
+	$contentForm->contentType = "article";
+	$contentForm->baseURL = "/write";
+	
+	// Prepare Essential Metadata
+	Photo::prepareResponsivePage();
+	Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" />');
+	
+	// Run the Interpreter
+	$contentForm->interpret();
 	
 To create the form, run this line:
 	
-	$contentForm->drawContent();
-	
-Note that the page that loads these things will require responsive photos and unique styling provided like this:
-	
-	// Include Important Scripts
-	Photo::prepareResponsivePage();
-	Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-block.css" />');
+	$contentForm->draw();
 	
 	
 ------------------------------------------
 ------ Customizing the Content Form ------
 ------------------------------------------
 
-Some sites will need to have custom tools applied in the content system. For example, the Gallery only needs images to be posted, and even those don't need titles. Furthermore, the style of thumbnail on the gallery would be different than on other sites.
+Some sites will need to have custom tools applied in the content system. For example, the Gallery only needs images to be posted. Furthermore, the style of thumbnail on the gallery would be different than on other sites.
 
-Customizing the form can take place in a few ways. The first way is through choosing what methods you want to provide, and under what circumstances to provide them. To set the modules you want in this form, you can set the $contentForm->modules value. For example:
+Customizing the form can take place in a few ways. The first way is through choosing what setting modules and segment modules you want to provide. Setting modules are modules that set the configurations of an article. Segment modules are the blocks of content (such as text and image blocks).
 	
-	// Set the modules allowed in this content entry
-	$contentForm->modules = array(
-		"Text"			=> ContentForm::MODULE_TYPE_SEGMENT
-	,	"Image"			=> ContentForm::MODULE_TYPE_SEGMENT
-	,	"Video"			=> ContentForm::MODULE_TYPE_SEGMENT
-	,	"Author"		=> ContentForm::MODULE_TYPE_META
-	,	"Hashtags"		=> ContentForm::MODULE_TYPE_META
-	,	"Search"		=> ContentForm::MODULE_TYPE_META
-	,	"Related"		=> ContentForm::MODULE_TYPE_META
+	// Choose the setting modules allowed in this content entry
+	$contentForm->settings = array(
+		"Hashtags"		=> true
+	,	"Search"		=> true
+	,	"Related"		=> true
 	);
 	
-This is a common "default" set of modules for a site, allowing a variety of functionality for the content system. There are three different segment types ("Text", "Image", and "Video") as well as several meta-functions to affect other functions (such as having searchable functionality).
+	// Choose the segment modules allowed in this content entry
+	$contentForm->settings = array(
+		"Text"			=> true
+	,	"Image"			=> true
+	,	"Video"			=> true
+	);
+	
+This is a common "default" set of modules for a site, allowing a variety of functionality for the content system. There are three different segment types ("Text", "Image", and "Video") as well as several settings to affect other functions (such as having searchable functionality).
 
 Aside from modules, there are other values that can be adjusted, such as to enable or disable comments, voting, etc.
 
-A major way to update the form system is to call an alternative form type that extends the ContentForm class, but which overwrites or extends some of the functionality.
+A powerful way to update the content form system is to call an alternative plugin that extends the ContentForm class, but which overwrites or extends some of its functionality.
 
 For example, the Gallery may use the "GalleryForm" class, which extends "ContentForm" and overwrite "updateThumbnail" so that a new style of thumbnails can be used.
 
 The only line that changes when you run an alternative class is:
 	
-	$AlternateForm = new AlternateForm("/base-url", $contentID);
+	$AlternateForm = new AlternateForm();
 	
 To create a custom behavior, interpreter, or segment form with the "Alternative Form" class, you can create one of the following methods:
-	
-	// Create a custom behavior (for the "Image" module)
-	$AlternateForm->customBehaviorImage();
 	
 	// Create a custom interpreter (for the "Text" module)
 	$AlternateForm->customInterpretText();
@@ -67,58 +69,30 @@ To create a custom behavior, interpreter, or segment form with the "Alternative 
 	
 You can also customize the update and deletion of pages with the following methods:
 	
-	$AlternateForm->customUpdate();
-	$AlternateForm->customDelete();
+	$AlternateForm->updateCustom();
 
 	
 ----------------------------------------------
 ------ Examples of the ContentForm Page ------
 ----------------------------------------------
 
-// Prepare Form
-$contentForm = new ContentForm("/base-url", $contentID);
+// Prepare the Class and Values
+$contentForm = new ContentForm((int) $_GET['id']);
+$contentForm->contentType = "article";
+$contentForm->baseURL = "/write";
+$contentForm->redirectOnError = "/";
+$contentForm->urlPrefix = "";
 
-// Set the modules allowed in this content entry
-$contentForm->modules = array(
-	"Text"			=> self::MODULE_TYPE_SEGMENT
-,	"Image"			=> self::MODULE_TYPE_SEGMENT
-,	"Video"			=> self::MODULE_TYPE_SEGMENT
-,	"Author"		=> self::MODULE_TYPE_META
-,	"Hashtags"		=> self::MODULE_TYPE_META
-,	"Search"		=> self::MODULE_TYPE_META
-,	"Related"		=> self::MODULE_TYPE_META
-);
-
-// Prepare Settings
-ContentForm::$contentType = 'article';		// Set the content entry type.
-
-$contentForm->guestPosts = true;			// Allows guest submissions on the site.
-$contentForm->privatePosts = true;			// Allows private submissions on the site.
-$contentForm->maxStatus = 4;				// Sets the maximum allowed status for a user to set.
-
-// $contentForm->urlPrefix = Me::$vals['handle'] . '/';		// Used in the blog
-// $contentForm->urlFixed = "";								// If set, forces the URL to be a specific value
-// $contentForm->urlClearance = ContentForm::URL_ALLOW;		// Allows the writer to update his own URL
-// $contentForm->urlClearance = ContentForm::URL_ONCE;		// Allows the writer to update his own URL when published
-// $contentForm->urlClearance = ContentForm::URL_DENY;		// Prevents the writer from updating his own URL
-
-$contentForm->useComments = true;			// Allows comments
-$contentForm->useVoting = true;				// Allows voting
-$contentForm->useDeletion = true;			// Allows deletion
-
-// Make sure you have permissions to edit this form
-$contentForm->verifyAccess("/my-articles");
-
-// Run Behaviors and Interpreters
-$contentForm->runBehavior();
-$contentForm->runInterpreter();
+// Run the Interpreter
+$contentForm->interpret();
 
 // Include Responsive Script
 Photo::prepareResponsivePage();
-Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-block.css" />');
+
+Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" />');
 
 // Run Global Script
-require(APP_PATH . "/includes/global.php");
+require(CONF_PATH . "/includes/global.php");
 
 // Display the Header
 require(SYS_PATH . "/controller/includes/metaheader.php");
@@ -127,26 +101,18 @@ require(SYS_PATH . "/controller/includes/header.php");
 // Side Panel
 require(SYS_PATH . "/controller/includes/side-panel.php");
 
-echo '<div id="content">' . Alert::display();
+// Display the Page
+echo '
+<div id="panel-right"></div>
+<div id="content">' . Alert::display();
 
-$contentForm->drawEditingBox();
-$contentForm->drawContent();
+$contentForm->draw();
 
-echo '</div>';
+echo '
+</div>';
 
 // Display the Footer
 require(SYS_PATH . "/controller/includes/footer.php");
-
-
--------------------------------
------- Methods Available ------
--------------------------------
-
-$contentForm = new ContentForm("/this-page");
-$contentForm->runBehavior();
-$contentForm->runInterpreter();
-
-Content::output($contentID);
 
 */
 
@@ -154,566 +120,837 @@ class ContentForm {
 	
 	
 /****** Plugin Variables ******/
-	public string $baseURL = "";			// <str> The base URL of the Content Form
 	public int $contentID = 0;			// <int> The ID of the content entry being worked on.
-	public array <str, mixed> $contentData = array();	// <str:mixed> The data of the content entry.
-	public int $blockID = 0;			// <int> The ID of the active content block being modified.
-	public string $action = "";			// <str> The action / behavior to run.
-	public string $type = "";				// <str> The active module type.
 	
-	// Default Modules
-	public array <str, bool> $modules = array(			// <str:bool> A list of modules to load into this content form.
-		"Hashtags"		=> self::MODULE_TYPE_META
-	,	"Text"			=> self::MODULE_TYPE_SEGMENT
-	,	"Image"			=> self::MODULE_TYPE_SEGMENT
-	,	"Video"			=> self::MODULE_TYPE_SEGMENT
-	,	"Author"		=> self::MODULE_TYPE_META
-	,	"Search"		=> self::MODULE_TYPE_META
-	,	"Related"		=> self::MODULE_TYPE_META
+	// Allowed Setting Modules
+	public array <str, bool> $settings = array(		// <str:bool> A list of setting modules to load.
+		"Hashtags"		=> true
+	,	"Author"		=> true
+	,	"Search"		=> true
+	,	"Related"		=> true
+	);
+	
+	// Allowed Segment Modules
+	public array <str, bool> $segments = array(		// <str:bool> A list of segment modules to load.
+		"Text"			=> true
+	,	"Image"			=> true
+	,	"Video"			=> true
 	);
 	
 	// Form Settings (set these on every form page)
-	public static string $contentType = "blog";	// <str> The type of content entry (blog, article, etc)
-	
-	public bool $guestPosts = true;		// <bool> TRUE if there are guest posts on this site.
-	public bool $privatePosts = false;	// <bool> TRUE if there are private posts allowed on this site.
-	public int $maxStatus = 4;			// <int> The maximum status level (e.g. Content::STATUS_GUEST)
+	public string $contentType = "blog";	// <str> The type of content entry (blog, article, etc)
+	public string $baseURL = "";			// <str> The base URL of the Content Form
+	public string $redirectOnError = "";	// <str> The page to redirect to if there's an error.
 	
 	public string $urlPrefix = "";			// <str> Set this value to indicate the prefix to a URL slug.
 	public string $urlFixed = "";			// <str> If set, this forces the URL to be a specific value.
-	public int $urlClearance = 0;		// <int> The level of clearance the writer has regarding the URL.
-	public bool $urlReassign = false;	// <bool> TRUE if you are allowed to reassign URL's after making them public.
 	
-	public int $blockLimit = 25;		// <int> The total number of blocks that this form is limited to.
-	public int $pagination = 1;			// <int> The total number of pages that this content can allow.
+	public bool $guestPosts = true;		// <bool> TRUE if there are guest posts on this site.
+	public bool $openPost = false;		// <bool> TRUE if guests can post officially on this site.
+	public bool $privatePosts = false;	// <bool> TRUE if there are private posts allowed on this site.
 	
-	public bool $useHashtags = false;	// <bool> TRUE to allow hashtags.
-	public bool $useComments = false;	// <bool> TRUE to allow comments.
-	public bool $useVoting = false;		// <bool> TRUE to allow voting.
+	public int $comments = 4;			// <int> The level of commenting allowed.
+	public int $voting = 4;				// <int> The level of voting allowance.
 	
-	// Important Constants
-	const MODULE_TYPE_SEGMENT = 1;		// <int> This type is a segment (a content block).
-	const MODULE_TYPE_META = 2;			// <int> This type is metadata, or a menu option.
-	
-	const URL_DENY = 0;			// Prevents the writer from updating his own URL
-	const URL_ONCE = 1;			// Allows the writer to update the URL one time only (when publishing)
-	const URL_ALLOW = 2;		// Allows the writer to update his own URL at will
+	// Values that the system sets
+	public int $urlLength = 42;			// <int> The maximum length allowed with the URL.
+	public bool $urlUpdate = true;		// <bool> TRUE if you can update the URL, FALSE if not.
+	public bool $hashtagsAllow = false;	// <bool> Sets to TRUE once you're allowed to add hashtags.
 	
 	
 /****** Content Form Constructor ******/
 	public function __construct
 	(
-		string $baseURL		// <str> The base URL of the Content Form to submit to.
-	,	int $contentID = 0	// <int> The ID of the content entry being worked on.
+		int $contentID		// <int> The ID of the content entry being worked on.
 	): void					// RETURNS <void> outputs the appropriate data.
 	
-	// $contentForm = new ContentForm($baseURL, $contentID);
+	// $contentForm = new ContentForm($contentID);
 	{
-		// Make sure a valid ID has been provided
-		if(!$contentID)
+		$this->contentID = $contentID;
+		
+		// Get the Content Data
+		if(!$this->contentData = Content::get($contentID))
 		{
-			return;
+			header("Location: /"); exit;
 		}
+		
+		// Recognize Integers
+		$this->contentData['id'] = (int) $this->contentData['id'];
+		$this->contentData['uni_id'] = (int) $this->contentData['uni_id'];
+		$this->contentData['status'] = (int) $this->contentData['status'];
+		$this->contentData['comments'] = (int) $this->contentData['comments'];
+		$this->contentData['voting'] = (int) $this->contentData['voting'];
+		$this->contentData['date_posted'] = (int) $this->contentData['date_posted'];
 		
 		// Prepare Values
-		$this->baseURL = "/" . trim($baseURL, "/");
-		$this->contentID = (int) $contentID;
+		$this->urlLength = 42 - (strlen($this->urlPrefix));
+		$this->contentData['url_slug'] = str_replace($this->urlPrefix, "", $this->contentData['url_slug']);
 		
-		// Set the Active Type
-		if(isset($_GET['t']))
+		// Prevent any updates to the URL slug if one has been set, and status is higher than DRAFT
+		if($this->contentData['url_slug'] and $this->contentData['status'] > Content::STATUS_DRAFT)
 		{
-			$this->type = Sanitize::variable($_GET['t']);
+			$this->urlUpdate = false;
 		}
 		
-		$this->blockID = (isset($_GET['block']) ? (int) $_GET['block'] : 0);
-		$this->action = (isset($_GET['action']) ? Sanitize::variable($_GET['action']) : "");
+		// Include Responsive Script
+		Photo::prepareResponsivePage();
 		
-		// Get the content data for the system
-		$this->contentData = Content::get($this->contentID);
-		
-		if($this->urlFixed) { $this->contentData['url_slug'] = $this->urlFixed; }
-	}
-	
-	
-/****** Run basic form behaviors (such as when a link is clicked during editing) ******/
-	public function runBehavior (
-	): void				// RETURNS <void> outputs the appropriate data.
-	
-	// $contentForm->runBehavior();
-	{
-		// Make sure the necessary data is provided for this method to work
-		if($this->contentID == 0 or !$this->type) { return; }
-		
-		// Check if there is a custom behavior to load
-		if(method_exists($this, "customBehavior" . $this->type))
-		{
-			$funcName = "customBehavior" . $this->type;
-			
-			$this->$funcName();
-		}
-		
-		// Generate a block of the appropriate type
-		else if(method_exists("Module" . $this->type, "behavior"))
-		{
-			// Make sure the link is protected
-			if($link = Link::clicked() and $link == $this->contentData['uni_id'] . ":" . $this->contentID)
-			{
-				call_user_func(array("Module" . $this->type, "behavior"), $this);
-			}
-		}
-		
-		// Check for actions involved in the meta section
-		else if($this->action == "meta")
-		{
-			// Run Meta Behaviors
-			if($this->type == "Settings" and $link = Link::clicked())
-			{
-				// Delete the current thumbnail so that it will refresh
-				if($link == "thumb")
-				{
-					$this->contentData['thumbnail'] = "";
-					
-					Database::query("UPDATE content_entries SET thumbnail=? WHERE id=? LIMIT 1", array("", $this->contentID));
-					
-					Alert::saveSuccess("Thumbnail Updated", "You have run the thumbnail update, which sets the thumbnail to the most relevant image.");
-				}
-			}
-		}
-	}
-	
-	
-/****** Interpret a Form Submission ******/
-	public function runInterpreter (
-	): void					// RETURNS <void> outputs the appropriate data.
-	
-	// $contentForm->runInterpreter();
-	{
-		if(!$this->type) { return; }
-		
-		// Check if there is a custom interpreter to load
-		if(method_exists($this, "customInterpret" . $this->type))
-		{
-			$funcName = "customInterpret" . $this->type;
-			
-			$this->$funcName();
-		}
-		
-		// Make sure we located an available interpreter
-		else if(method_exists("Module" . $this->type, "interpret"))
-		{
-			call_user_func(array("Module" . $this->type, "interpret"), $this);
-			
-			$this->updateCache();
-		}
-		
-		// Run interpreter for Settings
-		if($this->type == "Settings")
-		{
-			$this->interpretSettings();
-		}
-		
-		// Run interpreter for Delete
-		else if($this->type == "Delete")
-		{
-			$this->interpretDelete();
-		}
-	}
-	
-	
-/****** Run a custom update ******/
-# This is a dummy function designed to be overwritten by any child plugins that would want to use it.
-# This method runs during the entry update process.
-	public function customUpdate
-	(
-		array <str, mixed> $customData		// <str:mixed> The custom data to submit to the method.
-	): bool					// RETURNS <bool> TRUE to continue with update, FALSE to end update sequence.
-	
-	// $contentForm->customUpdate($customData);
-	{
-		return true;
-	}
-	
-	
-/****** Run a custom deletion ******/
-# This is a dummy function designed to be overwritten by any child plugins that would want to use it.
-# This method runs during the entry deletion process.
-	public function customDelete (
-	): bool					// RETURNS <bool> TRUE to continue with deletion, FALSE to end deletion sequence.
-	
-	// $contentForm->customDelete();
-	{
-		return true;
+		Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" />');
 	}
 	
 	
 /****** Verify access to modifying this content entry ******/
-	public function verifyAccess
-	(
-		string $redirectTo		// <str> The URL to redirect to if verification fails.
-	): void					// RETURNS <void> outputs the appropriate data.
+	public function redirect (
+	): void					// RETURNS <void> redirects to the appropriate page.
 	
-	// $contentForm->verifyAccess($redirectTo);
+	// $contentForm->redirect($redirectTo);
 	{
-		// Make sure the content data was retrieved successfully
-		if(!$this->contentData)
+		if($this->redirectOnError)
 		{
-			header("Location: " . $redirectTo); exit;
+			header("Location: " . $this->redirectOnError); exit;
 		}
 		
-		// Make sure you own this blog
-		if($this->contentData['uni_id'] != Me::$id and Me::$clearance < 6)
+		header("Location: /"); exit;
+	}
+	
+	
+/****** Verify access to modifying this content entry ******/
+	public function verifyAccess (
+	): void					// RETURNS <void> redirects if user is not allowed editing access.
+	
+	// $contentForm->verifyAccess();
+	{
+		if(Me::$clearance >= 6) { return; }
+		
+		// Check if guest users are allowed to post on this site
+		if(!$this->guestPosts) { $this->redirect(); }
+		
+		// Make sure you own this content
+		if($this->contentData['uni_id'] != Me::$id)
 		{
 			Alert::error("Invalid User", "You do not have permissions to edit this content.", 7);
 			
-			header("Location: " . $redirectTo); exit;
+			$this->redirect();
 		}
 		
-		// If Guest Posts are allowed on this site
-		if($this->guestPosts)
+		// If this entry is set to official, guest submitters cannot change it any longer
+		if($this->contentData['status'] >= Content::STATUS_OFFICIAL)
 		{
-			// If this entry is set to official, guest submitters cannot change it any longer
-			if($this->contentData['status'] >= Content::STATUS_OFFICIAL)
+			Alert::saveInfo("Editing Disabled", "This entry is now an official live post, and cannot be edited.");
+			
+			$this->redirect();
+		}
+	}
+	
+	
+/****** Interpreter ******/
+	public function interpret (
+	): void					// RETURNS <void>
+	
+	// $contentForm->interpret();
+	{
+		if(Form::submitted(SITE_HANDLE . "-content-" . $this->contentID))
+		{
+			// If the content entry is being deleted
+			if(isset($_POST['deletePost']))
 			{
-				if(Me::$clearance < 6)
+				if($this->delete())
 				{
-					Alert::saveInfo("Editing Disabled", "This entry is now an official live post, and cannot be edited.");
+					Alert::saveSuccess("Delete Successful", "The content entry has been successfully deleted.");
 					
-					header("Location: " . $redirectTo); exit;
+					$this->redirect();
 				}
 			}
-		}
-	}
-	
-	
-/****** Draw the Content ******/
-	public function drawContent (
-	): void					// RETURNS <void> outputs the appropriate data.
-	
-	// $contentForm->drawContent();
-	{
-		// Get the list of content segments
-		$results = Database::selectMultiple("SELECT * FROM content_block_segment WHERE content_id=? ORDER BY sort_order ASC", array($this->contentID));
-		
-		foreach($results as $result)
-		{
-			// Check if the Block ID is identical to the shown block ID - there may be editing necessary
-			if($this->blockID == $result['block_id'] and $this->type == $result['type'] and $this->action == "edit")
+			
+			// Run the Core Interpreters
+			$this->updateSettings();
+			$this->updateHashtags();
+			$this->updateURL();
+			$this->updateSegments();
+			$this->updateCustom();
+			
+			// Interpret Setting Modules
+			foreach($this->settings as $module => $bool)
 			{
-				$this->drawForm();
-				
-				continue;
-			}
-			
-			// Prepare the common segment URL for the links in this segment
-			$segURL = '&content=' . $this->contentID . '&t=' . $result['type'] . '&block=' . $result['block_id'] . "#block-" . $result['block_id'];
-			
-			echo '<fieldset id="block-' . $result['block_id'] . '" class="content-form">
-				<legend>' . $result['type'] . ' Block</legend>
-			<div class="content-form-opts"><a href="' . $this->baseURL . '?action=edit' . $segURL . '">Edit</a> <a href="' . $this->baseURL . '?action=delete&' . Link::prepare($this->contentData['uni_id'] . ":" . $this->contentID) . $segURL . '">Delete</a> <a href="' . $this->baseURL . '?action=moveUp&' . Link::prepare($this->contentData['uni_id'] . ":" . $this->contentID) . $segURL . '">Move Up</a></div>';
-			
-			// Display the appropriate block type
-			if($result['type'])
-			{
-				if(method_exists("Module" . $result['type'], "get"))
+				if(method_exists("Module" . $module, "interpret"))
 				{
-					echo call_user_func(array("Module" . $result['type'], "get"), (int) $result['block_id']);
+					call_user_func(array("Module" . $module, "interpret"), $this);
 				}
 			}
 			
-			echo '</fieldset>';
+			// If the thumbnail was updated
+			if(isset($_FILES['thumb_image']) and $_FILES['thumb_image']['tmp_name'])
+			{
+				$this->updateThumbnail();
+			}
+			
+			// Update Blocks
+			$this->updateBlocks();
+			
+			// If a thumbnail is not selected, try to generate one
+			if(!$this->contentData['thumbnail'])
+			{
+				$this->updateThumbnailAuto();
+			}
+		}
+		else
+		{
+			// Interpret Setting Modules
+			foreach($this->settings as $module => $bool)
+			{
+				if(method_exists("Module" . $module, "behavior"))
+				{
+					call_user_func(array("Module" . $module, "behavior"), $this);
+				}
+			}
 		}
 	}
 	
 	
-/****** Draw the Editing Box for the Content Form ******/
-	public function drawEditingBox (
-	): void					// RETURNS <void> outputs the appropriate data.
+/****** Update a Content Entry ******/
+	public function updateSettings (
+	): bool						// RETURNS <bool> TRUE if the update is successful, FALSE if there is a failure.
 	
-	// $contentForm->drawEditingBox();
+	// $contentForm->updateSettings();
 	{
-		// Draw the appropriate form block
-		echo '
-		<fieldset class="content-form"><legend>Content Editor</legend>
-		<div class="content-form-opts">
-			<a href="' . $this->baseURL . '?action=meta&content=' . $this->contentID . '&t=Settings">Settings</a>';
+		$settingUpdate = false;
 		
-		// Show Modules
-		foreach($this->modules as $module => $modType)
+		// Title of the Post
+		if(isset($_POST['title']) and $_POST['title'] != $this->contentData['title'])
 		{
-			if($modType == self::MODULE_TYPE_SEGMENT)
-			{
-				echo '
-				<a href="' . $this->baseURL . '?action=segment&content=' . $this->contentID . '&t=' . $module . '&' . Link::prepare($this->contentData['uni_id'] . ":" . $this->contentID) . '">New ' . $module . ' Block</a>';
-			}
-			
-			else if($modType == self::MODULE_TYPE_META)
-			{
-				echo '
-				<a href="' . $this->baseURL . '?action=meta&content=' . $this->contentID . '&t=' . $module . '">' . $module . '</a>';
-			}
+			$this->contentData['title'] = Sanitize::safeword($_POST['title'], "'\"?");
+			$settingUpdate = true;
 		}
 		
-		// Show Deletion Option (for moderators)
+		// Post Status
+		if(isset($_POST['save_official']) and $this->contentData['status'] < Content::STATUS_OFFICIAL and Me::$clearance >= 6)
+		{
+			$this->contentData['status'] = Content::STATUS_OFFICIAL;
+			$settingUpdate = true;
+		}
+		
+		else if(isset($_POST['save_publish']) and $this->contentData['status'] < Content::STATUS_GUEST)
+		{
+			$this->contentData['status'] = Content::STATUS_GUEST;
+			$settingUpdate = true;
+		}
+		
+		else if(isset($_POST['save_guest']) and $this->contentData['status'] > Content::STATUS_GUEST and Me::$clearance >= 6)
+		{
+			$this->contentData['status'] = Content::STATUS_GUEST;
+			$settingUpdate = true;
+		}
+		
+		// Date Posted
+		if($this->contentData['status'] >= Content::STATUS_GUEST and $this->contentData['date_posted'] == 0)
+		{
+			$this->contentData['date_posted'] = time();
+			$settingUpdate = true;
+		}
+		
+		// Primary Hashtag
+		if(isset($_POST['primary_hashtag']) and $_POST['primary_hashtag'] != $this->contentData['primary_hashtag'])
+		{
+			$this->contentData['primary_hashtag'] = $_POST['primary_hashtag'];
+			$settingUpdate = true;
+		}
+		
 		if(Me::$clearance >= 6)
 		{
-			echo '
-			<a href="' . $this->baseURL . '?action=meta&content=' . $this->contentID . '&t=Delete">Delete</a>';
-		}
-		
-		echo '
-		</div>';
-		
-		// If you are editing the metadata for the content entry
-		if($this->action == "meta")
-		{
-			if($this->type and method_exists("Module" . $this->type, "drawForm"))
+			// Comments
+			if(isset($_POST['comments']) and $_POST['comments'] != $this->contentData['comments'])
 			{
-				call_user_func(array("Module" . $this->type, "drawForm"), $this);
+				$this->contentData['comments'] = (int) $_POST['comments'];
+				$settingUpdate = true;
 			}
 			
-			switch($this->type)
+			// Voting
+			if(isset($_POST['voting']) and $_POST['voting'] != $this->contentData['voting'])
 			{
-				// Allow updating of the main settings
-				case "Settings":		$this->drawFormSettings();			break;
-				
-				// Allow the deletion of the content entry
-				case "Delete":			$this->drawFormDelete();			break;
+				$this->contentData['voting'] = (int) $_POST['voting'];
+				$settingUpdate = true;
 			}
 		}
 		
-		echo '</fieldset>';
+		if(!$settingUpdate)
+		{
+			return true;
+		}
+		
+		// Process the Update
+		return Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, status=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($this->contentData['title'], $this->contentData['primary_hashtag'], $this->contentData['status'], $this->contentData['comments'], $this->contentData['voting'], $this->contentData['date_posted'], $this->contentID));
 	}
 	
 	
-/****** Draw the Form for the active block ******/
-	public function drawForm (
-	): void					// RETURNS <void> outputs the appropriate data.
+/****** Update the Hashtags ******/
+	public function updateHashtags (
+	): bool						// RETURNS <bool> TRUE if the update is successful, FALSE if there is a failure.
 	
-	// $contentForm->drawForm();
+	// $contentForm->updateHashtags();
 	{
-		// Make sure the necessary information is provided
-		if(!$this->contentID or !$this->type or !$this->blockID)
+		// Make sure we can update hashtags
+		if(!$this->contentData['url_slug'])
 		{
-			return;
+			return false;
 		}
 		
-		// Draw the appropriate form block
-		echo '<fieldset id="block-' . $this->blockID . '" class="content-form"><legend>Edit This Content Block</legend>';
-		
-		// Check if there is a custom form
-		if(method_exists($this, "customForm" . $this->type))
+		if($this->contentData['status'] <= Content::STATUS_GUEST)
 		{
-			$funcName = "customForm" . $this->type;
+			return false;
+		}
+		
+		// Allow Hashtags to be updated
+		$this->hashtagsAllow = true;
+		return true;
+		
+		// Process the update
+		Database::startTransaction();
+		
+		$pass = true;
+		
+		// If hashtags are being used, check if the entry is already posted there
+		// Delete any old version so that we can update to a new value later
+		if($pass and ($primeHashtag or $entry['primary_hashtag']))
+		{
+			if($entry['primary_hashtag'] != $primeHashtag)
+			{
+				Database::query("UPDATE IGNORE content_entries SET primary_hashtag=? WHERE id=? LIMIT 1", array($primeHashtag, $contentID));
+				
+				$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
+			}
 			
-			$this->$funcName();
+			else if($status < Content::STATUS_OFFICIAL)
+			{
+				$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
+			}
 		}
 		
-		// Draw the Module's Form
-		else if(method_exists("Module" . $this->type, "drawForm"))
+		// Update the entry
+		if($pass)
 		{
-			call_user_func(array("Module" . $this->type, "drawForm"), $this);
+			// Update the hashtag handler, if applicable
+			if($pass and $status >= Content::STATUS_OFFICIAL and $primeHashtag)
+			{
+				if($pass = ModuleHashtags::setHashtag($contentID, $primeHashtag))
+				{
+					$pass = Database::query("REPLACE INTO content_by_hashtag (hashtag, content_id) VALUES (?, ?)", array($primeHashtag, $contentID));
+				}
+			}
 		}
 		
-		echo '
-		</fieldset>';
+		// Run custom update methods
+		if($pass)
+		{
+			// Prepare Custom Data
+			$customData = array(
+				'content_id'		=> $contentID
+			,	'status'			=> $status
+			,	'title'				=> $title
+			,	'url_slug'			=> $urlSlug
+			,	'primary_hashtag'	=> $primeHashtag
+			);
+			
+			$pass = $this->customUpdate($customData);
+		}
+		
+		// Add the entry to a queue if it is a guest post
+		if($pass and $status == Content::STATUS_GUEST)
+		{
+			Content::queue($contentID);
+		}
+		
+		// Finalize the update
+		return Database::endTransaction($pass);
 	}
 	
 	
-/****** Draw the Form for the active Text Block ******/
-	public function drawFormSettings (
-	): void					// RETURNS <void> outputs the appropriate data.
+/****** Update a Content Entry ******/
+	public function updateURL (
+	): bool						// RETURNS <bool> TRUE if the update is successful, FALSE if there is a failure.
 	
-	// $contentForm->drawFormSettings();
+	// $contentForm->updateURL();
+	{
+		// Make sure you're allowed to update the URL
+		if(!$this->urlUpdate)
+		{
+			return false;
+		}
+		
+		// Make sure a URL Slug was set
+		if(!isset($_POST['url_slug']) or $_POST['url_slug'] == $this->contentData['url_slug'])
+		{
+			return true;
+		}
+		
+		// Validate the URL Slug
+		FormValidate::url("URL", $_POST['url_slug'], 10, 42, "-");
+		
+		if(strpos($_POST['url_slug'], "-") === false)
+		{
+			Alert::error("URL", "The URL must contain at least one \"-\" dash.");
+		}
+		
+		// Update the URL
+		if(FormValidate::pass("URL"))
+		{
+			Database::startTransaction();
+			
+			if($pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($this->contentData['url_slug'])))
+			{
+				if($pass = Database::query("UPDATE IGNORE content_entries SET url_slug=? WHERE id=? LIMIT 1", array($_POST['url_slug'], $this->contentID)))
+				{
+					$pass = Database::query("INSERT INTO content_by_url (url_slug, content_id) VALUES (?, ?)", array($_POST['url_slug'], $this->contentID));
+				}
+			}
+			
+			// Update Values
+			$this->contentData['url_slug'] = $_POST['url_slug'];
+			
+			// Finalize the update
+			if(Database::endTransaction($pass))
+			{
+				$this->urlUpdate = true;
+				
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+/****** Update Segments ******/
+	public function updateSegments (
+	): bool						// RETURNS <bool> TRUE if the update is successful, FALSE if there is a failure.
+	
+	// $contentForm->updateSegments();
+	{
+		// Create New Module Segments
+		if(isset($_POST['add_module']) and is_array($_POST['add_module']))
+		{
+			foreach($_POST['add_module'] as $module => $bool)
+			{
+				call_user_func(array("Module" . $module, "create"), $this->contentID);
+			}
+		}
+		
+		// If any of the blocks were moved
+		if(isset($_POST['moveUp']) and is_array($_POST['moveUp']))
+		{
+			reset($_POST['moveUp']);
+			
+			if($sortOrder = (int) key($_POST['moveUp']))
+			{
+				$this->moveUp($sortOrder);
+			}
+		}
+		
+		// If any of the blocks were deleted
+		else if(isset($_POST['deleteBlock']) and is_array($_POST['deleteBlock']))
+		{
+			reset($_POST['deleteBlock']);
+			
+			if($sortOrder = (int) key($_POST['deleteBlock']))
+			{
+				if($blockData = Database::selectOne("SELECT type, block_id FROM content_block_segment WHERE content_id=? AND sort_order=? LIMIT 1", array($this->contentID, $sortOrder)))
+				{
+					call_user_func(array("Module" . $blockData['type'], "purgeBlock"), (int) $blockData['block_id'], $this->contentID);
+				}
+			}
+		}
+	}
+	
+	
+/****** Update Blocks ******/
+	public function updateBlocks (
+	): bool						// RETURNS <bool> TRUE if the update is successful, FALSE if there is a failure.
+	
+	// $contentForm->updateBlocks();
 	{
 		// Prepare Values
-		$urlLength = 42 - (strlen($this->urlPrefix));
-		$this->contentData['url_slug'] = str_replace($this->urlPrefix, "", $this->contentData['url_slug']);
+		$runCache = false;
 		
-		$this->contentData['title'] = isset($_POST['title']) ? Sanitize::safeword($_POST['title'], "'?") : $this->contentData['title'];
-		$this->contentData['url_slug'] = isset($_POST['url_slug']) ? Sanitize::variable($_POST['url_slug'], "-") : $this->contentData['url_slug'];
-		$this->contentData['status'] = isset($_POST['status']) ? ($_POST['status'] + 0) : $this->contentData['status'];
+		// Cycle through all of the modules for interpretation
+		$segments = Database::selectMultiple("SELECT * FROM content_block_segment WHERE content_id=? ORDER BY sort_order", array($this->contentID));
 		
-		// Determine information about hashtags, if applicable
-		$hashtagLock = false;	// This value is set to TRUE if the URL is publicly locked due to hashtags.
-		
-		if(isset($this->modules["Hashtags"]))
+		foreach($segments as $segment)
 		{
-			// Get the list of hashtags for this content ID
-			list($submittedHashtags, $unsubmittedHashtags) = ModuleHashtags::getBySub($this->contentID);
-			
-			if($submittedHashtags or $unsubmittedHashtags)
+			// Check if there is a custom interpreter to load
+			if(method_exists($this, "customInterpret" . $segment['type']))
 			{
-				$hashtagLock = true;
+				$funcName = "customInterpret" . $segment['type'];
+				
+				$this->$funcName();
+			}
+			
+			// Run the module interpreter
+			else if(method_exists("Module" . $segment['type'], "interpret"))
+			{
+				// Prepare Variables
+				$runInterpreter = false;
+				$blockID = (int) $segment['block_id'];
+				
+				// For images, we need to see if there was an image set
+				if($segment['type'] == "Image" and isset($_FILES['image']) and $_FILES['image']['tmp_name'][$blockID] != "")
+				{
+					$runInterpreter = true;
+				}
+				
+				// Check each of the block values against the related $_POST values
+				$moduleData = Database::selectOne("SELECT * FROM content_block_" . strtolower($segment['type']) . " WHERE id=? LIMIT 1", array($blockID));
+				
+				foreach($moduleData as $blockKey => $blockVal)
+				{
+					if(!isset($_POST[$blockKey][$blockID]) or $blockVal == $_POST[$blockKey][$blockID])
+					{
+						continue;
+					}
+					
+					$runInterpreter = true;
+				}
+				
+				if($runInterpreter)
+				{
+					$runCache = true;
+					
+					call_user_func(array("Module" . $segment['type'], "interpret"), $this->contentID, $blockID);
+				}
 			}
 		}
 		
-		// Prepare the dropdown list for the statuses
-		$statusDropdown = "";
-		
-		if(!$this->guestPosts or Me::$clearance >= 6)
+		// Update the cache, if applicable
+		if($runCache)
 		{
-			$statusDropdown = '<option value="' . Content::STATUS_OFFICIAL . '">Official Post</option>';
+			$this->updateCache();
 		}
+	}
+	
+	
+/****** Custom Update Handler ******/
+# This is a dummy function, but can be updated by an extended class.
+	public function updateCustom (
+	): bool						// RETURNS <bool> TRUE if the update is successful, FALSE if there is a failure.
+	
+	// $contentForm->updateCustom();
+	{
+		return true;
+	}
+	
+	
+/****** Output the Content Form ******/
+	public function draw (
+	): void					// RETURNS <void>
+	
+	// $contentForm->draw();
+	{
+		// Draw the appropriate form block
+		echo '
+		<form class="uniform" action="' . $this->baseURL . '?id=' . $this->contentID . '" enctype="multipart/form-data" method="post">' . Form::prepare(SITE_HANDLE . "-content-" . $this->contentID);
 		
-		if($this->guestPosts)
-		{
-			$statusDropdown .= '<option value="' . Content::STATUS_GUEST . '">Public Post</option>';
-		}
+		$this->drawSettings();
+		$this->drawBlocks();
+		$this->drawFooter();
 		
-		if(!$hashtagLock)
-		{
-			if($this->privatePosts)
-			{
-				$statusDropdown .= '
-				<option value="' . Content::STATUS_PRIVATE . '">Private Post (Friends Can View)</option>';
-			}
-			
-			$statusDropdown .= '
-				<option value="' . Content::STATUS_DRAFT . '">Draft</option>';
-		}
+		echo '
+		</form>';
+	}
+	
+	
+/****** Output the Content Form Settings ******/
+	public function drawSettings (
+	): void					// RETURNS <void>
+	
+	// $contentForm->drawSettings();
+	{
+		echo '
+		<input type="text" name="title" style="width:97%; height:38px; font-size:32px; font-weight:bold; margin-bottom:10px;" placeholder="Article Title . . ." value="' . $this->contentData['title'] . '" maxlength="72" />
 		
-		// If a thumbnail is not selected, we should pull one once available)
-		if(!$this->contentData['thumbnail'])
-		{
-			$this->updateThumbnail();
-		}
+		<div style="border:solid 1px #bbbbbb; font-size:18px; height:38px; margin-bottom:10px; width:97%; padding-left:14px;">
+			' . SITE_URL . '/' . ($this->urlPrefix ? trim($this->urlPrefix, "/") . '/' : "") . '
+			<input type="text" name="url_slug" style="border:none; color:#5abcde; height:26px; font-size:18px; font-weight:bold; padding-left:0px; min-width:280px;" value="' . str_replace($this->urlPrefix, "", $this->contentData['url_slug']) . '" maxlength="72" placeholder="enter-desired-url-here..." maxlength="' . $this->urlLength . '"' . ($this->urlUpdate ? "" : " disabled") . ' />
+		</div>';
 		
 		// Display the Metadata Block
 		echo '
-		<div style="margin-top:22px;">
-		<form class="uniform" action="' . $this->baseURL . '?action=meta&content=' . ($this->contentID + 0) . '&t=Settings" method="post">' . Form::prepare(SITE_HANDLE . "-contentSettings");
+		<div id="setting-box" style="margin-top:22px;"><fieldset style="border:solid 1px #bbbbbb; overflow:hidden;"><legend style="font-size:1.2em;">Article Settings</legend>';
 		
 		// Show the Thumbnail, if applicable
 		if($this->contentData['thumbnail'])
 		{
 			echo '
-			<p>
-				<span style="font-weight:bold;">Current Thumbnail:</span><br />
-				<img src="' . $this->contentData['thumbnail'] . '?cache=' . time() . '" /><br />
-				<a href="' . $this->baseURL . '?action=meta&content=' . ($this->contentID + 0) . '&t=Settings&' . Link::prepare("thumb") . '">Update Thumbnail</a>
-			</p>';
+			<span style="font-weight:bold;">Current Thumbnail:</span>
+			<div style="position:relative; height:200px;">
+				<img src="' . $this->contentData['thumbnail'] . '?cache=' . time() . '" style="position:absolute; left:0px; top:0px;" />
+				<img src="' . CDN . '/images/upload-thumb.png" style="position:absolute; left:0px; top:0px;" />
+				<div style="position:absolute; left:0px; top:0px; height:60px; width:100px;">
+					<input type="file" name="thumb_image" value="" style="height:60px; width:100px; overflow:hidden; opacity:0; cursor:pointer;" />
+				</div>
+			</div>';
 		}
 		
-		// Display the Status Dropdown
-		echo '
-			<p>
-				<span style="font-weight:bold;">Status:</span><br />
-				<select name="status">' . str_replace('value="' . $this->contentData['status'] . '"', 'value="' . $this->contentData['status'] . '" selected', $statusDropdown) . '
-				</select>
-			</p>';
-		
-		// Display the Title Field
-		echo '
-			<p>
-				<span style="font-weight:bold;">Title:</span><br />
-				<input type="text" name="title" value="' . $this->contentData['title'] . '" placeholder="Title of the post . . ." size="54" maxlength="72" tabindex="10" autofocus />
-			</p>';
-		
-		// Display the URL Field
-		$urlDisabled = " disabled";
-		
-		if($this->urlClearance == self::URL_ALLOW or ($this->contentData['url_slug'] == "" and $this->urlClearance == self::URL_ONCE))
+		// Display the hashtag dropdown
+		if(Me::$clearance >= 6 or $this->openPost)
 		{
-			// If hashtags are locking the URL, it cannot be re-enabled.
-			// Note: If the URL has no default, we need to make sure the user sets it (enable in this case).
-			if($hashtagLock and $this->contentData['url_slug'] != "")
+			if($dropHTML = ContentHashtags::hashtagFormDropdown($this->contentData['id'], $this->contentData['primary_hashtag']))
 			{
-				$urlDisabled = " disabled";
-			}
-			else
-			{
-				$urlDisabled = "";
+				echo '
+				<div>
+				<select name="primary_hashtag">
+					<option value="">-- Select Primary Hashtag --</option>
+					' . $dropHTML . '
+				</select>
+				</div>';
 			}
 		}
-		
-		echo '
-		<p>
-			<span style="font-weight:bold;">URL to save this content at:</span><br />
-			' . SITE_URL . '/' . ($this->urlPrefix ? trim($this->urlPrefix, "/") . '/' : "") . ' <input type="text" name="url_slug" value="' . $this->contentData['url_slug'] . '" placeholder="URL . . ." size="32" maxlength="' . $urlLength . '" tabindex="20"' . $urlDisabled . ' />
-		</p>';
 		
 		// Show several options that only editors are allowed to use
 		if(Me::$clearance >= 6)
 		{
-			// Display the hashtag dropdown
-			echo '
-			<p>
-				<span style="font-weight:bold;">Primary Hashtag:</span><br />
-				<select name="primary_hashtag">
-					<option value="0">-- Select Hashtag --</option>
-					' . ContentHashtags::hashtagDropdown($this->contentData['primary_hashtag']) . '</select>
-			</p>';
+			echo '<p>';
 			
 			// Show the comment dropdown, if allowed
-			if($this->useComments)
+			if($this->comments > 0)
 			{
 				echo '
-				<p>
-					<span style="font-weight:bold;">Comments:</span><br />
-					<select name="comments">' . str_replace('value="' . $this->contentData['comments'] . '"', 'value="' . $this->contentData['comments'] . '" selected', '
-						<option value="' . Content::COMMENTS_STANDARD . '">Standard Comments</option>
-						<option value="' . Content::COMMENTS_NO_POSTING . '">Prevent Posting (But Show Comments)</option>
-						<option value="' . Content::COMMENTS_DISABLED . '">Disabled</option>
-					</select>') . '
-				</p>';
+				<select name="comments">' . str_replace('value="' . $this->contentData['comments'] . '"', 'value="' . $this->contentData['comments'] . '" selected', '
+					<option value="' . Content::COMMENTS_STANDARD . '">Standard Comments</option>
+					<option value="' . Content::COMMENTS_MODERATE . '">Comments Need Approval</option>
+					<option value="' . Content::COMMENTS_NO_POSTING . '">Freeze Comments</option>
+					<option value="' . Content::COMMENTS_DISABLED . '">Don\'t Show Comments</option>
+				</select>');
 			}
 			
 			// Show the voting dropdown, if allowed
-			if($this->useVoting)
+			if($this->voting > 0)
 			{
 				echo '
-				<p>
-					<span style="font-weight:bold;">Voting:</span><br />
-					<select name="voting">' . str_replace('value="' . $this->contentData['voting'] . '"', 'value="' . $this->contentData['voting'] . '" selected', '
-						<option value="' . Content::VOTING_STANDARD . '">Standard Voting</option>
-						<option value="' . Content::VOTING_FREEZE . '">Freeze Voting</option>
-						<option value="' . Content::VOTING_DISABLED . '">Disabled</option>
-					</select>') . '
-				</p>';
-			}
-		}
-		
-		// Show the hashtags that will be submitted
-		if(isset($this->modules["Hashtags"]) and $unsubmittedHashtags)
-		{
-			echo '
-			<p>
-				<span style="font-weight:bold;">Unsubmitted Hashtags:</span><br />';
-			
-			foreach($unsubmittedHashtags as $key => $un)
-			{
-				echo '<span class="c-hashtag" style="font-size:1.1em;"><a href="' . URL::hashtag_unifaction_com() . '/' . $un . '">#' . $un . '</a></span> ';
+				<select name="voting">' . str_replace('value="' . $this->contentData['voting'] . '"', 'value="' . $this->contentData['voting'] . '" selected', '
+					<option value="' . Content::VOTING_STANDARD . '">Standard Voting</option>
+					<option value="' . Content::VOTING_FREEZE . '">Freeze Voting</option>
+					<option value="' . Content::VOTING_DISABLED . '">No Voting</option>
+				</select>');
 			}
 			
 			echo '
 			</p>';
 		}
 		
+		// Show the setting modules
+		foreach($this->settings as $module => $bool)
+		{
+			if(method_exists("Module" . $module, "draw"))
+			{
+				call_user_func(array("Module" . $module, "draw"), $this);
+			}
+		}
+		
 		echo '
-			<input type="submit" name="submit" value="Update" />
-		</form>
-		</div>';
-	}
-	
-	
-/****** Draw the Content Entry Deletion Form ******/
-	public function drawFormDelete (
-	): void					// RETURNS <void> outputs the appropriate data.
-	
-	// $contentForm->drawFormDelete();
-	{
-		echo '
-		<div style="margin-top:22px;">
-			<h3>Delete this Entry</h3>
-			<p style="color:red; font-weight:bold;">Warning: If you delete this entry, all of the contents will be permanently destroyed, and all links to it will be broken.</p>
-			<p>If you are certain that you want to delete the entry, type "DELETE" into the text box below.</p>
+		</div>
+		
+		<script>
+			var setbox = document.getElementById("setting-box");
 			
-			<form class="uniform" action="' . $this->baseURL . '?action=meta&content=' . ($this->contentID + 0) . '&t=Delete" method="post">' . Form::prepare(SITE_HANDLE . "-contentDelete") . '
-				<p><input type="text" name="delete" value="" size="10" maxlength="6" autocomplete="off" tabindex="10" autofocus style="text-transform:uppercase" /></p>
-				<p><input type="submit" name="submit" value="Delete This Entry" /></p>
-			</form>
-		</div>';
+			setbox.insertAdjacentHTML("beforebegin", "<div><a href=\'javascript:void(0)\' onclick=\'showSettingBox();\' style=\'border:solid 1px #bbbbbb; border-radius:5px; padding:8px; margin-top:2px; margin-bottom:8px; display:inline-block;\'><span class=\'icon-settings\'></span> Article Settings</a></div>");
+			
+			function showSettingBox()
+			{
+				if(setbox.style.display == "none")
+				{
+					setbox.style.display = "inline";
+				}
+				else
+				{
+					setbox.style.display = "none";
+				}
+			}
+			
+			showSettingBox();
+		</script>';
 	}
+	
+	
+/****** Output the Content Form Block Content ******/
+	public function drawBlocks (
+	): void					// RETURNS <void>
+	
+	// $contentForm->drawBlocks();
+	{
+		// Get the list of content segments
+		$segments = Database::selectMultiple("SELECT * FROM content_block_segment WHERE content_id=? ORDER BY sort_order", array($this->contentID));
+		
+		foreach($segments as $segment)
+		{
+			// Recognize Integers
+			$blockID = (int) $segment['block_id'];
+			$sortOrder = (int) $segment['sort_order'];
+			
+			// Draw the appropriate form block
+			echo '<div id="block-' . $sortOrder . '" class="content-form"><fieldset style="border:solid 1px #bbbbbb; overflow:hidden;"><legend>' . $segment['type'] . ' Block</legend>';
+			
+			echo '
+			<div style="float:right;">
+				<input type="submit" name="moveUp[' . $sortOrder . ']" value="Move Up" />
+				<input type="submit" name="deleteBlock[' . $sortOrder . ']" value="Delete" />
+			</div>';
+			
+			// Check if there is a custom form
+			if(method_exists($this, "customForm" . $segment['type']))
+			{
+				$funcName = "customForm" . $segment['type'];
+				
+				$this->$funcName();
+			}
+			
+			// Draw the Module's Form
+			else if(method_exists("Module" . $segment['type'], "draw"))
+			{
+				call_user_func(array("Module" . $segment['type'], "draw"), $blockID);
+			}
+			
+			echo '</fieldset></div>';
+		}
+	}
+	
+	
+/****** Output the Content Form Footer ******/
+	public function drawFooter (
+	): void					// RETURNS <void>
+	
+	// $contentForm->drawFooter();
+	{
+		// Show Segment-Creation Modules
+		foreach($this->segments as $module => $bool)
+		{
+			switch($module)
+			{
+				case "Text":
+					$icon = "newspaper";
+					break;
+				
+				case "Image":
+					$icon = "image";
+					break;
+				
+				case "Video":
+					$icon = "video";
+					break;
+				
+				default:
+					$icon = "circle-exclaim";
+					break;
+			}
+			
+			echo '
+			<div class="newsegment-wrap">
+				<div class="newsegment"><span class="newsegment-text">Add<br /><span class="icon-' . $icon . '" style="font-size:32px;"></span><br />' . $module . ' Block</span></div>
+				<input class="newsegment-sub" type="submit" name="add_module[' . $module . ']" value="" style="background:none;" />
+			</div>';
+		}
+		
+		echo '
+		<hr class="separate-div"/>';
+		
+		// Display Submission Options
+		echo '
+		<p>';
+		
+		// Make official post
+		if($this->contentData['status'] < Content::STATUS_OFFICIAL and Me::$clearance >= 6)
+		{
+			echo '
+			<input type="submit" name="save_official" value="Save and Make Official Post" style="background-color:#56ccc8;" />';
+		}
+		
+		// Save and Publish option
+		if($this->contentData['status'] < Content::STATUS_GUEST)
+		{
+			echo '
+			<input type="submit" name="save_publish" value="Save and Publish" style="background-color:#56ccc8;" />';
+		}
+		
+		// Official Post Option
+		if($this->contentData['status'] >= Content::STATUS_OFFICIAL and Me::$clearance >= 6)
+		{
+			echo '
+			<input type="submit" name="save_standard" value="Live Update" style="background-color:#56ccc8;" />
+			<input type="submit" name="save_guest" value="Set as Guest Post" style="background-color:#aa2222;" />';
+		}
+		else
+		{
+			// Save / Update Option
+			echo '
+			<input type="submit" name="save_standard" value="Save and Update" />';
+		}
+		
+		// Display the Submit Button
+		echo '
+			<input type="submit" name="deletePost" value="Delete Post" onclick="return confirm(\'Are you sure you want to delete this post?\');" />
+		</p>';
+	}
+	
+	
+/****** Move a block up in the sort order of a segment list ******/
+	public function moveUp
+	(
+		int $sortOrder		// <int> The sort order of the block associated with this segment piece.
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
+	
+	// $contentForm->moveUp($sortOrder);
+	{
+		// Make sure there is upward mobility (a block higher than itself)
+		if($sortOrder <= 1) { return false; }
+		
+		$swapOrder = $sortOrder - 1;
+		
+		Database::startTransaction();
+		
+		if($pass = Database::query("UPDATE content_block_segment SET sort_order=? WHERE content_id=? AND sort_order=? LIMIT 1", array(0, $this->contentID, $sortOrder)))
+		{
+			if($pass = Database::query("UPDATE content_block_segment SET sort_order=? WHERE content_id=? AND sort_order=? LIMIT 1", array($sortOrder, $this->contentID, $swapOrder)))
+			{
+				$pass = Database::query("UPDATE content_block_segment SET sort_order=? WHERE content_id=? AND sort_order=? LIMIT 1", array($swapOrder, $this->contentID, 0));
+			}
+		}
+		
+		if(Database::endTransaction($pass))
+		{
+			$this->updateCache();
+			
+			header("Location: " . $this->baseURL  . "?id=" . $this->contentID); exit;
+		}
+		
+		return false;
+	}
+	
+	
+/****** Update a Content Entry's content, but not any of its settings ******/
+	public function updateCache (
+	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
+	
+	// $contentForm->updateCache();
+	{
+		// Prepare the text for being cached
+		$body = "";
+		
+		// Get the list of content segments
+		$results = Database::selectMultiple("SELECT block_id, type FROM content_block_segment WHERE content_id=? ORDER BY sort_order ASC", array($this->contentID));
+		
+		// Pull the text from the appropriate block type
+		foreach($results as $result)
+		{
+			if(method_exists("Module" . $result['type'], "get"))
+			{
+				$body .= call_user_func(array("Module" . $result['type'], "get"), (int) $result['block_id'], $this);
+			}
+		}
+		
+		// Cache the text
+		return Database::query("REPLACE INTO content_cache (content_id, body) VALUES (?, ?)", array($this->contentID, $body));
+	}
+	
+	
+	
+	
 	
 	
 /****** Update the Thumbnail ******/
@@ -721,6 +958,55 @@ class ContentForm {
 	): void						// RETURNS <void>
 	
 	// $this->updateThumbnail();
+	{
+		// Initialize the plugin
+		$imageUpload = new ImageUpload($_FILES['thumb_image']);
+		
+		// Set your image requirements
+		$imageUpload->maxWidth = 4200;
+		$imageUpload->maxHeight = 3500;
+		$imageUpload->minWidth = 320;
+		$imageUpload->minHeight = 180;
+		$imageUpload->maxFilesize = 1024 * 3000;	// 3 megabytes
+		$imageUpload->saveMode = Upload::MODE_OVERWRITE;
+		
+		// Set the image directory
+		$srcData = Upload::fileBucketData($this->contentID, 10000);
+		$bucketDir = '/assets/content/' . $srcData['main_directory'] . '/' . $srcData['second_directory'];
+		$imageDir = CONF_PATH . $bucketDir;
+		
+		// Save the image to a chosen path
+		if($imageUpload->validate())
+		{
+			$image = new Image($imageUpload->tempPath, $imageUpload->width, $imageUpload->height, $imageUpload->extension);
+			
+			if(FormValidate::pass())
+			{
+				// Resize the image to the appropriate size (320 x 180)
+				$image->autoCrop(320, 180);
+				
+				// Prepare the filename for this image
+				$imageUpload->filename = $this->contentID . '-thumb';
+				
+				// Save the image
+				$image->save($imageDir . '/' . $imageUpload->filename . '.jpg');
+				
+				$imageURL = SITE_URL . $bucketDir . '/' . $imageUpload->filename . '.jpg';
+				
+				// Save the thumbnail
+				Database::query("UPDATE content_entries SET thumbnail=? WHERE id=? LIMIT 1", array($imageURL, $this->contentID));
+				
+				$this->contentData['thumbnail'] = $imageURL;
+			}
+		}
+	}
+	
+	
+/****** Update the Thumbnail Automatically ******/
+	public function updateThumbnailAuto (
+	): void						// RETURNS <void>
+	
+	// $this->updateThumbnailAuto();
 	{
 		$coreData = Content::scanForCoreData($this->contentID, 5);
 		
@@ -740,11 +1026,8 @@ class ContentForm {
 			// Prepare the image that will become the thumbnail
 			$image = new Image($imageDir . '/' . $this->contentID . '-thumb.jpg');
 			
-			// Resize the image to the appropriate size
-			if($image->width > 180 or $image->height > 220)
-			{
-				$image->autoWidth(180, 220);
-			}
+			// Resize the image to the appropriate size (320 x 180)
+			$image->autoCrop(320, 180);
 			
 			// If the image needs a video cover, provide it here
 			if($coreData['video_thumb'] and File::exists(APP_PATH . "/assets/icons/video_icon.png"))
@@ -763,124 +1046,6 @@ class ContentForm {
 		}
 		
 		$this->contentData['thumbnail'] = $coreData['thumbnail'];
-	}
-	
-	
-/****** Run Interpreter for Settings ******/
-	public function interpretSettings (
-	): void						// RETURNS <void>
-	
-	// $this->interpretSettings();
-	{
-		if(!Form::submitted(SITE_HANDLE . "-contentSettings")) { return false; }
-		
-		// Prepare Values
-		$_POST['title'] = (isset($_POST['title']) ? $_POST['title'] : 'Untitled Blog');
-		$_POST['status'] = (isset($_POST['status']) and $_POST['status'] != Content::STATUS_DRAFT) ? (int) $_POST['status'] : Content::STATUS_DRAFT;
-		$_POST['url_slug'] = (isset($_POST['url_slug']) ? strtolower($_POST['url_slug']) : '');
-		$_POST['primary_hashtag'] = (isset($_POST['primary_hashtag']) ? $_POST['primary_hashtag'] : '');
-		
-		$datePosted = 0;
-		$minSlugLen = 0;
-		
-		$comments = (isset($_POST['comments']) ? (int) $_POST['comments'] : Content::COMMENTS_STANDARD);
-		$voting = (isset($_POST['voting']) ? (int) $_POST['voting'] : Content::VOTING_STANDARD);
-		
-		// If you're not an editor (or otherwise have appropriate permissions)
-		if(Me::$clearance < 6)
-		{
-			// Standard users cannot change certain settings
-			$_POST['primary_hashtag'] = $this->contentData['primary_hashtag'];
-			$comments = $this->contentData['comments'];
-			$voting = $this->contentData['voting'];
-			
-			// Standard users are not allowed to change the post status once it has been made official
-			if($this->contentData['status'] >= Content::STATUS_OFFICIAL)
-			{
-				$_POST['status'] = $this->contentData['status'];
-			}
-			
-			// Standard users cannot affect the URL once it has been set publicly
-			if($this->contentData['url_slug'] and $this->contentData['status'] >= Content::STATUS_GUEST)
-			{
-				$_POST['url_slug'] = trim(str_replace($this->urlPrefix, "", $this->contentData['url_slug']), "/");
-			}
-		}
-		
-		// If the URL clearance is designed to prevent you from an update, bypass it appropriately
-		if($this->urlClearance == self::URL_DENY or ($this->contentData['url_slug'] != "" and $this->urlClearance == self::URL_ONCE))
-		{
-			$_POST['url_slug'] = $this->contentData['url_slug'];
-		}
-		
-		// Set URL standards if your post is live (or at least visible in guest form)
-		else if($_POST['status'] != Content::STATUS_DRAFT or $_POST['url_slug'])
-		{
-			$datePosted = time();
-			
-			// If the system is automatically applying a URL prefix, such as "/handle/", apply different rules
-			if($this->urlPrefix)
-			{
-				$minSlugLen = 3;
-			}
-			
-			// The standard rules apply to the URL if there is no URL prefix
-			else if($_POST['url_slug'])
-			{
-				$minSlugLen = 10;
-				
-				if(!strpos($_POST['url_slug'], "-"))
-				{
-					$_POST['url_slug'] = "";
-					
-					Alert::error("URL Requirement", 'The URL must contain at least one "-" dash, such as "local-team-wins-game".');
-				}
-			}
-		}
-		
-		// Validate the Form Values
-		FormValidate::safeword("Title", $_POST['title'], 3, 72, "'?");
-		FormValidate::variable("URL", $_POST['url_slug'], $minSlugLen, (42 - $this->urlPrefix), "-/");
-		FormValidate::variable("Primary Hashtag", $_POST['primary_hashtag'], 0, 22);
-		
-		// Update the Settings
-		if(FormValidate::pass())
-		{
-			// Update the Content Entry
-			if($this->update($this->contentID, $_POST['title'], $this->urlPrefix . $_POST['url_slug'], $_POST['status'], 0, 6, $datePosted, $_POST['primary_hashtag'], $comments, $voting))
-			{
-				// Update the cache
-				$this->updateCache();
-				
-				// Announce the success of the update
-				Alert::saveSuccess("Settings Updated", "The settings for this entry have been updated.");
-				
-				// Reload the page
-				header("Location: " . $this->baseURL . "?content=" . $this->contentID); exit;
-			}
-		}
-	}
-	
-	
-/****** Run Interpreter for Deletion ******/
-	public function interpretDelete (
-	): void						// RETURNS <void>
-	
-	// $this->interpretDelete();
-	{
-		if(!Form::submitted(SITE_HANDLE . "-contentDelete")) { return false; }
-		
-		if(isset($_POST['delete']) and strtolower($_POST['delete']) == "delete")
-		{
-			$this->delete($this->contentID);
-			
-			if(FormValidate::pass())
-			{
-				Alert::saveSuccess("Delete Successful", "The content entry has been successfully deleted.");
-				
-				header("Location: /"); exit;
-			}
-		}
 	}
 	
 	
@@ -930,211 +1095,14 @@ class ContentForm {
 	}
 	
 	
-/****** Update a Content Entry ******/
-	public function update
-	(
-		int $contentID			// <int> The ID of the content entry to update.
-	,	string $title				// <str> The title of the entry.
-	,	string $urlSlug			// <str> The url slug to assign the entry to.
-	,	int $status = 0			// <int> The current status to assign to the entry (e.g. Content::STATUS_DRAFT).
-	,	int $clearanceView = 0	// <int> The clearance required to view this entry.
-	,	int $clearanceEdit = 0	// <int> The clearance required to edit this entry.
-	,	int $datePosted = 0		// <int> The date that this entry has been posted (0 is ignore this).
-	,	string $primeHashtag = ""	// <str> Assigns a primary hashtag, if applicable ("" to ignore).
-	,	int $comments = 2		// <int> The type of comments to set.
-	,	int $voting = 2			// <int> The type of voting to set.
-	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
-	
-	// $contentForm->update($contentID, $title, $urlSlug, $status, $clearanceView, $clearanceEdit, $datePosted, [$primeHashtag], [$comments], [$voting]);
-	{
-		// Check the content entry data to see if it matches
-		if(!$entry = Database::selectOne("SELECT * FROM content_entries WHERE id=? LIMIT 1", array($contentID)))
-		{
-			return false;
-		}
-		
-		// Recognize Integers
-		$entry['uni_id'] = (int) $entry['uni_id'];
-		$entry['status'] = (int) $entry['status'];
-		$entry['clearance_view'] = (int) $entry['clearance_view'];
-		$entry['clearance_edit'] = (int) $entry['clearance_edit'];
-		$entry['comments'] = (int) $entry['comments'];
-		$entry['voting'] = (int) $entry['voting'];
-		$entry['date_posted'] = (int) $entry['date_posted'];
-		
-		// Prepare Values
-		$skipUpdate = false;
-		
-		// Check if you're updating values that are already set
-		if($entry['title'] == $title and $entry['url_slug'] == $urlSlug and $entry['status'] == $status and $entry['clearance_view'] == $clearanceView and $entry['clearance_edit'] == $clearanceEdit and $entry['comments'] == $comments and $entry['voting'] == $voting and $entry['primary_hashtag'] == $primeHashtag)
-		{
-			if($datePosted == 0 or $entry['date_posted'] == $datePosted)
-			{
-				$skipUpdate = true;
-				$success = true;
-			}
-		}
-		
-		// Everything seems okay to continue - process the update
-		if(!$skipUpdate)
-		{
-			Database::startTransaction();
-			
-			$pass = true;
-			
-			// Check if you've already been published on the current URL Slug
-			if(Database::selectValue("SELECT url_slug FROM content_by_url WHERE url_slug=? LIMIT 1", array($entry['url_slug'])))
-			{
-				if($entry['url_slug'] != $urlSlug)
-				{
-					$pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($entry['url_slug']));
-				}
-			}
-			
-			// If hashtags are being used, check if the entry is already posted there
-			// Delete any old version so that we can update to a new value later
-			if($pass and ($primeHashtag or $entry['primary_hashtag']))
-			{
-				if($entry['primary_hashtag'] != $primeHashtag)
-				{
-					Database::query("UPDATE IGNORE content_entries SET primary_hashtag=? WHERE id=? LIMIT 1", array($primeHashtag, $contentID));
-					
-					$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
-				}
-				
-				else if($status < Content::STATUS_OFFICIAL)
-				{
-					$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
-				}
-			}
-			
-			// If search archetypes are allowed and updated
-			if($pass and isset($entry['search_archetype']))
-			{
-				// If the update is official, we need to set the search data to live
-				if($status >= Content::STATUS_OFFICIAL and $entry['search_archetype'])
-				{
-					ModuleSearch::liveSubmission($contentID, $entry['search_archetype']);
-				}
-				else
-				{
-					ModuleSearch::guestSubmission($contentID);
-				}
-			}
-			
-			// Update the entry
-			if($pass)
-			{
-				if($pass = Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, url_slug=?, status=?, clearance_view=?, clearance_edit=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($title, $primeHashtag, $urlSlug, $status, $clearanceView, $clearanceEdit, $comments, $voting, ($datePosted == 0 ? $entry['date_posted'] : $datePosted), $contentID)))
-				{
-					// Set the URL Slug if necessary
-					if($entry['url_slug'] != $urlSlug)
-					{
-						$pass = Database::query("INSERT INTO content_by_url (url_slug, content_id) VALUES (?, ?)", array($urlSlug, $contentID));
-					}
-					
-					// Update the hashtag handler, if applicable
-					if($pass and $status >= Content::STATUS_OFFICIAL and $primeHashtag)
-					{
-						if($pass = ModuleHashtags::setHashtag($contentID, $primeHashtag))
-						{
-							$pass = Database::query("REPLACE INTO content_by_hashtag (hashtag, content_id) VALUES (?, ?)", array($primeHashtag, $contentID));
-						}
-					}
-				}
-			}
-			
-			// Run custom update methods
-			if($pass)
-			{
-				// Prepare Custom Data
-				$customData = array(
-					'content_id'		=> $contentID
-				,	'status'			=> $status
-				,	'title'				=> $title
-				,	'url_slug'			=> $urlSlug
-				,	'primary_hashtag'	=> $primeHashtag
-				);
-				
-				$pass = $this->customUpdate($customData);
-			}
-			
-			// Add the entry to a queue if it is a guest post
-			if($pass and $status == Content::STATUS_GUEST)
-			{
-				Content::queue($contentID);
-			}
-			
-			// Finalize the update
-			$success = Database::endTransaction($pass);
-		}
-		
-		// Submit hashtags, if applicable
-		if($success and isset($this->modules["Hashtags"]) and ($status >= Content::STATUS_OFFICIAL or ($status >= Content::STATUS_GUEST and Content::$openPost == true)))
-		{
-			// Get the list of hashtags for this content ID
-			list($submittedHashtags, $unsubmittedHashtags) = ModuleHashtags::getBySub($contentID);
-			
-			// If we've already submitted hashtags for this system, we're actually just building upon an existing set.
-			// This means we can set the type to 'resubmitted' and reuse the attachments already there.
-			$resubmit = ($submittedHashtags ? true : false);
-			
-			// Make sure there are hashtags that actually need to be submitted
-			if($unsubmittedHashtags)
-			{
-				// Get the core data that the hashtag system will require
-				$coreData = Content::scanForCoreData($contentID);
-				
-				// Submit the hashtags
-				if(ModuleHashtags::setSubmitted($contentID, $unsubmittedHashtags))
-				{
-					ContentHashtags::tagEntry($contentID, $unsubmittedHashtags);
-					
-					Hashtag::submitContentEntry($entry['uni_id'], self::$contentType, $title, $coreData['body'], $unsubmittedHashtags, SITE_URL . "/" . trim($urlSlug, "/"), $coreData['image_url'], $coreData['mobile_url'], $coreData['video_url'], $resubmit);
-				}
-			}
-		}
-		
-		return $success;
-	}
-	
-	
-/****** Update a Content Entry's content, but not any of its settings ******/
-	public function updateCache (
-	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
-	
-	// $contentForm->updateCache();
-	{
-		// Prepare the text for being cached
-		$body = "";
-		
-		// Get the list of content segments
-		$results = Database::selectMultiple("SELECT block_id, type FROM content_block_segment WHERE content_id=? ORDER BY sort_order ASC", array($this->contentID));
-		
-		// Pull the text from the appropriate block type
-		foreach($results as $result)
-		{
-			if(method_exists("Module" . $result['type'], "get"))
-			{
-				$body .= call_user_func(array("Module" . $result['type'], "get"), (int) $result['block_id']);
-			}
-		}
-		
-		// Cache the text
-		return Database::query("REPLACE INTO content_cache (content_id, body) VALUES (?, ?)", array($this->contentID, $body));
-	}
-	
-	
-/****** Delete a content entry and all of the other pieces related to it ******/
-	public function delete
-	(
-		int $contentID		// <int> The ID of the content entry to delete
+/****** Delete the content entry and all of the other pieces related to it ******/
+	public function delete (
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// $contentForm->delete($contentID);
+	// ContentForm::delete($contentID);
 	{
-		// Get the necessary data
-		$contentData = Content::get($contentID);
+		// Prepare Values
+		$contentID = $this->contentID;
 		
 		// Begin the deletion process
 		Database::startTransaction();
@@ -1147,14 +1115,14 @@ class ContentForm {
 		}
 		
 		// Delete the URL Data
-		if(!Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($contentData['url_slug'])))
+		if(!Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($this->contentData['url_slug'])))
 		{
 			Alert::error("Delete Error", "Deletion halted: the URL section could not be deleted properly.");
 			return Database::endTransaction(false);
 		}
 		
 		// Delete the User Data
-		if(!Database::query("DELETE FROM content_by_user WHERE uni_id=? AND content_id=? LIMIT 1", array($contentData['uni_id'], $contentID)))
+		if(!Database::query("DELETE FROM content_by_user WHERE uni_id=? AND content_id=? LIMIT 1", array($this->contentData['uni_id'], $contentID)))
 		{
 			Alert::error("Delete Error", "Deletion halted: the user data could not be deleted properly.");
 			return Database::endTransaction(false);
@@ -1168,7 +1136,7 @@ class ContentForm {
 		}
 		
 		// Loop through each module's purge functionality
-		foreach($this->modules as $module => $bool)
+		foreach($this->settings as $module => $bool)
 		{
 			if(method_exists("Module" . $module, "purge"))
 			{
@@ -1245,7 +1213,7 @@ class ContentForm {
 		}
 		
 		// Run any additional custom deletions
-		if(!$this->customDelete())
+		if(method_exists($this, "customDelete") and !$this->customDelete())
 		{
 			Alert::error("Delete Error", "Deletion halted: the custom deletion process failed.");
 			return Database::endTransaction(false);
@@ -1255,9 +1223,9 @@ class ContentForm {
 		Database::endTransaction();
 		
 		// Delete the thumbnail for the content entry, if applicable
-		if(isset($contentData['thumbnail']))
+		if(isset($this->contentData['thumbnail']))
 		{
-			$urlData = URL::parse($contentData['thumbnail']);
+			$urlData = URL::parse($this->contentData['thumbnail']);
 			
 			if(isset($urlData['path']) and File::exists($urlData['path']))
 			{
@@ -1275,9 +1243,9 @@ class ContentForm {
 		int $contentID		// <int> The ID of the content entry to assign this text block to.
 	,	string $type			// <str> The type of segment being created (e.g. TYPE_TEXT, TYPE_IMAGE, etc.)
 	,	int $blockID		// <int> The ID of the block that needs to be created.
-	): int					// RETURNS <int> the sort order of the new segment, or 0 on failure.
+	): int					// RETURNS <int> the ID of the block, or 0 on failure.
 	
-	// $segmentID = ContentForm::createSegment($contentID, $type, $blockID);
+	// $segmentID = $contentForm->createSegment($contentID, $type, $blockID);
 	{
 		// Get the last sort order
 		if(!$sortOrder = (int) Database::selectValue("SELECT sort_order FROM content_block_segment WHERE content_id=? ORDER BY sort_order DESC LIMIT 1", array($contentID)))
@@ -1295,7 +1263,7 @@ class ContentForm {
 			return 0;
 		}
 		
-		return $sortOrder;
+		return $blockID;
 	}
 	
 	
@@ -1319,41 +1287,6 @@ class ContentForm {
 		if($pass = Database::query("DELETE FROM content_block_segment WHERE content_id=? AND type=? AND block_id=? LIMIT 1", array($contentID, $type, $blockID)))
 		{
 			$pass = Database::query("UPDATE IGNORE content_block_segment SET sort_order = sort_order - 1 WHERE content_id=? AND sort_order >= ?", array($contentID, $sortOrder));
-		}
-		
-		return Database::endTransaction($pass);
-	}
-	
-	
-/****** Move a block up in the sort order of a segment list ******/
-	public static function moveUp
-	(
-		int $contentID		// <int> The ID of the content entry assigned to this segment piece.
-	,	string $type = ""		// <str> The type of the segment.
-	,	int $blockID = 0	// <int> The ID of the block associated with this segment piece.
-	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
-	
-	// ContentForm::moveUp($contentID, $type, $blockID);
-	{
-		// Find the current sort order of the designated segment
-		if(!$sortOrder = (int) Database::selectValue("SELECT sort_order FROM content_block_segment WHERE content_id=? AND type=? AND block_id=? LIMIT 1", array($contentID, $type, $blockID)))
-		{
-			return false;
-		}
-		
-		// Make sure there is upward mobility (a block higher than itself)
-		if($sortOrder <= 1) { return false; }
-		
-		$swapOrder = $sortOrder - 1;
-		
-		Database::startTransaction();
-		
-		if($pass = Database::query("UPDATE content_block_segment SET sort_order=? WHERE content_id=? AND sort_order=? LIMIT 1", array(0, $contentID, $sortOrder)))
-		{
-			if($pass = Database::query("UPDATE content_block_segment SET sort_order=? WHERE content_id=? AND sort_order=? LIMIT 1", array($sortOrder, $contentID, $swapOrder)))
-			{
-				$pass = Database::query("UPDATE content_block_segment SET sort_order=? WHERE content_id=? AND sort_order=? LIMIT 1", array($swapOrder, $contentID, 0));
-			}
 		}
 		
 		return Database::endTransaction($pass);

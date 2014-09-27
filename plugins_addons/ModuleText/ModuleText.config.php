@@ -28,8 +28,6 @@ class ModuleText_config {
 			`id`					int(10)			unsigned	NOT NULL	AUTO_INCREMENT,
 			
 			`class`					varchar(22)					NOT NULL	DEFAULT '',
-			
-			`title`					varchar(120)				NOT NULL	DEFAULT '',
 			`body`					text						NOT NULL	DEFAULT '',
 			
 			PRIMARY KEY (`id`)

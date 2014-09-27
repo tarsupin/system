@@ -24,7 +24,6 @@ class ContentTrack {
 	
 /****** Plugin Variables ******/
 	public int $contentID = 0;			// <int> The ID of the content entry.
-	public array <str, mixed> $trackerData = array();	// <str:mixed> The tracker data for this content entry.
 	
 	public int $uniID = 0;				// <int> The UniID to be tracking.
 	public bool $userTracker = false;	// <bool> TRUE if the user has viewed this page, and has tracker data.
@@ -42,34 +41,15 @@ class ContentTrack {
 	// $contentTrack = new ContentTrack($contentID, [$uniID]);
 	{
 		// Prepare Values
-		$this->contentID = $contentID + 0;
-		$this->uniID = $uniID + 0;
+		$this->contentID = (int) $contentID;
+		$this->uniID = (int) $uniID;
 		
 		// Attempt to retrieve the existing tracking data for this entry
-		if(!$this->trackerData = Database::selectOne("SELECT content_id, rating, views, shared, comments, votes_up, votes_down, tipped_times, tipped_amount, flagged FROM content_tracking WHERE content_id=? LIMIT 1", array($this->contentID)))
+		if(!Database::selectOne("SELECT content_id FROM content_tracking WHERE content_id=? LIMIT 1", array($this->contentID)))
 		{
 			// If we couldn't retrieve an existing row, create one
-			if(Database::query("INSERT INTO content_tracking (content_id) VALUES (?)", array($this->contentID)))
-			{
-				// After creating the row initially, retrieve it
-				$this->trackerData = Database::selectOne("SELECT content_id, rating, views, shared, comments, votes_up, votes_down, tipped_times, tipped_amount, flagged FROM content_tracking WHERE content_id=? LIMIT 1", array($this->contentID));
-			}
+			Database::query("INSERT IGNORE INTO content_tracking (content_id) VALUES (?)", array($this->contentID));
 		}
-		
-		// If there was an error retrieving the tracker data, end now
-		if(!$this->trackerData)
-		{
-			return;
-		}
-		
-		// Recognize Integers
-		$this->trackerData['content_id'] = (int) $this->trackerData['content_id'];
-		$this->trackerData['rating'] = (int) $this->trackerData['rating'];
-		$this->trackerData['content_id'] = (int) $this->trackerData['content_id'];
-		$this->trackerData['content_id'] = (int) $this->trackerData['content_id'];
-		$this->trackerData['content_id'] = (int) $this->trackerData['content_id'];
-		$this->trackerData['content_id'] = (int) $this->trackerData['content_id'];
-		$this->trackerData['content_id'] = (int) $this->trackerData['content_id'];
 		
 		// Run the user's tracker, if a UniFaction user is logged in
 		if($this->uniID)
@@ -92,7 +72,7 @@ class ContentTrack {
 			// Pull the results gathered and save the values appropriately
 			if($results)
 			{
-				$results['vote'] = (int) $result['vote'];
+				$results['vote'] = (int) $results['vote'];
 				
 				$this->userTracker = true;
 				$this->userShared = ($results['shared'] ? true : false);
@@ -132,8 +112,13 @@ class ContentTrack {
 	
 	// $contentTrack->updateRating();
 	{
+		// Get Tracking Data
+		$trackingData = self::getData($this->contentID);
+		
+		if(!$trackingData) { return false; }
+		
 		// Run the algorithms to determine the ratings
-		$rating = Ranking::contentRatings($this->trackerData['views'], $this->trackerData['votes_up'], $this->trackerData['votes_down'], $this->trackerData['comments'], $this->trackerData['shared'], $this->trackerData['tipped_amount']);
+		$rating = Ranking::contentRatings((int) $trackingData['views'], (int) $trackingData['votes_up'], (int) $trackingData['votes_down'], (int) $trackingData['comments'], (int) $trackingData['shared'], (int) $trackingData['tipped_amount']);
 		
 		// Update the tracker with the new rating
 		return Database::query("UPDATE content_tracking SET rating=? WHERE content_id=? LIMIT 1", array($rating, $this->contentID));
@@ -253,7 +238,31 @@ class ContentTrack {
 	}
 	
 	
-/****** Set user tracking for a content entry ******/
+/****** Track a user's nooch for this entry ******/
+	public function nooch (
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
+	
+	// $contentTrack->nooch();
+	{
+		Database::startTransaction();
+		
+		if($pass = Database::query("UPDATE content_tracking_users SET nooch=nooch+? WHERE uni_id=? AND content_id=? LIMIT 1", array(1, $this->uniID, $this->contentID)))
+		{
+			$pass = Database::query("UPDATE content_tracking SET nooch=nooch+? WHERE content_id=? LIMIT 1", array(1, $this->contentID));
+		}
+		
+		if(Database::endTransaction($pass))
+		{
+			// Nooches do not affect the ratings right now
+			// We may want to update this later
+			// $this->updateRating();
+		}
+		
+		return $pass;
+	}
+	
+	
+/****** Track a user's share for this entry ******/
 	public function share (
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
@@ -315,7 +324,9 @@ class ContentTrack {
 			return false;
 		}
 		
-		$this->trackerData['flagged'] += 1;
+		// Prepare Flag Count
+		$flags = Database::selectValue("SELECT flagged FROM content_tracking WHERE content_id=? LIMIT 1", array($contentID));
+		$flags = (int) ($flags + 1);
 		
 		// Update the number of flags on this content
 		Database::startTransaction();
@@ -323,7 +334,7 @@ class ContentTrack {
 		if($pass = Database::query("UPDATE content_tracking SET flagged=flagged+? WHERE content_id=? LIMIT 1", array(1, $this->contentID)))
 		{
 			// Check how many times the content has been flagged, and set the importance based on this value
-			$importance = min(9, $this->trackerData['flagged']);
+			$importance = min(9, $flags);
 			
 			// Create a report
 			$pass = Database::query("INSERT INTO site_reports (submitter_id, uni_id, importance_level, url, timestamp) VALUES (?, ?, ?, ?, ?)", array(Me::$id, $contentData['uni_id'], $importance, SITE_URL . "/" . $contentData['url_slug'], time()));
@@ -347,5 +358,32 @@ class ContentTrack {
 		}
 		
 		return false;
+	}
+	
+	
+/****** Get the Content Tracking Data ******/
+	public static function getData
+	(
+		int $contentID		// <int> The ID of the content entry.
+	,	int $uniID = 0		// <int> The UniID to pull tracking data for.
+	): array <str, mixed>					// RETURNS <str:mixed>
+	
+	// $trackingData = ContentTrack::getData($contentID, [$uniID]);
+	{
+		if(!$uniID)
+		{
+			if(!$result = Database::selectOne("SELECT * FROM content_tracking WHERE content_id=? LIMIT 1", array($contentID)))
+			{
+				return array();
+			}
+			
+			$result['user_vote'] = 0;
+			$result['user_nooch'] = 0;
+			$result['user_shared'] = 0;
+			
+			return $result;
+		}
+		
+		return Database::selectOne("SELECT t.*, u.shared as user_shared, u.vote as user_vote, u.nooch as user_nooch FROM content_tracking t LEFT JOIN content_tracking_users u ON u.uni_id=? AND u.content_id=t.content_id WHERE t.content_id=? LIMIT 1", array($uniID, $contentID));
 	}
 }

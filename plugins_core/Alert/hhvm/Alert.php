@@ -256,11 +256,18 @@ abstract class Alert {
 	
 /****** Check if there are Errors ******/
 # Note: This method can be used to identify if a form succeeds or not.
-	public static function hasErrors (
-	): bool		// RETURNS <bool> TRUE if there are error alerts, FALSE if not
+	public static function hasErrors
+	(
+		string $key = ""		// <str> If specified, only checks this particular key for errors.
+	): bool					// RETURNS <bool> TRUE if there are error alerts, FALSE if not
 	
-	// if(!Alert::hasErrors()) { echo "There were no errors!"; }
+	// if(!Alert::hasErrors([$key])) { echo "There were no errors!"; }
 	{
+		if($key)
+		{
+			return (isset(self::$errorList[$key]) ? true : false);
+		}
+		
 		return (self::$errorList == array() ? false : true);
 	}
 	

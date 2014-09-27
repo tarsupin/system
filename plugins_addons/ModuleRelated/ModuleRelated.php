@@ -29,12 +29,12 @@ abstract class ModuleRelated {
 	
 	
 /****** Draw the form for this module ******/
-	public static function drawForm
+	public static function draw
 	(
 		$formClass		// <mixed> The form class.
 	)					// RETURNS <void> outputs the appropriate data.
 	
-	// ModuleRelated::drawForm($formClass);
+	// ModuleRelated::draw($formClass);
 	{
 		// Delete Relative Content, if applicable
 		if(isset($_GET['delRel']))
@@ -48,33 +48,45 @@ abstract class ModuleRelated {
 		// Display the Form
 		echo '
 		<div style="margin-top:22px;">
-			<span style="font-weight:bold;">Related Content Entries:</span><br />';
+			<span style="font-weight:bold;">Related Posts:</span><br />';
 		
 		// Provide a list of existing content entries that are associated with this one
-		echo '
-		<style>
-			.form-rel-art { display:inline-block; padding:10px; text-align:center; max-width:130px; vertical-align:top; position:relative; }
-			.form-rel-art img { max-width:130px; }
-			.form-rel-del { position:absolute; top:10px; right:10px; background-color:#bb0000; padding:4px; }
-		</style>';
-		
-		foreach($relatedArticles as $art)
+		if($relatedArticles)
 		{
-			echo '
-			<div class="form-rel-art"><div class="form-rel-del"><a href="' . $formClass->baseURL . '?action=meta&content=' . ($formClass->contentID + 0) . '&t=' . self::$type . '&delRel=' . $art['id'] . '">X</a></div><a href="' . $formClass->baseURL . '?action=meta&content=' . ($art['id'] + 0) . '"><img src="' . $art['thumbnail'] . '" /></a><br />' . $art['title'] . '</div>';
+			echo '<div style="margin-bottom:8px;">';
+			
+			foreach($relatedArticles as $art)
+			{
+				echo '
+				<div class="form-rel-art"><div class="form-rel-del"><a href="' . $formClass->baseURL . '?id=' . $formClass->contentID . '&delRel=' . $art['id'] . '">X</a></div><a href="' . $formClass->baseURL . '?id=' . ($art['id'] + 0) . '" target="_new"><img src="' . $art['thumbnail'] . '" /></a><br />' . $art['title'] . '</div>';
+			}
+			
+			echo '</div>';
 		}
 		
 		// Add a related content article by it's URL slug, relative to the base domain
 		// You can insert a direct domain link here as well.
 		echo '
-			<div style="margin-top:22px; font-weight:bold;">Add New Related Content:</div>
-			<form class="uniform" action="' . $formClass->baseURL . '?action=meta&content=' . ($formClass->contentID + 0) . '&t=' . self::$type . '" method="post">' . Form::prepare(SITE_HANDLE . "-modRelated") . '
-				<p>
-					<input type="text" name="rel_url" value="' . (isset($_POST['rel_url']) ? Sanitize::url($_POST['rel_url']) : '') . '" placeholder="URL of related content . . ." size="42" maxlength="100" autocomplete="off" tabindex="10" autofocus />
-				</p>
-				<p><input type="submit" name="add_rel_url" value="Add Related Content" /></p>
-			</form>
+			<p>
+				<input type="text" name="rel_url" value="' . (isset($_POST['rel_url']) ? Sanitize::url($_POST['rel_url']) : '') . '" placeholder="URL of related post . . ." size="42" maxlength="100" autocomplete="off" tabindex="10" /> <input type="submit" name="add_rel_url" value="Add Related Post" />
+			</p>
 		</div>';
+	}
+	
+	
+/****** Run Behavior Checks ******/
+	public static function behavior
+	(
+		$formClass		// <mixed> The class data.
+	)					// RETURNS <void>
+	
+	// ModuleRelated::behavior($formClass);
+	{
+		// Delete a related entry, if applicable
+		if(isset($_GET['delRel']))
+		{
+			self::delete($formClass->contentID, (int) $_GET['delRel']);
+		}
 	}
 	
 	
@@ -86,8 +98,7 @@ abstract class ModuleRelated {
 	
 	// ModuleRelated::interpret($formClass);
 	{
-		if(!Form::submitted(SITE_HANDLE . "-modRelated")) { return; }
-		
+		// Add a related post
 		if(isset($_POST['rel_url']) and $_POST['rel_url'])
 		{
 			if(self::createByURL($formClass->contentID, $_POST['rel_url']))

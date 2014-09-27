@@ -74,6 +74,13 @@ You will notice there are multiple types of search options that you can select f
 		
 		For example, if you're looking for people, you might want to search for Musicians and Actors. However, some people might be BOTH Musicians and Actors, and therefore they may fit into both categories.
 		
+------------
+
+// Display Search Widget
+list($singleFilters, $choiceFilters, $multiFilters) = ModuleSearch::getFilterData($archetype);
+$widgetHTML = ModuleSearch::widget($baseURL, $singleFilters, $choiceFilters, $multiFilters);
+WidgetLoader::add("SidePanel", 12, $widgetHTML);
+
 */
 
 abstract class ModuleSearch {
@@ -82,6 +89,9 @@ abstract class ModuleSearch {
 /****** Plugin Variables ******/
 	public static string $type = "Search";			// <str>
 	
+	// Values handled internally
+	public static array <int, int> $contentIDs = array();	// <int:int> A list of ContentIDs that were found by search.
+	
 	
 /****** Plugin Variables ******/
 	const FILTER_SINGLE = 1;		// Indicates the "single-option" filter type
@@ -89,128 +99,193 @@ abstract class ModuleSearch {
 	const FILTER_MULTI = 3;			// Indicates the "multi-option" filter type
 	
 	
-/****** Update a content entry's filters ******/
-	public static function interpret
+/****** Get the data of the search filters for a particular archetype ******/
+	public static function getFilterData
 	(
-		mixed $formClass		// <mixed> The class data.
-	): void					// RETURNS <void>
+		string $archetype		// <str> The type of archetype to extract filter data from.
+	): array <int, array<str, array>>					// RETURNS <int:[str:array]> The filter data that was recovered.
 	
-	// ModuleSearch::interpret($formClass);
+	// list($singleFilters, $choiceFilters, $multiFilters) = ModuleSearch::getFilterData($archetype);
 	{
-		// Update the Search Archetype
-		if(Form::submitted(SITE_HANDLE . "-modSearch-arch"))
+		// Prepare Values
+		$singleFilters = array();
+		$choiceFilters = array();
+		$multiFilters = array();
+		
+		// Gather the Filter Options
+		if(!$results = Database::selectMultiple("SELECT f.filter_name, f.filter_type, o.hashtag, o.title FROM content_search_filters f INNER JOIN content_search_filter_opts o ON f.id=o.filter_id WHERE f.archetype=? ORDER BY f.filter_name", array($archetype)))
 		{
-			$_POST['search_archetype'] = (isset($_POST['search_archetype']) ? Sanitize::variable($_POST['search_archetype'], "-") : '');
-			
-			if(Database::query("UPDATE content_entries SET search_archetype=? WHERE id=? LIMIT 1", array($_POST['search_archetype'], $formClass->contentID)))
+			return array(array(), array(), array());
+		}
+		
+		foreach($results as $res)
+		{
+			switch($res['filter_type'])
 			{
-				// If the content is official, we can add the search data
-				if($formClass->contentData['status'] < Content::STATUS_OFFICIAL)
-				{
-					Database::query("DELETE IGNORE FROM content_search WHERE content_id=? LIMIT 1", array($formClass->contentID));
-				}
+				// If this is a "single-option-only" filter
+				case self::FILTER_SINGLE:
+					$singleFilters[$res['filter_name']][$res['hashtag']] = $res['title']; continue;
 				
-				// Display the success and load the appropriate page
-				Alert::saveSuccess("Search Updated", "The Search Archetype has been set.");
-				
-				header("Location: " . $formClass->baseURL . "?action=meta&content=" . $formClass->contentID . "&t=" . self::$type); exit;
+				// If this is a "choice option" filter
+				case self::FILTER_CHOICE:
+					$choiceFilters[$res['filter_name']][$res['hashtag']] = $res['title']; continue;
+					
+				// If this is a "multi-option" filter
+				case self::FILTER_MULTI:
+					$multiFilters[$res['filter_name']][$res['hashtag']] = $res['title']; continue;
 			}
 		}
 		
-		// Update the Filters
-		if(Form::submitted(SITE_HANDLE . "-modSearch-filt"))
+		return array($singleFilters, $choiceFilters, $multiFilters);
+	}
+	
+	
+/****** Search the available content on the system ******/
+	public static function search
+	(
+		array <str, array<str, str>> $singleFilters		// <str:[str:str]> The single-option filters involved in this search.
+	,	array $choiceFilters		// <array> The choice-option filters involved in this search.
+	,	array $multiFilters		// <array> The multi-option filters involved in this search.
+	,	bool $boolMode = true	// <bool> TRUE if you are using boolean mode (forces each entry to be used)
+	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
+	
+	// ModuleSearch::search($singleFilters, $choiceFilters, $multiFilters, [$boolMode]);
+	{
+		// Make sure the appropriate information was sent
+		if(!Form::submitted(SITE_HANDLE . "-ctb"))
 		{
-			if(!isset($formClass->contentData['search_archetype']))
-			{
-				return;
-			}
-			
-			// Prepare Values
-			$keywords = "";
-			
-			// Get the list of filters for this archetype
-			list($singleFilters, $choiceFilters, $multiFilters) = self::getFilterData($formClass->contentData['search_archetype']);
-			
-			// Cycle through the list of single-option filters
-			foreach($singleFilters as $filter => $value)
-			{
-				// Check if the post data included this value
-				if(isset($_POST[$filter]))
-				{
-					$keywords .= " " . $_POST[$filter];
-				}
-			}
-			
-			// Cycle through the list of choice-option filters
-			foreach($choiceFilters as $filter => $value)
-			{
-				// Check if the post data included this value
-				if(isset($_POST[$filter]))
-				{
-					foreach($_POST[$filter] as $keyword => $active)
-					{
-						$keywords .= " " . $keyword;
-					}
-				}
-			}
-			
-			// Cycle through the list of multi-option filters
-			foreach($multiFilters as $filter => $value)
-			{
-				// Check if the post data included this value
-				if(isset($_POST[$filter]))
-				{
-					foreach($_POST[$filter] as $keyword => $active)
-					{
-						$keywords .= " " . $keyword;
-					}
-				}
-			}
-			
-			// Sanitize the keyword list
-			$keywords = Sanitize::variable($keywords, " ");
-			
-			Database::startTransaction();
-			
-			// Update the keywords into your draft
-			if($pass = Database::query("REPLACE INTO content_search_draft (content_id, keywords) VALUES (?, ?)", array($formClass->contentID, trim($keywords))))
-			{
-				if($formClass->contentData['status'] >= Content::STATUS_OFFICIAL)
-				{
-					$pass = Database::query("REPLACE INTO content_search (content_id, keywords) VALUES (?, ?)", array($formClass->contentID, $formClass->contentData['search_archetype'] . $keywords));
-				}
-				else
-				{
-					$pass = Database::query("DELETE IGNORE FROM content_search WHERE content_id=? LIMIT 1", array($formClass->contentID));
-				}
-			}
-			if(Database::endTransaction($pass))
-			{
-				Alert::success("Filters Updated", "The Search Filters have been updated.");
-			}
+			return false;
 		}
+		
+		// Return all entries in this archetype
+		if(!$hashtags = ModuleSearch::getSearchedHashtags($singleFilters, $choiceFilters, $multiFilters))
+		{
+			return false;
+		}
+		
+		// Prepare Values
+		self::$contentIDs = array();
+		$hashtagStr = "";
+		$hashtagPrefix = ($boolMode ? " +" : " ");
+		
+		foreach($hashtags as $hashtag)
+		{
+			$hashtagStr .= $hashtagPrefix . $hashtag;
+		}
+		
+		// Retrieve the list of entries that match the search
+		$results = Database::selectMultiple("SELECT content_id FROM content_search WHERE MATCH(hashtags) AGAINST (?" . ($boolMode ? ' IN BOOLEAN MODE' : '') . ")", array($hashtagStr));
+		
+		foreach($results as $result)
+		{
+			self::$contentIDs[] = (int) $result['content_id'];
+		}
+		
+		return true;
+	}
+	
+	
+/****** Display the Search Form ******/
+	public static function widget
+	(
+		string $baseURL			// <str> The base URL to return to.
+	,	array <str, array<str, str>> $singleFilters		// <str:[str:str]> The single-option filters involved in this search.
+	,	array $choiceFilters		// <array> The choice-option filters involved in this search.
+	,	array $multiFilters		// <array> The multi-option filters involved in this search.
+	): string						// RETURNS <str> HTML
+	
+	// $widgetHTML = ModuleSearch::widget($baseURL, $singleFilters, $choiceFilters, $multiFilters);
+	// WidgetLoader::add("SidePanel", 12, $widgetHTML);
+	{
+		$html = '
+		<div class="panel-box">
+			<form action="' . $baseURL . '" method="post">' . Form::prepare(SITE_HANDLE . "-ctb") . '
+			<a href="#" class="panel-head">Search Filters<span class="icon-circle-right nav-arrow"></a>
+			<div style="padding:0px 16px 8px 16px;">';
+			
+		// Show the Single Filters (ones that have only one option)
+		foreach($singleFilters as $filter => $filterData)
+		{
+			$html .= '
+			<div style="padding-bottom:8px;">
+				<select name="' . $filter . '">
+					<option value="">-- ' . ucwords(str_replace("-", " ", $filter)) . ' --</option>';
+			
+			foreach($filterData as $hashtag => $title)
+			{
+				$html .= '
+					<option value="' . $hashtag . '"' . ((isset($_POST[$filter]) and $hashtag == $_POST[$filter]) ? ' selected' : '') . '>' . $title . '</option>';
+			}
+			
+			$html .= '
+				</select>
+			</div>';
+		}
+		
+		// Show the Choice Filters
+		foreach($choiceFilters as $filter => $filterData)
+		{
+			$html .= '
+			<div style="padding-bottom:8px;">
+				<select name="' . $filter . '">
+					<option value="">-- ' . ucwords(str_replace("-", " ", $filter)) . ' --</option>';
+			
+			foreach($filterData as $hashtag => $title)
+			{
+				$html .= '
+					<option value="' . $hashtag . '"' . ((isset($_POST[$filter]) and $hashtag == $_POST[$filter]) ? ' selected' : '') . '>' . $title . '</option>';
+			}
+			
+			$html .= '
+				</select>
+			</div>';
+		}
+		
+		// Show the Multi-Select Filters
+		foreach($multiFilters as $filter => $filterData)
+		{
+			$html .= '
+			<div style="padding-bottom:8px;">
+				<span style="font-weight:bold;">' . ucwords(str_replace("-", " ", $filter)) . ':</span><br />';
+			
+			foreach($filterData as $hashtag => $title)
+			{
+				$html .= '
+				<div><input type="checkbox" name="' . $filter . '[' . $hashtag . ']"' . (isset($_POST[$filter][$hashtag]) ? ' checked' : '') . ' /> ' . $title . "</div>";
+			}
+			
+			$html .= '
+			</div>';
+		}
+		
+		$html .= '
+			<div><input type="submit" name="submit" value="Search" /></div>
+			</div>
+			</form>
+		</div>';
+		
+		return $html;
 	}
 	
 	
 /****** Draw the form for this module ******/
-	public static function drawForm
+	public static function draw
 	(
 		mixed $formClass		// <mixed> The form class.
 	): void					// RETURNS <void> outputs the appropriate data.
 	
-	// ModuleSearch::drawForm($formClass);
+	// ModuleSearch::draw($formClass);
 	{
 		// Get Search Archetypes
 		if(!$archetypeList = ModuleSearch::getArchetypes())
 		{
-			echo "There are no search archetypes available on this system."; return;
+			return;
 		}
 		
 		// Assign a Search Archetype
 		echo '
 		<div style="margin-top:22px;">
-		<form class="uniform" action="' . $formClass->baseURL . '?action=meta&content=' . ($formClass->contentID + 0) . '&t=' . self::$type . '" method="post">' . Form::prepare(SITE_HANDLE . "-modSearch-arch") . '
-			<h3>Search Type</h3>
+			<strong>Search Type</strong>
 			<p>
 				<select name="search_archetype">
 					<option value="">-- None Selected --</option>';
@@ -222,86 +297,41 @@ abstract class ModuleSearch {
 			}
 			
 			echo '</select>
-			<input type="submit" name="submit" value="Set" /></p>
-		</form>
 		</div>';
+	}
+	
+	
+/****** Update a content entry's filters ******/
+	public static function interpret
+	(
+		mixed $formClass		// <mixed> The class data.
+	): void					// RETURNS <void>
+	
+	// ModuleSearch::interpret($formClass);
+	{
+		// Update the Search Archetype
+		$_POST['search_archetype'] = (isset($_POST['search_archetype']) ? Sanitize::variable($_POST['search_archetype'], "-") : '');
 		
-		// If you don't have a search archetype selected, end here
-		if(!$formClass->contentData['search_archetype'])
+		Database::query("UPDATE content_entries SET search_archetype=? WHERE id=? LIMIT 1", array($_POST['search_archetype'], $formClass->contentID));
+		
+		// If the content is official, we can add the search data
+		if($formClass->contentData['status'] >= Content::STATUS_OFFICIAL)
 		{
-			return;
+			// Get the array of hashtags associated with the content entry
+			$hashtags = ModuleHashtags::get($formClass->contentID);
+			
+			$hashtagStr = implode(" ", $hashtags);
+			
+			// Update the search system with the hashtags for that entry
+			ModuleSearch::updateEntryFilters($formClass->contentID, $hashtagStr);
+			
+			// Run the live update for this system
+			ModuleSearch::liveSubmission($formClass->contentID);
 		}
-		
-		// Get the content entry's keywords
-		$keys = self::getContentKeys($formClass->contentID);
-		
-		// Get the list of filters
-		list($singleFilters, $choiceFilters, $multiFilters) = self::getFilterData($formClass->contentData['search_archetype']);
-		
-		// Display the search filter form
-		echo '
-		<div style="margin-top:22px;">
-			<h3>Search Filters</h3>
-			<form class="uniform" action="' . $formClass->baseURL . '?action=meta&content=' . ($formClass->contentID + 0) . '&t=' . self::$type . '" method="post">' . Form::prepare(SITE_HANDLE . "-modSearch-filt");
-		
-		// Show the Single Filters (ones that have only one option)
-		foreach($singleFilters as $filter => $filterData)
+		else
 		{
-			echo '
-			<p>
-				<span style="font-weight:bold;">' . str_replace("-", " ", ucwords($filter)) . ':</span>
-				<select name="' . $filter . '">
-					<option value="">-- Select an Option --</option>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				echo '
-					<option value="' . $keyword . '"' . (in_array($keyword, $keys) ? ' selected' : '') . '>' . $title . '</option>';
-			}
-			
-			echo '
-				</select>
-			</p>';
+			ModuleSearch::guestSubmission($formClass->contentID);
 		}
-		
-		// Show the Choice-Select Filters
-		foreach($choiceFilters as $filter => $filterData)
-		{
-			echo '
-			<p>
-				<span style="font-weight:bold;">' . str_replace("-", " ", ucwords($filter)) . ':</span>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				echo '
-				<input type="checkbox" name="' . $filter . '[' . $keyword . ']"' . (in_array($keyword, $keys) ? ' checked' : '') . ' /> ' . $title;
-			}
-			
-			echo '
-			</p>';
-		}
-		
-		// Show the Multi-Select Filters
-		foreach($multiFilters as $filter => $filterData)
-		{
-			echo '
-			<p>
-				<span style="font-weight:bold;">' . str_replace("-", " ", ucwords($filter)) . ':</span>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				echo '
-				<input type="checkbox" name="' . $filter . '[' . $keyword . ']"' . (in_array($keyword, $keys) ? ' checked' : '') . ' /> ' . $title;
-			}
-			
-			echo '
-			</p>';
-		}
-		
-		echo '
-			<p><input type="submit" name="submit" value="Update Filters" /></p>
-			</form>
-		</div>';
 	}
 	
 	
@@ -309,18 +339,17 @@ abstract class ModuleSearch {
 	public static function liveSubmission
 	(
 		int $contentID		// <int> The ID of the content entry to update.
-	,	string $archetype		// <str> The search archetype that the content uses.
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// ModuleSearch::liveSubmission($contentID, $archetype);
+	// ModuleSearch::liveSubmission($contentID);
 	{
-		// Get the drafted keywords for this submission
-		if(!$keywords = Database::selectValue("SELECT keywords FROM content_search_draft WHERE content_id=? LIMIT 1", array($contentID)))
+		// Get the drafted hashtags for this submission
+		if(!$hashtagStr = Database::selectValue("SELECT hashtags FROM content_search_draft WHERE content_id=? LIMIT 1", array($contentID)))
 		{
 			return false;
 		}
 		
-		return Database::query("REPLACE INTO content_search (content_id, keywords) VALUES (?, ?)", array($contentID, $archetype . " " . $keywords));
+		return Database::query("REPLACE INTO content_search (content_id, hashtags) VALUES (?, ?)", array($contentID, $hashtagStr));
 	}
 	
 	
@@ -340,56 +369,55 @@ abstract class ModuleSearch {
 	public static function updateEntryFilters
 	(
 		int $contentID		// <int> The ID of the content entry to update.
-	,	string $archetype		// <str> The archetype of this content.
-	,	string $keywords		// <str> The keywords.
+	,	string $hashtagStr		// <str> The hashtag string.
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// ModuleSearch::updateEntryFilters($contentID, $archetype, $keywords);
+	// ModuleSearch::updateEntryFilters($contentID, $hashtags);
 	{
-		return Database::query("UPDATE content_search_draft SET keywords=? WHERE content_id=? LIMIT 1", array($archetype . " " . $keywords, $contentID));
+		return Database::query("REPLACE INTO content_search_draft (content_id, hashtags) VALUES (?, ?)", array($contentID, $hashtagStr));
 	}
 	
 	
 /****** Get a content entry's filters ******/
-	public static function getContentKeys
+	public static function getContentHashtags
 	(
-		int $contentID		// <int> The ID of the content entry to get keywords from.
-	): array <int, str>					// RETURNS <int:str> The keywords for the content.
+		int $contentID		// <int> The ID of the content entry to get hashtags from.
+	): array <int, str>					// RETURNS <int:str> The hashtags for the content.
 	
-	// $keys = ModuleSearch::getContentKeys($contentID);
+	// $hashtags = ModuleSearch::getContentHashtags($contentID);
 	{
-		// Get the search keys
-		if(!$results = Database::selectOne("SELECT keywords FROM content_search_draft WHERE content_id=? LIMIT 1", array($contentID)))
+		// Get the search hashtags
+		if(!$results = Database::selectOne("SELECT hashtags FROM content_search_draft WHERE content_id=? LIMIT 1", array($contentID)))
 		{
 			return array();
 		}
 		
-		// Extract the keys
-		$keys = explode(" ", $results['keywords']);
+		// Extract the hashtags
+		$hashtags = explode(" ", $results['hashtags']);
 		
 		// Return the Values
-		return $keys;
+		return $hashtags;
 	}
 	
 	
-/****** Obtain the keys posted from a search ******/
-	public static function getSearchResultKeys
+/****** Obtain the hashtags posted from a search ******/
+	public static function getSearchedHashtags
 	(
 		array $singleFilters		// <array> The single-option filters to check.
 	,	array $choiceFilters		// <array> The choice-option filters to check.
 	,	array $multiFilters		// <array> The multi-option filters to check.
-	): array <int, str>						// RETURNS <int:str> The resulting keys that were searched.
+	): array <int, str>						// RETURNS <int:str> The resulting hashtags that were searched.
 	
-	// $keysSearched = ModuleSearch::getSearchResultKeys($singleFilters, $choiceFilters, $multiFilters);
+	// $hashtags = ModuleSearch::getSearchedHashtags($singleFilters, $choiceFilters, $multiFilters);
 	{
 		// Retrieve the list of content entries
-		$keys = array();
+		$hashtags = array();
 		
 		foreach($singleFilters as $filter => $filterData)
 		{
 			if(isset($_POST[$filter]) and $_POST[$filter])
 			{
-				$keys[] = $_POST[$filter];
+				$hashtags[] = $_POST[$filter];
 			}
 		}
 		
@@ -397,22 +425,22 @@ abstract class ModuleSearch {
 		{
 			if(isset($_POST[$filter]) and $_POST[$filter])
 			{
-				$keys[] = $_POST[$filter];
+				$hashtags[] = $_POST[$filter];
 			}
 		}
 		
 		foreach($multiFilters as $filter => $filterData)
 		{
-			foreach($filterData as $key => $val)
+			foreach($filterData as $hashtag => $val)
 			{
-				if(isset($_POST[$filter][$key]))
+				if(isset($_POST[$filter][$hashtag]))
 				{
-					$keys[] = $key;
+					$hashtags[] = $hashtag;
 				}
 			}
 		}
 		
-		return $keys;
+		return $hashtags;
 	}
 	
 	
@@ -429,58 +457,17 @@ abstract class ModuleSearch {
 	}
 	
 	
-/****** Get the data of the search filters for a particular archetype ******/
-	public static function getFilterData
-	(
-		string $archetype		// <str> The type of archetype to extract filter data from.
-	): array <int, array<str, array>>					// RETURNS <int:[str:array]> The filter data that was recovered.
-	
-	// list($singleFilters, $choiceFilters, $multiFilters) = ModuleSearch::getFilterData($archetype);
-	{
-		// Prepare Values
-		$singleFilters = array();
-		$choiceFilters = array();
-		$multiFilters = array();
-		
-		// Gather the Filter Options
-		if(!$results = Database::selectMultiple("SELECT f.filter_name, f.filter_type, o.keyword, o.title FROM content_search_filters f INNER JOIN content_search_filter_opts o ON f.id=o.filter_id WHERE f.archetype=? ORDER BY f.filter_name", array($archetype)))
-		{
-			return array(array(), array(), array());
-		}
-		
-		foreach($results as $res)
-		{
-			switch($res['filter_type'])
-			{
-				// If this is a "single-option-only" filter
-				case self::FILTER_SINGLE:
-					$singleFilters[$res['filter_name']][$res['keyword']] = $res['title']; continue;
-				
-				// If this is a "choice option" filter
-				case self::FILTER_CHOICE:
-					$choiceFilters[$res['filter_name']][$res['keyword']] = $res['title']; continue;
-					
-				// If this is a "multi-option" filter
-				case self::FILTER_MULTI:
-					$multiFilters[$res['filter_name']][$res['keyword']] = $res['title']; continue;
-			}
-		}
-		
-		return array($singleFilters, $choiceFilters, $multiFilters);
-	}
-	
-	
 /****** Create a Search Filter Option ******/
 	public static function createFilterOption
 	(
 		string $archetype			// <str> The archetype to add this filter to.
 	,	string $filterName			// <str> The name of the filter to create.
-	,	string $keyword			// <str> The keyword to assign.
-	,	string $title				// <str> The human-readable form of the keyword.
+	,	string $hashtag			// <str> The hashtag to assign.
+	,	string $title				// <str> The human-readable form of the hashtag.
 	,	int $filterType = 1		// <int> The filter type to use (e.g. ModuleSearch::FILTER_SINGLE).
 	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// ModuleSearch::createFilterOption($archetype, $filterName, $keyword, $title, [$filterType]);
+	// ModuleSearch::createFilterOption($archetype, $filterName, $hashtag, $title, [$filterType]);
 	{
 		// Check if the Filter already exists
 		if(!$filter = Database::selectOne("SELECT id, filter_type FROM content_search_filters WHERE archetype=? AND filter_name=? LIMIT 1", array($archetype, $filterName)))
@@ -498,10 +485,7 @@ abstract class ModuleSearch {
 			}
 		}
 		
-		// Prepare a prefix to avoid name collisions
-		$keyPrefix = substr($archetype, 0, 2) . substr($filterName, 0, 2) . "_";
-		
-		return Database::query("REPLACE INTO content_search_filter_opts (filter_id, keyword, title) VALUES (?, ?, ?)", array((int) $filter['id'], $keyPrefix . $keyword, $title));
+		return Database::query("REPLACE INTO content_search_filter_opts (filter_id, hashtag, title) VALUES (?, ?, ?)", array((int) $filter['id'], $hashtag, $title));
 	}
 	
 	
@@ -510,10 +494,10 @@ abstract class ModuleSearch {
 	(
 		string $archetype			// <str> The archetype to add this filter to.
 	,	string $filterName			// <str> The name of the filter to create.
-	,	string $keyword			// <str> The keyword to assign.
+	,	string $hashtag			// <str> The hashtag to assign.
 	): bool						// RETURNS <bool> TRUE if the value doesn't exist, FALSE on failure.
 	
-	// ModuleSearch::deleteFilter($archetype, $filterName, $keyword);
+	// ModuleSearch::deleteFilter($archetype, $filterName, $hashtag);
 	{
 		// Get the Filter
 		if($filterID = ModuleSearch::getFilterID($archetype, $filterName))
@@ -535,15 +519,15 @@ abstract class ModuleSearch {
 	(
 		string $archetype			// <str> The archetype to add this filter to.
 	,	string $filterName			// <str> The name of the filter to create.
-	,	string $keyword			// <str> The keyword to assign.
+	,	string $hashtag			// <str> The hashtag to assign.
 	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// ModuleSearch::deleteFilter($archetype, $filterName, $keyword);
+	// ModuleSearch::deleteFilter($archetype, $filterName, $hashtag);
 	{
 		// Get the Filter
 		if($filterID = ModuleSearch::getFilterID($archetype, $filterName))
 		{
-			return Database::query("DELETE FROM content_search_filter_opts WHERE filter_id=? AND keyword=? LIMIT 1", array($filter_id, $keyword));
+			return Database::query("DELETE FROM content_search_filter_opts WHERE filter_id=? AND hashtag=? LIMIT 1", array($filterID, $hashtag));
 		}
 	}
 	
@@ -602,208 +586,6 @@ abstract class ModuleSearch {
 		}
 		
 		return false;
-	}
-	
-	
-/****** Search the available content on the system ******/
-	public static function search
-	(
-		string $archetype			// <str> The archetype of this content.
-	,	array <int, str> $keys				// <int:str> The single-use keywords to match with this system.
-	,	bool $boolMode = true	// <bool> TRUE if you are using boolean mode (forces each entry to be used)
-	): array <int, int>						// RETURNS <int:int> TRUE on success, FALSE on failure.
-	
-	// $contentIDs = ModuleSearch::search($archetype, $keys, [$boolMode]);
-	{
-		// Prepare Values
-		$contentIDs = array();
-		
-		// Return all entries in this archetype
-		if(!$keys)
-		{
-			$results = Database::selectMultiple("SELECT content_id FROM content_search WHERE MATCH(keywords) AGAINST (?)", array($archetype));
-		}
-		
-		// Run Standard Search
-		else
-		{
-			$keywords = "";
-			$keyPrefix = ($boolMode ? " +" : " ");
-			
-			foreach($keys as $key)
-			{
-				$keywords .= $keyPrefix . $key;
-			}
-			
-			// Retrieve the list of entries that match the search
-			$results = Database::selectMultiple("SELECT content_id FROM content_search WHERE MATCH(keywords) AGAINST (?" . ($boolMode ? ' IN BOOLEAN MODE' : '') . ")", array($archetype . " " . $keywords));
-		}
-		
-		foreach($results as $result)
-		{
-			$contentIDs[] = (int) $result['content_id'];
-		}
-		
-		return $contentIDs;
-	}
-	
-	
-/****** Display the Search Form ******/
-	public static function displayForm
-	(
-		string $baseURL			// <str> The base URL to return to.
-	,	array $singleFilters		// <array> The single-option filters involved in this search.
-	,	array $choiceFilters		// <array> The choice-option filters involved in this search.
-	,	array $multiFilters		// <array> The multi-option filters involved in this search.
-	): array <int, int>						// RETURNS <int:int> TRUE on success, FALSE on failure.
-	
-	// ModuleSearch::displayForm($baseURL, $singleFilters, $choiceFilters, $multiFilters);
-	{
-		echo '
-		<form class="uniform" action="' . $baseURL . '" method="post">' . Form::prepare(SITE_HANDLE . "-ctb");
-		
-		// Show the Single Filters (ones that have only one option)
-		foreach($singleFilters as $filter => $filterData)
-		{
-			echo '
-			<p>
-				<span style="font-weight:bold;">' . ucwords(str_replace("-", " ", $filter)) . ':</span>
-				<select name="' . $filter . '">
-					<option value="">-- Any --</option>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				echo '
-					<option value="' . $keyword . '"' . ((isset($_POST[$filter]) and $keyword == $_POST[$filter]) ? ' selected' : '') . '>' . $title . '</option>';
-			}
-			
-			echo '
-				</select>
-			</p>';
-		}
-		
-		// Show the Choice Filters (can only select one, but the options can fit into multiple)
-		foreach($choiceFilters as $filter => $filterData)
-		{
-			echo '
-			<p>
-				<span style="font-weight:bold;">' . ucwords(str_replace("-", " ", $filter)) . ':</span>
-				<select name="' . $filter . '">
-					<option value="">-- Any --</option>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				echo '
-					<option value="' . $keyword . '"' . ((isset($_POST[$filter]) and $keyword == $_POST[$filter]) ? ' selected' : '') . '>' . $title . '</option>';
-			}
-			
-			echo '
-				</select>
-			</p>';
-		}
-		
-		// Show the Multi-Select Filters (can select multiple, and the entry can also fit into multiple)
-		foreach($multiFilters as $filter => $filterData)
-		{
-			echo '
-			<p>
-				<span style="font-weight:bold;">' . ucwords(str_replace("-", " ", $filter)) . ':</span>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				echo '
-				<input type="checkbox" name="' . $filter . '[' . $keyword . ']"' . (isset($_POST[$filter][$keyword]) ? ' checked' : '') . ' /> ' . $title;
-			}
-			
-			echo '
-			</p>';
-		}
-		
-		echo '
-			<p><input type="submit" name="submit" value="Search Library" /></p>
-		</form>';
-	}
-	
-	
-/****** Display the Search Form ******/
-	public static function widget
-	(
-		string $baseURL			// <str> The base URL to return to.
-	,	array $singleFilters		// <array> The single-option filters involved in this search.
-	,	array $choiceFilters		// <array> The choice-option filters involved in this search.
-	,	array $multiFilters		// <array> The multi-option filters involved in this search.
-	): string						// RETURNS <str> HTML
-	
-	// $widgetHTML = ModuleSearch::widget($baseURL, $singleFilters, $choiceFilters, $multiFilters);
-	{
-		$html = '
-		<div class="panel-box">
-			<form action="' . $baseURL . '" method="post">' . Form::prepare(SITE_HANDLE . "-ctb") . '
-			<a href="#" class="panel-head">Search Filters<span class="icon-circle-right nav-arrow"></a>
-			<div style="padding:0px 16px 8px 16px;">';
-			
-		// Show the Single Filters (ones that have only one option)
-		foreach($singleFilters as $filter => $filterData)
-		{
-			$html .= '
-			<div style="padding-bottom:8px;">
-				<select name="' . $filter . '">
-					<option value="">-- Any ' . ucwords(str_replace("-", " ", $filter)) . ' --</option>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				$html .= '
-					<option value="' . $keyword . '"' . ((isset($_POST[$filter]) and $keyword == $_POST[$filter]) ? ' selected' : '') . '>' . $title . '</option>';
-			}
-			
-			$html .= '
-				</select>
-			</div>';
-		}
-		
-		// Show the Choice Filters
-		foreach($choiceFilters as $filter => $filterData)
-		{
-			$html .= '
-			<div style="padding-bottom:8px;">
-				<select name="' . $filter . '">
-					<option value="">-- Any ' . ucwords(str_replace("-", " ", $filter)) . ' --</option>';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				$html .= '
-					<option value="' . $keyword . '"' . ((isset($_POST[$filter]) and $keyword == $_POST[$filter]) ? ' selected' : '') . '>' . $title . '</option>';
-			}
-			
-			$html .= '
-				</select>
-			</div>';
-		}
-		
-		// Show the Multi-Select Filters
-		foreach($multiFilters as $filter => $filterData)
-		{
-			$html .= '
-			<div style="padding-bottom:8px;">
-				<span style="font-weight:bold;">' . ucwords(str_replace("-", " ", $filter)) . ':</span><br />';
-			
-			foreach($filterData as $keyword => $title)
-			{
-				$html .= '
-				<div><input type="checkbox" name="' . $filter . '[' . $keyword . ']"' . (isset($_POST[$filter][$keyword]) ? ' checked' : '') . ' /> ' . $title . "</div>";
-			}
-			
-			$html .= '
-			</div>';
-		}
-		
-		$html .= '
-			<div><input type="submit" name="submit" value="Filter Search" /></div>
-			</div>
-			</form>
-		</div>';
-		
-		return $html;
 	}
 	
 	

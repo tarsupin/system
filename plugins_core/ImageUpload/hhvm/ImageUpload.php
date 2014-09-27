@@ -161,11 +161,27 @@ class ImageUpload extends Upload {
 /****** Construct the image uploader ******/
 	public function __construct
 	(
-		array <str, mixed> $_filesData		// <str:mixed> Set to $_FILES[$theInputName]
-	): void					// RETURNS <void>
+		array <str, mixed> $_filesData			// <str:mixed> Set to $_FILES[$theInputName]
+	,	mixed $arrayVal = false	// <mixed> FALSE for standard use, $value if setting one of the array values to update.
+	): void						// RETURNS <void>
 	
-	// $imageUpload = new ImageUpload($_FILES['image']);
+	// $imageUpload = new ImageUpload($_FILES['image'], [$arrayVal]);
 	{
+		// If we're selecting a single image uploaded from an array that was uploaded:
+		if($arrayVal !== false)
+		{
+			if(!isset($_filesData['tmp_name'][$arrayVal]) or !isset($_filesData['type'][$arrayVal]) or !isset($_filesData['name'][$arrayVal]) or !isset($_filesData['size'][$arrayVal]))
+			{
+				return;
+			}
+			
+			$_filesData['tmp_name'] = $_filesData['tmp_name'][$arrayVal];
+			$_filesData['type'] = $_filesData['type'][$arrayVal];
+			$_filesData['name'] = $_filesData['name'][$arrayVal];
+			$_filesData['error'] = $_filesData['error'][$arrayVal];
+			$_filesData['size'] = $_filesData['size'][$arrayVal];
+		}
+		
 		// Validate the file data
 		if(!$this->validateFileData($_filesData)) { return; }
 		

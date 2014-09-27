@@ -492,12 +492,14 @@ abstract class FormValidate {
 	
 	
 /****** Check if Form Validation passed ******/
-	public static function pass (
+	public static function pass
+	(
+		string $key = ""		// <str> If specified, it checks the particular error key only.
 	): bool					// RETURNS <bool> TRUE if validation passed, FALSE if not.
 	
-	// FormValidate::pass();
+	// FormValidate::pass([$key]);
 	{
-		return (Alert::hasErrors() ? false : true);
+		return (Alert::hasErrors($key) ? false : true);
 	}
 	
 	

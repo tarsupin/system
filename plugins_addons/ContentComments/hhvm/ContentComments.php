@@ -25,7 +25,7 @@ abstract class ContentComments {
 		
 		// Display Comment Section
 		echo '
-		<div class="comment-section">
+		<div class="comment-section" style="clear:both;">
 			<h3>Comments</h3>';
 		
 		// Prepare Values

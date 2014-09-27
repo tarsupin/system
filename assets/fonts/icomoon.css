@@ -19,6 +19,15 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.icon-text-edit:before {
+	content: "\e63e";
+}
+.icon-rocket:before {
+	content: "\e63f";
+}
+.icon-nooch:before {
+	content: "\e640";
+}
 .icon-music:before {
 	content: "\f001";
 }

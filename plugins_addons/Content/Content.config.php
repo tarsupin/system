@@ -38,6 +38,7 @@ class Content_config {
 			`primary_hashtag`		varchar(22)					NOT NULL	DEFAULT '',
 			
 			`thumbnail`				varchar(72)					NOT NULL	DEFAULT '',
+			`description`			varchar(255)				NOT NULL	DEFAULT '',
 			
 			`status`				tinyint(1)		unsigned	NOT NULL	DEFAULT '0',
 			`clearance_view`		tinyint(1)		unsigned	NOT NULL	DEFAULT '0',

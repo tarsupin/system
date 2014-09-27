@@ -33,11 +33,20 @@ abstract class ContentHashtags {
 		$hashtag		// <str> The hashtag to retrieve entry ID's from.
 	,	$startPos = 0	// <int> The starting position to retrieve rows from.
 	,	$rows = 20		// <int> The number of rows to retrieve.
-	)					// RETURNS <int:[str:mixed]> The data associated with the content entry.
+	)					// RETURNS <int:int> The data associated with the content entry.
 	
-	// $entryIDs = ContentHashtags::getEntryIDs($hashtag, [$startPos], [$rows]);
+	// $contentIDs = ContentHashtags::getEntryIDs($hashtag, [$startPos], [$rows]);
 	{
-		return Database::selectMultiple("SELECT content_id FROM content_by_hashtag WHERE hashtag=? ORDER BY content_id DESC LIMIT " . ($startPos + 0) . ", " . ($rows + 0), array($hashtag));
+		$contentIDs = array();
+		
+		$results = Database::selectMultiple("SELECT content_id FROM content_by_hashtag WHERE hashtag=? ORDER BY content_id DESC LIMIT " . ($startPos + 0) . ", " . ($rows + 0), array($hashtag));
+		
+		foreach($results as $result)
+		{
+			$contentIDs[] = (int) $result['content_id'];
+		}
+		
+		return $contentIDs;
 	}
 	
 	
@@ -83,17 +92,42 @@ abstract class ContentHashtags {
 	}
 	
 	
-/****** Return a Hashtag Dropdown (for selection purposes) ******/
-	public static function hashtagDropdown 
+/****** Return a Content Form Hashtag Dropdown (for selection purposes) ******/
+	public static function hashtagFormDropdown
+	(
+		$contentID			// <int> The ID of the content.
+	,	$selectedTag = ""	// <str> The hashtag to set as the default selection.
+	)						// RETURNS <str> An HTML select input filled by the site's hashtag options.
+	
+	// $dropdownHTML = ContentHashtags::hashtagFormDropdown($contentID, $selectedTag);
+	{
+		// Prepare Values
+		$html = "";
+		$selectedTag = strtolower($selectedTag);
+		
+		// Retrieve the list of categories
+		$results = Database::selectMultiple("SELECT hashtag FROM content_hashtags WHERE content_id=? ORDER BY hashtag", array($contentID));
+		
+		foreach($results as $res)
+		{
+			$html .= '
+			<option value="' . $res['hashtag'] . '"' . ($selectedTag == strtolower($res['hashtag']) ? ' selected' : '') . '>#' . $res['hashtag'] . '</option>';
+		}
+		
+		return $html;
+	}
+	
+	
+/****** Return a Full-Site Hashtag Dropdown (for selection purposes) ******/
+	public static function hashtagSiteDropdown
 	(
 		$selectedTag = ""	// <str> The hashtag to set as the default selection.
 	)						// RETURNS <str> An HTML select input filled by the site's hashtag options.
 	
-	// $dropdownHTML = ContentHashtags::hashtagDropdown($selectedTag);
+	// $dropdownHTML = ContentHashtags::hashtagSiteDropdown($selectedTag);
 	{
 		// Prepare Values
 		$html = "";
-		$curGroup = "";
 		$selectedTag = strtolower($selectedTag);
 		
 		// Retrieve the list of categories

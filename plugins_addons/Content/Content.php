@@ -42,7 +42,7 @@ if($contentData['comments'])
 
 // Include Responsive Script
 Photo::prepareResponsivePage();
-Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-block.css" />');
+Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" />');
 
 // Run Global Script
 require(APP_PATH . "/includes/global.php");
@@ -101,19 +101,72 @@ abstract class Content {
 	public static $returnURL = "";		// <str> The URL to return to after a content button has been clicked.
 	public static $openPost = false;	// <bool> Set to TRUE if this content allows open posting (like blogs).
 	
+	public static $contentData = array();	// <str:mixed> The content data for the system.
+	
 	const STATUS_DRAFT = 0;			// The post is in draft form - nobody can view it right now.
 	const STATUS_PRIVATE = 2;		// Private post - available to friends or mods only.
 	const STATUS_GUEST = 4;			// Public post - viewable to the public.
 	const STATUS_OFFICIAL = 6;		// The post has been officially published.
 	const STATUS_FEATURED = 8;		// The content has been featured.
 	
-	const COMMENTS_DISABLED = 0;	// Disables comments for this entry.
-	const COMMENTS_NO_POSTING = 1;	// Prevents any further posting to this entry (unless you're a mod / admin).
-	const COMMENTS_STANDARD = 2;	// Provides standard comment type for this entry.
+	const COMMENTS_UNAVAILBLE = 0;	// Disables comments for the entire system.
+	const COMMENTS_DISABLED = 1;	// Disables comments for a specific entry.
+	const COMMENTS_MODERATE = 2;	// All comments require moderation approval.
+	const COMMENTS_NO_POSTING = 3;	// Prevents any further posting to this entry (unless you're a mod / admin).
+	const COMMENTS_STANDARD = 4;	// Provides standard comment type for this entry.
 	
-	const VOTING_DISABLED = 0;		// Disables voting for this entry.
-	const VOTING_FREEZE = 1;		// Prevents any futher voting (unless you're a mod), but shows the existing votes.
-	const VOTING_STANDARD = 2;		// Provides standard voting type for this entry.
+	const VOTING_UNAVAILBLE = 0;	// Disables voting for the entire system.
+	const VOTING_DISABLED = 1;		// Disables voting for the specific entry.
+	const VOTING_FREEZE = 3;		// Prevents any further voting (unless you're a mod), but shows the existing votes.
+	const VOTING_STANDARD = 4;		// Provides standard voting type for this entry.
+	
+	
+/****** Prepare a page for handling a content feed ******/
+	public static function prepare
+	(
+		$contentID		// <int> The ID of the content to prepare.
+	)					// RETURNS <void> runs the appropriate preparation methods.
+	
+	// ContentFeed::prepare($contentID);
+	{
+		// Retrieve important content data
+		self::$contentData = self::load($contentID);
+		
+		// Recognize Integers
+		self::$contentData['uni_id'] = (int) self::$contentData['uni_id'];
+		self::$contentData['status'] = (int) self::$contentData['status'];
+		
+		// Make sure the user has appropriate clearance to view this page
+		self::validateClearance(self::$contentData['status'], self::$contentData['uni_id']);
+		
+		// Prepare Modules for this Entry
+		ModuleRelated::widget($contentID);
+		ModuleAuthor::widget(Me::$id);
+		
+		// Prepare Values
+		self::$returnURL = "/" . self::$contentData['url_slug'];
+		Feed::$returnURL = "/" . self::$contentData['url_slug'];
+		
+		// Run Comment Form, if applicable
+		if(self::$contentData['comments'])
+		{
+			ContentComments::interpreter($contentID, self::$returnURL, self::$contentData['comments']);
+		}
+		
+		// Run Tip Exchanges
+		/*
+		if($getData = Link::getData("send-tip-article") and is_array($getData) and isset($getData[0]))
+		{
+			// Get the user from the post
+			Credits::tip(Me::$id, (int) $getData[0]);
+		}
+		*/
+		
+		// Prepare Metaheader Scripts
+		Photo::prepareResponsivePage();
+		
+		Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" /><script src="' . CDN . '/scripts/content-system.js"></script>');
+	}
 	
 	
 /****** Get Content Entry ******/
@@ -148,31 +201,6 @@ abstract class Content {
 	}
 	
 	
-/****** Get the User's Content Entries ******/
-	public static function getByUser
-	(
-		$uniID				// <int> The UniID whose content entries you are retrieving.
-	,	$startPos = 0		// <int> The starting position to retrieve rows from.
-	,	$rows = 20			// <int> The number of rows to retrieve.
-	,	$minStatus = 0		// <int> The minimum status allowed to retrieve.
-	,	$columns = "c.*"	// <str> The columns to retrieve during this query.
-	)						// RETURNS <int:[str:mixed]> The data associated with the article.
-	
-	// $entries = Content::getByUser($uniID, [$startPos], [$rows], [$minStatus], [$columns]);
-	{
-		$sqlArray = array($uniID);
-		$sqlWhere = "";
-		
-		if($minStatus > 0)
-		{
-			$sqlWhere = " AND c.status >= ?";
-			$sqlArray[] = $minStatus;
-		}
-		
-		return Database::selectMultiple("SELECT " . Sanitize::variable($columns, " .,*`") . " FROM content_by_user u INNER JOIN content_entries c ON u.content_id=c.id WHERE u.uni_id=?" . $sqlWhere . " ORDER BY u.content_id DESC LIMIT " . ($startPos + 0) . ", " . ($rows + 0), $sqlArray);
-	}
-	
-	
 /****** Output a Content Entry ******/
 	public static function output
 	(
@@ -191,6 +219,130 @@ abstract class Content {
 			{
 				echo call_user_func(array("Module" . $result['type'], "get"), (int) $result['block_id']);
 			}
+		}
+	}
+	
+	
+/****** Display Content ******/
+	public static function display (
+	)					// RETURNS <void> outputs the appropriate data.
+	
+	// Content::display();
+	{
+		// Prepare Values
+		$contentID = (int) self::$contentData['id'];
+		
+		// Display the Header
+		echo '
+		<h1 style="line-height:120%; padding-bottom:4px;">' . self::$contentData['title'] . '</h1>
+		<p style="margin-top:0px; margin-bottom:8px;">' . date("F jS, Y", self::$contentData['date_posted']) . ' by <a href="' . URL::unifaction_social() . '/' . self::$contentData['handle'] . '">' . self::$contentData['display_name'] . '</a> (<a href="' . URL::fastchat_social() . '/' . self::$contentData['handle'] . '">@' . self::$contentData['handle'] . '</a>)</p>
+		<hr class="c-hr-dotted" />';
+		
+		// Pull the tracking data for this entry
+		$trackingData = ContentTrack::getData($contentID, Me::$id);
+		
+		// Make sure the user tracking values are at least available
+		if(!isset($trackingData['user_vote']))
+		{
+			$trackingData['user_vote'] = 0;
+			$trackingData['user_nooch'] = 0;
+			$trackingData['user_shared'] = 0;
+		}
+		
+		// Display the Content Tracking Data
+		if(isset($trackingData['views']) and is_int($trackingData['views']))
+		{
+			$trackingData['tips'] = round($trackingData['tipped_amount'] * 10);
+			$boostClicked = $trackingData['user_vote'] == 1 ? "-track" : "";
+			$noochClicked = $trackingData['user_nooch'] >= 3 ? "-track" : "";
+		}
+		else
+		{
+			$trackingData['votes_up'] = 0;
+			$trackingData['nooch'] = 0;
+			$trackingData['tips'] = 0;
+			$boostClicked = "";
+			$noochClicked = "";
+		}
+		
+		echo '
+		<div class="c-options">
+			<ul class="c-opt-list" style="text-align:left;">
+				<li id="boost-count-' . $contentID . '" class="c-bubble bub-boost">' . $trackingData['votes_up'] . '</li>
+				<li id="boost-track-' . $contentID . '" class="c-boost' . $boostClicked . '"><a href="javascript:track_boost(' . $contentID . ');"><span class="c-opt-icon icon-rocket"></span><span class="c-desktop"> &nbsp;Boost</span></a></li>
+				
+				<li id="nooch-count-' . $contentID . '" class="c-bubble bub-nooch">' . $trackingData['nooch'] . '</li>
+				<li id="nooch-track-' . $contentID . '" class="c-nooch' . $noochClicked . '"><a href="javascript:track_nooch(' . $contentID . ');"><span class="c-opt-icon icon-nooch"></span><span class="c-desktop"> &nbsp;Nooch</span></a></li>
+				
+				<li id="tip-count-' . $contentID . '" class="c-bubble bub-tip">' . $trackingData['tips'] . '</li>
+				<li id="tip-track-' . $contentID . '" class="c-tip"><a href="javascript:track_tip(' . $contentID . ');"><span class="c-opt-icon icon-coin"></span><span class="c-desktop"> &nbsp;Tip</span></a></li>
+			</ul>
+		</div>';
+		
+		// <a href="' . Content::$returnURL . "?" . Link::prepareData("send-tip-article", self::$contentData['uni_id']) . '">Tip the Author</a
+		// <a href="' . Content::setVote($contentID) . '">Boost</a>
+		
+		echo '
+		<style>
+			.but-share { padding:8px; background-color:#4bc7c7; color:white !important; border-radius:6px; }
+			.but-share:hover { background-color:#8fdad7; }
+		</style>
+
+		<p style="margin-top:16px;">
+			<a class="but-share" href="' . Content::shareContent($contentID, "article") . '"><span class="icon-group"></span> Share</a>
+			<a class="but-share" href="' . Content::chatContent($contentID, "article") . '"><span class="icon-comments"></span> Chat</a>
+			<a class="but-share" href="' . Content::flag($contentID) . '"><span class="icon-flag"></span> Flag</a>
+		</p>';
+		
+		echo '
+		<hr class="c-hr-dotted" />';
+		
+		// Hashtag List
+		$hashtagURL = URL::hashtag_unifaction_com();
+		
+		if(self::$contentData['primary_hashtag'])
+		{
+			echo '
+			<div style="margin-bottom:18px;">
+				<div class="c-tag-wrap-full">
+					<div class="c-tag-prime">
+						<div class="c-tp-plus">
+							<a class="c-tp-plink" href="' . Feed::follow(self::$contentData['primary_hashtag']) . '"><span class="icon-circle-plus"></span></a>
+						</div>
+						<a class="c-hlink" href="' . $hashtagURL . '/' . self::$contentData['primary_hashtag'] . '">#' . self::$contentData['primary_hashtag'] . '</a>
+					</div>';
+			
+			// Retrieve a list of hashtags for this article
+			if($hashtags = ModuleHashtags::get($contentID))
+			{
+				foreach($hashtags as $tag)
+				{
+					if($tag == self::$contentData['primary_hashtag']) { continue; }
+					
+					echo '
+					<div class="c-htag-full"><a class="c-hlink" href="' . $hashtagURL . '/' . $tag . '">#' . $tag . '</a></div>';
+				}
+			}
+			
+			echo '
+				</div>
+			</div>';
+		}
+		
+		// Display the Body Text
+		if(self::$contentData['body'])
+		{
+			echo self::$contentData['body'];
+		}
+		else
+		{
+			Content::output($contentID);
+		}
+		
+		// Show Comments, if applicable
+		if(self::$contentData['comments'])
+		{
+			ContentComments::draw($contentID, self::$returnURL, self::$contentData['comments']);
 		}
 	}
 	
@@ -286,7 +438,7 @@ abstract class Content {
 	// $coreData = Content::scanForCoreData($contentID, [$blocksToScan]);
 	{
 		// Get the Content Data
-		if(!$scanData = Database::selectOne("SELECT c.uni_id, c.url_slug, c.title, c.thumbnail, c.date_posted, c.status, u.handle, u.display_name FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id WHERE c.id=? LIMIT 1", array($contentID)))
+		if(!$scanData = Database::selectOne("SELECT c.uni_id, c.url_slug, c.title, c.thumbnail, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id WHERE c.id=? LIMIT 1", array($contentID)))
 		{
 			return array();
 		}
@@ -313,23 +465,18 @@ abstract class Content {
 			// Retrieve a text block
 			if($result['type'] == "Text")
 			{
-				if($txtBlock = Database::selectOne("SELECT title, body FROM content_block_text WHERE id=? LIMIT 1", array($result['block_id'])))
+				if($txtBlock = Database::selectValue("SELECT body FROM content_block_text WHERE id=? LIMIT 1", array($result['block_id'])))
 				{
 					// Prepare Values
-					$scanData['title'] = ($scanData['title'] == "" ? $txtBlock['title'] : $scanData['title']);
-					$scanData['body'] = ($scanData['body'] == "" ? UniMarkup::strip($txtBlock['body']) : $scanData['body']);
+					$scanData['body'] = ($scanData['body'] == "" ? UniMarkup::strip($txtBlock) : $scanData['body']);
 				}
 			}
 			
 			// Retrieve an image block
 			else if($result['type'] == "Image")
 			{
-				if($imgBlock = Database::selectOne("SELECT title, body, image_url, mobile_url FROM content_block_image WHERE id=? LIMIT 1", array($result['block_id'])))
+				if($imgBlock = Database::selectOne("SELECT image_url, mobile_url FROM content_block_image WHERE id=? LIMIT 1", array($result['block_id'])))
 				{
-					// Prepare Values
-					$scanData['title'] = ($scanData['title'] == "" ? $imgBlock['title'] : $scanData['title']);
-					$scanData['body'] = ($scanData['body'] == "" ? UniMarkup::strip($imgBlock['body']) : $scanData['body']);
-					
 					// Retrieve the images, if applicable
 					if(!$scanData['image_url'] and $imgBlock['image_url'])
 					{
@@ -352,14 +499,11 @@ abstract class Content {
 			// Retrieve an video block
 			else if($result['type'] == "Video")
 			{
-				if($videoBlock = Database::selectOne("SELECT video_url, caption FROM content_block_video WHERE id=? LIMIT 1", array($result['block_id'])))
+				if($videoURL = Database::selectValue("SELECT video_url FROM content_block_video WHERE id=? LIMIT 1", array($result['block_id'])))
 				{
-					// Prepare Values
-					$scanData['body'] = ($scanData['body'] == "" ? $videoBlock['caption'] : $scanData['body']);
-					
-					if(!$scanData['video_url'] and $videoBlock['video_url'])
+					if(!$scanData['video_url'] and $videoURL)
 					{
-						$scanData['video_url'] = $videoBlock['video_url'];
+						$scanData['video_url'] = $videoURL;
 						
 						// Get the video thumbnail, but only if the thumbnail hasn't been set yet
 						if(!$scanData['thumbnail'])
@@ -371,7 +515,7 @@ abstract class Content {
 			}
 			
 			// End the loop if we have all of the necessary information retrieved
-			if($scanData['title'] and $scanData['body'] and $scanData['image_url'])
+			if($scanData['body'] and $scanData['image_url'])
 			{
 				break;
 			}

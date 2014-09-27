@@ -19,6 +19,67 @@ Database::initRoot();
 
 // Prepare your script(s) below:
 
+if(DatabaseAdmin::tableExists("content_block_text"))
+{
+	DatabaseAdmin::dropColumn("content_block_text", "title");
+}
+
+if(DatabaseAdmin::tableExists("content_block_image"))
+{
+	DatabaseAdmin::renameColumn("content_block_image", "title", "caption");
+	DatabaseAdmin::addColumn("content_block_image", "credits", "varchar(64) not null", "");
+	DatabaseAdmin::dropColumn("content_block_image", "body");
+}
+
+if(DatabaseAdmin::tableExists("content_tracking_users"))
+{
+	DatabaseAdmin::addColumn("content_tracking_users", "nooch", "tinyint(1) unsigned not null", "0");
+}
+
+if(DatabaseAdmin::tableExists("content_tracking"))
+{
+	DatabaseAdmin::addColumn("content_tracking", "nooch", "mediumint(6) unsigned not null", "0");
+}
+
+if(DatabaseAdmin::tableExists("content_entries"))
+{
+	DatabaseAdmin::addColumn("content_entries", "description", "varchar(255) not null", "");
+}
+
+if(DatabaseAdmin::tableExists("content_search"))
+{
+	DatabaseAdmin::renameColumn("content_search", "keywords", "hashtags");
+}
+
+if(DatabaseAdmin::tableExists("content_search_draft"))
+{
+	DatabaseAdmin::renameColumn("content_search_draft", "keywords", "hashtags");
+}
+
+if(DatabaseAdmin::tableExists("content_search_filter_opts"))
+{
+	DatabaseAdmin::renameColumn("content_search_filter_opts", "keyword", "hashtag");
+}
+
+if(DatabaseAdmin::tableExists("content_agg_entries"))
+{
+	DatabaseAdmin::renameColumn("content_agg_entries", "blurb", "description");
+	DatabaseAdmin::renameColumn("content_agg_entries", "image_url", "thumbnail");
+	DatabaseAdmin::dropColumn("content_agg_entries", "mobile_url");
+}
+
+if(DatabaseAdmin::tableExists("feed_data"))
+{
+	DatabaseAdmin::renameColumn("feed_data", "blurb", "description");
+	DatabaseAdmin::renameColumn("feed_data", "image_url", "thumbnail");
+}
+
+if(DatabaseAdmin::tableExists("feed_data_old"))
+{
+	DatabaseAdmin::renameColumn("feed_data_old", "blurb", "description");
+	DatabaseAdmin::renameColumn("feed_data_old", "image_url", "thumbnail");
+}
+
 //*
 if(DatabaseAdmin::tableExists("ads_sponsored"))
 {

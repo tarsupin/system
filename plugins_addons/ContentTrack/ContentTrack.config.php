@@ -36,6 +36,8 @@ class ContentTrack_config {
 			`votes_up`				mediumint(6)	unsigned	NOT NULL	DEFAULT '0',
 			`votes_down`			mediumint(6)	unsigned	NOT NULL	DEFAULT '0',
 			
+			`nooch`					mediumint(6)	unsigned	NOT NULL	DEFAULT '0',
+			
 			`tipped_times`			smallint(5)		unsigned	NOT NULL	DEFAULT '0',
 			`tipped_amount`			float(8,2)		unsigned	NOT NULL	DEFAULT '0.00',
 			
@@ -51,8 +53,9 @@ class ContentTrack_config {
 			`uni_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
 			`content_id`			int(10)			unsigned	NOT NULL	DEFAULT '0',
 			
-			`shared`				tinyint(1)		unsigned	NOT NULL	DEFAULT '0',
 			`vote`					tinyint(1)					NOT NULL	DEFAULT '0',
+			`nooch`					tinyint(1)		unsigned	NOT NULL	DEFAULT '0',
+			`shared`				tinyint(1)		unsigned	NOT NULL	DEFAULT '0',
 			
 			UNIQUE (`uni_id`, `content_id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8 PARTITION BY KEY(uni_id) PARTITIONS 7;

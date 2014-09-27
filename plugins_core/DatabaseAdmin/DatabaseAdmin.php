@@ -352,6 +352,12 @@ abstract class DatabaseAdmin {
 	
 	// DatabaseAdmin::editColumn("users", "mailing_goodies", "tinyint(1) unsigned not null", 0);
 	{
+		// If the column doesn't exist, return true
+		if(!self::columnExists($table, $columnToEdit))
+		{
+			return false;
+		}
+		
 		// Prepare Default
 		$default = " default " . (is_numeric($default) ? ($default + 0) : "'" . Sanitize::variable($default) . "'");
 		
@@ -388,6 +394,12 @@ abstract class DatabaseAdmin {
 		
 		for($i = 1;$i < count($args);$i++)
 		{
+			// If the column doesn't exist, skip
+			if(!self::columnExists($table, $args[$i]))
+			{
+				continue;
+			}
+			
 			$colSQL .= ($colSQL != "" ? ',' : '') . " DROP COLUMN `" . Sanitize::variable($args[$i], '-') . "`";
 		}
 		
@@ -409,6 +421,12 @@ abstract class DatabaseAdmin {
 	
 	// DatabaseAdmin::renameColumn("users", "unnecessary_column", "better_name");
 	{
+		// If the column doesn't exist, skip
+		if(!self::columnExists($table, $columnName))
+		{
+			return true;
+		}
+		
 		// Gather the Schema
 		$schema = self::getTableSchema($table, $columnName);
 		
