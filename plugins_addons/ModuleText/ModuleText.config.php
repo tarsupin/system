@@ -45,7 +45,7 @@ class ModuleText_config {
 	// $plugin->isInstalled();
 	{
 		// Make sure the newly installed tables exist
-		return DatabaseAdmin::columnsExist("content_block_text", array("id", "title", "body"));
+		return DatabaseAdmin::columnsExist("content_block_text", array("id", "body"));
 	}
 	
 }

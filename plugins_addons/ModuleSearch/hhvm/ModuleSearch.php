@@ -276,28 +276,7 @@ abstract class ModuleSearch {
 	
 	// ModuleSearch::draw($formClass);
 	{
-		// Get Search Archetypes
-		if(!$archetypeList = ModuleSearch::getArchetypes())
-		{
-			return;
-		}
-		
-		// Assign a Search Archetype
-		echo '
-		<div style="margin-top:22px;">
-			<strong>Search Type</strong>
-			<p>
-				<select name="search_archetype">
-					<option value="">-- None Selected --</option>';
-			
-			foreach($archetypeList as $arch)
-			{
-				echo '
-				<option value="' . $arch . '"' . ($formClass->contentData['search_archetype'] == $arch ? ' selected' : '') . '>' . ucwords(str_replace("-", " ", $arch)) . '</option>';
-			}
-			
-			echo '</select>
-		</div>';
+		return;
 	}
 	
 	
@@ -309,11 +288,6 @@ abstract class ModuleSearch {
 	
 	// ModuleSearch::interpret($formClass);
 	{
-		// Update the Search Archetype
-		$_POST['search_archetype'] = (isset($_POST['search_archetype']) ? Sanitize::variable($_POST['search_archetype'], "-") : '');
-		
-		Database::query("UPDATE content_entries SET search_archetype=? WHERE id=? LIMIT 1", array($_POST['search_archetype'], $formClass->contentID));
-		
 		// If the content is official, we can add the search data
 		if($formClass->contentData['status'] >= Content::STATUS_OFFICIAL)
 		{

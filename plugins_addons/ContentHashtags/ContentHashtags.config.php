@@ -37,7 +37,7 @@ class ContentHashtags_config {
 		CREATE TABLE IF NOT EXISTS `content_site_hashtags`
 		(
 			`hashtag`				varchar(22)					NOT NULL	DEFAULT '',
-			`title`					varchar(32)					NOT NULL	DEFAULT '',
+			`title`					varchar(50)					NOT NULL	DEFAULT '',
 			
 			UNIQUE (`hashtag`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -55,7 +55,7 @@ class ContentHashtags_config {
 	{
 		// Make sure the newly installed tables exist
 		$pass1 = DatabaseAdmin::columnsExist("content_by_hashtag", array("hashtag", "content_id"));
-		$pass2 = DatabaseAdmin::columnsExist("content_hashtags", array("hashtag"));
+		$pass2 = DatabaseAdmin::columnsExist("content_site_hashtags", array("hashtag"));
 		
 		return ($pass1 and $pass2);
 	}

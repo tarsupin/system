@@ -1,0 +1,201 @@
+
+Install From Clone:
+
+1. Create a new linode.
+
+2. Clone the linode from "CopyPasteServer"
+
+	a. Go to "CopyPasteServer"
+	b. Click on the "Clone" tab
+	c. Select the main profile, and select the disk images below.
+	d. Hit the "Select" button.
+	e. Select the newly built linode to clone to.
+	
+3. Once the clone has finished, boot the new linode.
+
+4. Get the IP that this server uses.
+	
+	a. Click the "Remote Access" tab.
+	b. Under "SSH Access" (and "Public IPs"), it should provide an IP that we can use to log in.
+	
+5. Assign the IP to the necessary domains.
+	
+	a. Click on the "DNS Manager" tab.
+	b. Add a new domain zone if necessary.
+	c. Click on the domain to be edited.
+	
+6. Handle the necessary Sub-Domains
+	
+	a. Click on the "DNS Manager" tab.
+	b. Click on the domain to be edited.
+	c. Click "Add a new A record"
+	
+	d. In the "Hostname" field, add something like: "mysubdomain.domain.com" (or just "mysubdomain")
+	e. In the "IP Address" field, add the IP address that the domain used.
+	
+	f. Note that these updates may take a while to propagate.
+	
+7. Log into the server
+	
+	a. Load the Putty program.
+	b. Set the port to 43715
+	c. Load the uni6home SSH Key
+	d. Passphrase is "cJfo9FsoHmvK2Lsa"
+	
+8. Check for any updates that need to be made
+	
+	apt-get clean
+	apt-get update
+	apt-get upgrade
+	apt-get dist-upgrade
+	
+9. Start important services
+	
+	service nginx restart
+	service hhvm restart
+	service mysql restart
+	service postfix restart
+	service memcached restart
+	
+	
+10. Update the MySQL Password
+	
+		// Development: set the password to "ZFOYOpuap539qLNKdAmc37VBloj5pkYc9oiBDXdFplzeSI2AHkgim"
+		
+		// Production: set the password to "1mA4aR5pgkYB4mc37Vn7zAJk4OmkI2AHloj5pkgiUHtapc3ERAPN9dAgaNDhuGeaiQj"
+	
+	
+12. Setup SSH key access
+	
+	// Create the SSH key in puttygen
+	// Use a passphrase, such as "cJfo9FsoHmvK2Lsa"
+	// Save the SSH key in a save location
+	
+	// Load the SSH keys into the server
+	
+	cd ~
+	mkdir .ssh
+	echo "" > .ssh/authorized_keys
+	chmod 700 .ssh
+	chmod 600 .ssh/authorized_keys
+	
+	nano .ssh/authorized_keys
+	
+	// Enter the appropriate ssh key into the file
+	
+	service ssh restart
+	
+	
+13. Test logging into the server with SSH.
+	
+	// Load putty and see if the SSH key was successful.
+	
+	
+14. Update important security settings.
+	
+	cd /etc/ssh
+	nano sshd_config
+	
+	// Change the port to 43715
+	// Change ChallengeResponseAuthentication to "no" (or create if it's not there)
+	// Change PasswordAuthentication to "no" (or create if it's not there)
+	// Change UsePAM to "no" (or create if it's not there)
+	
+	service ssh restart
+	
+	// Confirm that you can still log in
+	
+15. Install GIT on the server
+	
+	apt-get install git
+	
+	git config --global user.name "ServerName"
+	git config --global user.email unifaction@gmail.com
+	
+	// Now we're going to create the server's SSH key (for external connectsion, such as git)
+	
+	cd ~/.ssh
+	
+	ssh-keygen -t rsa -C "unifaction@gmail.com"
+	
+	// Now, copy the contents of id_rsa.pub
+	// Use the "-$" in the line so that it text-wraps.
+	// Note that you'll still have a line break or two and will have to remove those.
+	
+	nano -$ id_rsa.pub
+	
+	// Log into github.com
+	// Click on the gear (Settings) in the upper right corner.
+	// Click on "SSH Keys"
+	// Add the SSH key to your github account
+	
+	// Check if your SSH key was added
+	ssh -T git@github.com
+	
+15. Create your git repository in github (if it doesn't exist yet)
+	
+	
+	
+16. Load the repository onto your localhost computer.
+	
+	a. Open your git program (such as Github for Windows)
+	b. Clone the github repository into your localhost directory of choice.
+	c. Make any necessary commits.
+	
+16. Load the repostory onto the server.
+	
+	// Go to the directory that you want to clone the repo at
+	// Example: cd /var/www
+	// Note: This will put it in /var/www/NAMEOFREPO
+	
+	
+	// List of potential git repositories
+		git clone git@github.com:tarsupin/system.git
+		git clone git@github.com:tarsupin/auth.git
+		
+		
+	// Run "git pull" in the appropriate directory (/var/www/NAMEOFREPO) to pull
+	
+		git fetch --all && git reset --hard origin/master
+		
+	// This will overwrite any changes, and won't interrupt any untracked files, such as user uploaded content.
+	
+15. Log into the server with FTP
+
+	a. Username: root
+	b. Password: tempRootUbUni1000MasterRoot
+	
+16. Upload the appropriate directories:
+	
+	a. MUST ADD: /system
+	b. MUST ADD: /global-config.php
+	
+	
+17. Set web permissions
+	
+	chown www-data:www-data /var/www -R
+	
+	
+18. Run the virtual host script
+	
+	php /var/www/system/cli/vhost-script.php
+	
+	
+19. Run the server installation script
+	
+	php /var/www/system/cli/install-script.php
+	
+	
+20. Update "global-config.php"
+	
+	a. Set the environment to "development" or "production" (depending on your server used)
+	
+	
+	
+	
+// Things to do
+Check if user exists
+if user doesn't exist, create it
+update ssh settings
+set virtual host for each site uploaded
+upload a bunch of sites for this server

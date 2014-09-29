@@ -49,7 +49,7 @@ class ModuleImage_config {
 	// $plugin->isInstalled();
 	{
 		// Make sure the newly installed tables exist
-		return DatabaseAdmin::columnsExist("content_block_image", array("id", "image_url", "title"));
+		return DatabaseAdmin::columnsExist("content_block_image", array("id", "image_url"));
 	}
 	
 }

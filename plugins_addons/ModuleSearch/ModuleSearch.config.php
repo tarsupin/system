@@ -88,9 +88,6 @@ class ModuleSearch_config {
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		");
 		
-		// Update the Content System Table with a search archetype option
-		DatabaseAdmin::addColumn("content_entries", "search_archetype", "varchar(22) not null", "");
-		
 		return $this->isInstalled();
 	}
 	
@@ -107,10 +104,7 @@ class ModuleSearch_config {
 		$pass3 = DatabaseAdmin::columnsExist("content_search_filters", array("archetype", "filter_name"));
 		$pass4 = DatabaseAdmin::columnsExist("content_search_filter_opts", array("filter_id", "hashtag"));
 		
-		// Make sure the new table structure was updated
-		$pass5 = DatabaseAdmin::columnExists("content_entries", "search_archetype");
-		
-		return ($pass1 and $pass2 and $pass3 and $pass4 and $pass5);
+		return ($pass1 and $pass2 and $pass3 and $pass4);
 	}
 	
 }

@@ -103,6 +103,7 @@ if(DatabaseAdmin::tableExists("ads_sponsored"))
 }
 
 // Copy the icomoon file
+/*
 if($fileData = File::read(SYS_PATH . "/assets/fonts/icomoon.ttf"))
 {
 	File::write(CONF_PATH . "/assets/fonts/icomoon.ttf", $fileData);
@@ -112,6 +113,7 @@ if($fileData = File::read(SYS_PATH . "/assets/fonts/icomoon.css"))
 {
 	File::write(CONF_PATH . "/assets/css/icomoon.css", $fileData);
 }
+*/
 
 /*
 DatabaseAdmin::dropTable("site_variables");

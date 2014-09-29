@@ -13,6 +13,19 @@ abstract class ContentHashtags {
 /****** Plugin Variables ******/
 	
 	
+/****** Create a hashtag that this site will use ******/
+	public static function create
+	(
+		$hashtag	// <str> The official hashtag to assign to this site.
+	,	$title		// <str> The title of the hashtag.
+	)				// RETURNS <bool> TRUE if the hashtag was assigned to the site successfully, FALSE on failure.
+	
+	// ContentHashtags::create($hashtag, $title);
+	{
+		return Database::query("REPLACE INTO content_site_hashtags (hashtag, title) VALUES (?, ?)", array($hashtag, $title));
+	}
+	
+	
 /****** Get Content Entries based on a Hashtag ******/
 	public static function getEntries
 	(
