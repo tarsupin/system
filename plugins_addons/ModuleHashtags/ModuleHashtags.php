@@ -220,9 +220,10 @@ abstract class ModuleHashtags {
 					// Submit the hashtags
 					if(self::setSubmitted($formClass->contentID, $unsubmittedHashtags))
 					{
-						ContentHashtags::tagEntry($formClass->contentID, $unsubmittedHashtags);
-						
-						Hashtag::submitContentEntry($formClass->contentData['uni_id'], $formClass->contentType, $formClass->contentData['title'], $coreData['body'], $unsubmittedHashtags, SITE_URL . "/" . trim($formClass->contentData['url_slug'], "/"), $coreData['image_url'], $coreData['mobile_url'], $coreData['video_url'], $resubmit);
+						if(ContentHashtags::tagEntry($formClass->contentID, $unsubmittedHashtags))
+						{
+							Hashtag::submitContentEntry($formClass->contentData['uni_id'], $formClass->contentType, $formClass->contentData['title'], $coreData['body'], $unsubmittedHashtags, SITE_URL . "/" . trim($formClass->contentData['url_slug'], "/"), $coreData['image_url'], $coreData['mobile_url'], $coreData['video_url'], $resubmit);
+						}
 					}
 				}
 			}

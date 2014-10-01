@@ -24,6 +24,31 @@ abstract class ContentFeed {
 	}
 	
 	
+/****** Get a list of entry IDs based on a list of hashtags ******/
+	public static function getEntryIDsByHashtags
+	(
+		$hashtagList		// <int:str> An array of hashtags that we're going to pull entry IDs from.
+	,	$startPage = 1		// <int> The starting page.
+	,	$rowsPerPage = 15	// <int> The number of entries to return per page.
+	)						// RETURNS <int:int> a list of the content IDs based on recent posts.
+	
+	// $contentIDs = ContentFeed::getEntryIDsByHashtags($hashtagList, [$startPage], [$rowsPerPage]);
+	{
+		$contentIDs = array();
+		
+		list($sqlWhere, $sqlArray) = Database::sqlFilters(array("hashtag" => $hashtagList));
+		
+		$getList = Database::selectMultiple("SELECT DISTINCT content_id FROM content_by_hashtag WHERE " . $sqlWhere . " ORDER BY content_id DESC LIMIT " . (($startPage - 1) * $rowsPerPage) . ", " . ($rowsPerPage + 0), $sqlArray);
+		
+		foreach($getList as $getID)
+		{
+			$contentIDs[] = (int) $getID['content_id'];
+		}
+		
+		return $contentIDs;
+	}
+	
+	
 /****** Get a list of the recent entry IDs (such as for the home page) ******/
 	public static function getRecentEntryIDs (
 	)					// RETURNS <int:int> a list of the content IDs based on recent posts.
