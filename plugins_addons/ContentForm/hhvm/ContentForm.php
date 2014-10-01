@@ -333,6 +333,9 @@ class ContentForm {
 		{
 			$this->contentData['status'] = Content::STATUS_GUEST;
 			$settingUpdate = true;
+			
+			// Add the entry to the queue
+			Content::queue($this->contentID);
 		}
 		
 		else if(isset($_POST['save_guest']) and $this->contentData['status'] > Content::STATUS_GUEST and Me::$clearance >= 6)
@@ -401,66 +404,6 @@ class ContentForm {
 		
 		// Allow Hashtags to be updated
 		$this->hashtagsAllow = true;
-		return true;
-		
-		// Process the update
-		Database::startTransaction();
-		
-		$pass = true;
-		
-		// If hashtags are being used, check if the entry is already posted there
-		// Delete any old version so that we can update to a new value later
-		if($pass and ($primeHashtag or $entry['primary_hashtag']))
-		{
-			if($entry['primary_hashtag'] != $primeHashtag)
-			{
-				Database::query("UPDATE IGNORE content_entries SET primary_hashtag=? WHERE id=? LIMIT 1", array($primeHashtag, $contentID));
-				
-				$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
-			}
-			
-			else if($status < Content::STATUS_OFFICIAL)
-			{
-				$pass = Database::query("DELETE IGNORE FROM content_by_hashtag WHERE hashtag=? AND content_id=? LIMIT 1", array($entry['primary_hashtag'], $contentID));
-			}
-		}
-		
-		// Update the entry
-		if($pass)
-		{
-			// Update the hashtag handler, if applicable
-			if($pass and $status >= Content::STATUS_OFFICIAL and $primeHashtag)
-			{
-				if($pass = ModuleHashtags::setHashtag($contentID, $primeHashtag))
-				{
-					$pass = Database::query("REPLACE INTO content_by_hashtag (hashtag, content_id) VALUES (?, ?)", array($primeHashtag, $contentID));
-				}
-			}
-		}
-		
-		// Run custom update methods
-		if($pass)
-		{
-			// Prepare Custom Data
-			$customData = array(
-				'content_id'		=> $contentID
-			,	'status'			=> $status
-			,	'title'				=> $title
-			,	'url_slug'			=> $urlSlug
-			,	'primary_hashtag'	=> $primeHashtag
-			);
-			
-			$pass = $this->customUpdate($customData);
-		}
-		
-		// Add the entry to a queue if it is a guest post
-		if($pass and $status == Content::STATUS_GUEST)
-		{
-			Content::queue($contentID);
-		}
-		
-		// Finalize the update
-		return Database::endTransaction($pass);
 	}
 	
 	

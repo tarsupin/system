@@ -73,6 +73,8 @@ abstract class DatabaseAdmin {
 		if(!isSanitized::variable($username)) { return false; }
 		if(!isSanitized::variable($host, ".:")) { return false; }
 		
+		// Note: If you're getting an "access violation" error here, you can post this exact query to another system
+		// (such as Navicat) and it will work fine. Not sure why it's failing here.
 		Database::query('GRANT SELECT, INSERT, UPDATE, DELETE ON *.* TO "' . $username . '"@"' . $host . '" IDENTIFIED BY ? WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;', array($password));
 		
 		$user = Database::selectValue("SELECT user FROM mysql.user WHERE user=?", array($username));
