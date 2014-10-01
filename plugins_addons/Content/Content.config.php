@@ -32,6 +32,7 @@ class Content_config {
 			
 			`uni_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
 			
+			`url`					varchar(64)					NOT NULL	DEFAULT '',
 			`url_slug`				varchar(46)					NOT NULL	DEFAULT '',
 			`title`					varchar(72)					NOT NULL	DEFAULT '',
 			

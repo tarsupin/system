@@ -21,11 +21,36 @@ if(!isset($_POST['contentID']) or !isset($_POST['type']))
 }
 
 // Make sure the content exists
-if($contentData = Database::selectOne("SELECT id, uni_id FROM content_entries WHERE id=? LIMIT 1", array((int) $_POST['contentID'])))
+if($contentData = Database::selectOne("SELECT id, uni_id, url, url_slug FROM content_entries WHERE id=? LIMIT 1", array((int) $_POST['contentID'])))
 {
 	// Prepare Values
 	$contentID = (int) $contentData['id'];
 	$authorID = (int) $contentData['uni_id'];
+	
+	// If the entry was aggregated from another site
+	if($contentData['url'])
+	{
+		// Prepare the Packet
+		$packet = array(
+			"uni_id"			=> Me::$id
+		,	"url_slug"			=> $contentData['url_slug']
+		,	"type"				=> "boost"
+		);
+		
+		if(isset($_POST['voteType']))
+		{
+			$packet["voteType"] = (int) $_POST['voteType'];
+		}
+		
+		$articleSite = Database::selectValue("SELECT site_handle FROM network_data WHERE site_url=?", array($contentData['url']));
+		
+		// Run the API
+		$response = Connect::to($articleSite, "TrackerAPI", $packet);
+		
+		echo json_encode($response);
+		
+		exit;
+	}
 	
 	// Run the Content Track Handler
 	$contentTrack = new ContentTrack($contentID, Me::$id);

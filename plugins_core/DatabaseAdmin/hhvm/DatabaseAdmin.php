@@ -65,7 +65,7 @@ abstract class DatabaseAdmin {
 	(
 		string $username			// <str> The name of the database user to create.
 	,	string $password = ""		// <str> The password that the database user will connect with.
-	,	string $host = "127.0.0.1"	// <str> The host to create the database user on.
+	,	string $host = "localhost"	// <str> The host to create the database user on.
 	): bool						// RETURNS <bool> TRUE if user was created, FALSE if not.
 	
 	// DatabaseAdmin::createDBUser($username, $password, [$host]);
@@ -73,7 +73,7 @@ abstract class DatabaseAdmin {
 		if(!isSanitized::variable($username)) { return false; }
 		if(!isSanitized::variable($host, ".:")) { return false; }
 		
-		Database::query("GRANT SELECT, INSERT, UPDATE, DELETE ON *.* TO '" . $username . "'@'" . $host . "' IDENTIFIED BY ? WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;", array($password));
+		Database::query('GRANT SELECT, INSERT, UPDATE, DELETE ON *.* TO "' . $username . '"@"' . $host . '" IDENTIFIED BY ? WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;', array($password));
 		
 		$user = Database::selectValue("SELECT user FROM mysql.user WHERE user=?", array($username));
 		

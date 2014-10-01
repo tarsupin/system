@@ -18,7 +18,7 @@ if(Database::query("UPDATE users SET has_notifications=? WHERE uni_id=? AND has_
 }
 
 // Run Header
-require(SYS_PATH . "/controller/includes/user_panel_header.php");
+require(APP_PATH . "/includes/user_panel_header.php");
 
 echo '
 <style>

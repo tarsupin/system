@@ -126,14 +126,18 @@ class ContentTrack {
 	
 	
 /****** Vote a content entry up ******/
-	public function voteUp (
-	): bool				// RETURNS <bool> TRUE if the vote was properly set, FALSE on failure.
+	public function voteUp
+	(
+		bool $strict = false		// <bool> If set to TRUE, only vote up. Cannot void or vote down.
+	): int						// RETURNS <int> 1 if voted up, -1 if voted down, 0 on no change.
 	
-	// $contentTrack->voteUp();
+	// $contentTrack->voteUp([$strict]);
 	{
 		// Check if we need to void the vote
 		if($this->userVote == 1)
 		{
+			if($strict) { return 1; }
+			
 			return $this->voteVoid();
 		}
 		
@@ -159,15 +163,17 @@ class ContentTrack {
 		{
 			$this->userVote = 1;
 			$this->updateRating();
+			
+			return 1;
 		}
 		
-		return $pass;
+		return 0;
 	}
 	
 	
 /****** Vote a content entry down ******/
 	public function voteDown (
-	): bool				// RETURNS <bool> TRUE if the vote was properly set, FALSE on failure.
+	): int				// RETURNS <int> 1 if voted up, -1 if voted down, 0 on no change.
 	
 	// $contentTrack->voteDown();
 	{
@@ -199,18 +205,22 @@ class ContentTrack {
 		{
 			$this->userVote = -1;
 			$this->updateRating();
+			
+			return -1;
 		}
 		
-		return $pass;
+		return 0;
 	}
 	
 	
 /****** Void an earlier vote ******/
 	public function voteVoid (
-	): bool				// RETURNS <bool> TRUE if the vote was properly set, FALSE on failure.
+	): int				// RETURNS <int> 1 if voted up, -1 if voted down, 0 on no change.
 	
 	// $contentTrack->voteDown();
 	{
+		$returnVal = 0;
+		
 		Database::startTransaction();
 		
 		if($pass = Database::query("UPDATE content_tracking_users SET vote=? WHERE uni_id=? AND content_id=? LIMIT 1", array(0, $this->uniID, $this->contentID)))
@@ -219,12 +229,14 @@ class ContentTrack {
 			if($this->userVote == 1)
 			{
 				$pass = Database::query("UPDATE content_tracking SET votes_up=votes_up-? WHERE content_id=? LIMIT 1", array(1, $this->contentID));
+				$returnVal = -1;
 			}
 			
 			// If the user's vote was set to "down", decrease the number of "down votes" in the content tracker
 			if($this->userVote == -1)
 			{
 				$pass = Database::query("UPDATE content_tracking SET votes_up=votes_up-? WHERE content_id=? LIMIT 1", array(1, $this->contentID));
+				$returnVal = 1;
 			}
 		}
 		
@@ -232,9 +244,11 @@ class ContentTrack {
 		{
 			$this->userVote = 0;
 			$this->updateRating();
+			
+			return $returnVal;
 		}
 		
-		return $pass;
+		return 0;
 	}
 	
 	

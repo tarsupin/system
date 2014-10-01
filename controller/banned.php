@@ -13,7 +13,7 @@ if(Me::$clearance > -3)
 }
 
 // Run Header
-require(SYS_PATH . "/controller/includes/user_panel_header.php");
+require(APP_PATH . "/includes/user_panel_header.php");
 
 echo '
 This account is currently banned from accessing this site.';

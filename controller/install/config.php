@@ -29,7 +29,7 @@ if(!isset($_POST['environment']) or !in_array($_POST['environment'], array("loca
 }
 
 $_POST['db-type'] = (isset($_POST['db-type']) ? Sanitize::variable($_POST['db-type']) : "mysql");
-$_POST['db-host'] = (isset($_POST['db-host']) ? Sanitize::variable($_POST['db-host'], ".:/") : "127.0.0.1");
+$_POST['db-host'] = (isset($_POST['db-host']) ? Sanitize::variable($_POST['db-host'], ".:/") : "localhost");
 
 $_POST['db-admin-user'] = (isset($_POST['db-admin-user']) ? Sanitize::variable($_POST['db-admin-user']) : "");
 $_POST['db-admin-pass'] = (isset($_POST['db-admin-pass']) ? Sanitize::text($_POST['db-admin-pass']) : "");
@@ -77,6 +77,8 @@ if(Form::submitted("install-db-connect"))
 			
 			if(FormValidate::pass())
 			{
+				Database::initRoot();
+				
 				if(DatabaseAdmin::createDBUser($_POST['db-user'], $_POST['db-pass'], $_POST['db-host']))
 				{
 					if($connected = Database::initialize("", $_POST['db-user'], $_POST['db-pass'], $_POST['db-host'], $_POST['db-type']))

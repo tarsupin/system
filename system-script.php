@@ -44,6 +44,7 @@ if(DatabaseAdmin::tableExists("content_tracking"))
 if(DatabaseAdmin::tableExists("content_entries"))
 {
 	DatabaseAdmin::addColumn("content_entries", "description", "varchar(255) not null", "");
+	DatabaseAdmin::addColumn("content_entries", "url", "varchar(64) not null", "");
 }
 
 if(DatabaseAdmin::tableExists("content_search"))
@@ -78,6 +79,21 @@ if(DatabaseAdmin::tableExists("feed_data_old"))
 {
 	DatabaseAdmin::renameColumn("feed_data_old", "blurb", "description");
 	DatabaseAdmin::renameColumn("feed_data_old", "image_url", "thumbnail");
+}
+
+if(strpos(SITE_HANDLE, "article") !== false)
+{
+	DatabaseAdmin::dropTable("aggregate_sites");
+	
+	Database::exec("
+	CREATE TABLE IF NOT EXISTS `aggregate_sites`
+	(
+		`site_handle`			varchar(22)					NOT NULL	DEFAULT '',
+		`date_checked`			int(10)			unsigned	NOT NULL	DEFAULT '0',
+		
+		UNIQUE (`site_handle`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+	");
 }
 
 //*

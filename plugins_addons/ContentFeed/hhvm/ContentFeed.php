@@ -121,16 +121,16 @@ abstract class ContentFeed {
 			{
 				array_unshift($sqlArray, $uniID);
 				
-				$pullFeed = Database::selectMultiple("SELECT c.id, c.uni_id, c.url_slug, c.title, c.thumbnail, c.description, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name, t.*, tu.shared as user_shared, tu.vote as user_vote, tu.nooch as user_nooch FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id LEFT JOIN content_tracking t ON c.id=t.content_id LEFT JOIN content_tracking_users tu ON tu.uni_id=? AND tu.content_id=c.id WHERE " . $sqlWhere, $sqlArray);
+				$pullFeed = Database::selectMultiple("SELECT c.id, c.uni_id, c.url, c.url_slug, c.title, c.thumbnail, c.description, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name, t.*, tu.shared as user_shared, tu.vote as user_vote, tu.nooch as user_nooch FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id LEFT JOIN content_tracking t ON c.id=t.content_id LEFT JOIN content_tracking_users tu ON tu.uni_id=? AND tu.content_id=c.id WHERE " . $sqlWhere, $sqlArray);
 			}
 			else
 			{
-				$pullFeed = Database::selectMultiple("SELECT c.id, c.uni_id, c.url_slug, c.title, c.thumbnail, c.description, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name, t.* FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id LEFT JOIN content_tracking t ON c.id=t.content_id WHERE " . $sqlWhere, $sqlArray);
+				$pullFeed = Database::selectMultiple("SELECT c.id, c.uni_id, c.url, c.url_slug, c.title, c.thumbnail, c.description, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name, t.* FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id LEFT JOIN content_tracking t ON c.id=t.content_id WHERE " . $sqlWhere, $sqlArray);
 			}
 		}
 		else
 		{
-			$pullFeed = Database::selectMultiple("SELECT c.id, c.uni_id, c.url_slug, c.title, c.thumbnail, c.description, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id WHERE " . $sqlWhere, $sqlArray);
+			$pullFeed = Database::selectMultiple("SELECT c.id, c.uni_id, c.url, c.url_slug, c.title, c.thumbnail, c.description, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id WHERE " . $sqlWhere, $sqlArray);
 		}
 		
 		// Loop through each feed entry
@@ -188,7 +188,7 @@ abstract class ContentFeed {
 		// Make sure Content IDs are available
 		if(!$contentIDs)
 		{
-			echo "No articles available here at this time."; exit;
+			echo "No articles available here at this time."; return;
 		}
 		
 		// Prepare Values
@@ -206,6 +206,10 @@ abstract class ContentFeed {
 			// Retrieve the feed data relevant to this particular entry (main title, description, image, etc)
 			$coreData = $feedData[$contentID];
 			
+			// Prepare Values
+			$aggregate = $coreData['url'] == "" ? false : true;
+			$articleURL = $aggregate ? $coreData['url'] . "/" . $coreData['url_slug'] : "/" . $coreData['url_slug'];
+			
 			// Display the Content
 			echo '
 			<hr class="c-hr" />
@@ -215,7 +219,7 @@ abstract class ContentFeed {
 			// If we have a thumbnail version of the image, use that one
 			if($coreData['thumbnail'])
 			{
-				echo '<a href="/' . $coreData['url_slug'] . '">' . Photo::responsive($coreData['thumbnail'], "", 950, "", 950, "c-feed-img") . '</a>';
+				echo '<a href="' . $articleURL . '">' . Photo::responsive($coreData['thumbnail'], "", 950, "", 950, "c-feed-img") . '</a>';
 			}
 			
 			// If you have the clearance to edit this article
@@ -228,8 +232,15 @@ abstract class ContentFeed {
 				</div>
 				<div class="c-feed-right">
 					<div class="c-feed-date feed-desktop">' . date("m/j/y", $coreData['date_posted']) . '</div>
-					<div class="c-feed-title"><a href="/' . $coreData['url_slug'] . '">' . ($coreData['status'] == Content::STATUS_DRAFT ? "[Draft] " : "") . $coreData['title'] . '</a></div>
-					<div class="c-feed-author feed-desktop">Written by <a href="' . $socialURL . '/' . $coreData['handle'] . '">' . $coreData['display_name'] . '</a> (<a href="' . $fastchatURL . '/' . $coreData['handle'] . '">@' . $coreData['handle'] . '</a>)</div>
+					<div class="c-feed-title"><a href="' . $articleURL . '">' . ($coreData['status'] == Content::STATUS_DRAFT ? "[Draft] " : "") . $coreData['title'] . '</a></div>';
+			
+			if($coreData['handle'])
+			{
+				echo '
+					<div class="c-feed-author feed-desktop">Written by <a href="' . $socialURL . '/' . $coreData['handle'] . '">' . $coreData['display_name'] . '</a> (<a href="' . $fastchatURL . '/' . $coreData['handle'] . '">@' . $coreData['handle'] . '</a>)</div>';
+			}
+			
+			echo '
 					<div class="c-feed-body">' . $coreData['description'] . '</div>';
 			
 			// Hashtag List
@@ -270,6 +281,11 @@ abstract class ContentFeed {
 			// If there is no content tracking being displayed, end this loop
 			if($doTracking)
 			{
+				// Prepare Values
+				$boostClicked = "";
+				$noochClicked = "";
+				$jsAgg = "";
+				
 				// Make sure the user tracking values are at least available
 				if(!isset($coreData['user_vote']))
 				{
@@ -279,7 +295,14 @@ abstract class ContentFeed {
 				}
 				
 				// Display the Content Tracking Data
-				if(is_int($coreData['views']))
+				if($aggregate)
+				{
+					$coreData['tips'] = "?";
+					$coreData['votes_up'] = "?";
+					$coreData['nooch'] = "?";
+					$jsAgg = ', 1';
+				}
+				else if(is_int($coreData['views']))
 				{
 					$coreData['tips'] = round($coreData['tipped_amount'] * 10);
 					$boostClicked = $coreData['user_vote'] == 1 ? "-track" : "";
@@ -290,8 +313,6 @@ abstract class ContentFeed {
 					$coreData['votes_up'] = 0;
 					$coreData['nooch'] = 0;
 					$coreData['tips'] = 0;
-					$boostClicked = "";
-					$noochClicked = "";
 				}
 				
 				echo '
@@ -299,13 +320,13 @@ abstract class ContentFeed {
 				<div class="c-options">
 					<ul class="c-opt-list">
 						<li id="boost-count-' . $contentID . '" class="c-bubble bub-boost">' . $coreData['votes_up'] . '</li>
-						<li id="boost-track-' . $contentID . '" class="c-boost' . $boostClicked . '"><a href="javascript:track_boost(' . $contentID . ');"><span class="c-opt-icon icon-rocket"></span><span class="c-desktop"> &nbsp;Boost</span></a></li>
+						<li id="boost-track-' . $contentID . '" class="c-boost' . $boostClicked . '"><a href="javascript:track_boost(' . $contentID . $jsAgg . ');"><span class="c-opt-icon icon-rocket"></span><span class="c-desktop"> &nbsp;Boost</span></a></li>
 						
 						<li id="nooch-count-' . $contentID . '" class="c-bubble bub-nooch">' . $coreData['nooch'] . '</li>
-						<li id="nooch-track-' . $contentID . '" class="c-nooch' . $noochClicked . '"><a href="javascript:track_nooch(' . $contentID . ');"><span class="c-opt-icon icon-nooch"></span><span class="c-desktop"> &nbsp;Nooch</span></a></li>
+						<li id="nooch-track-' . $contentID . '" class="c-nooch' . $noochClicked . '"><a href="javascript:track_nooch(' . $contentID . $jsAgg . ');"><span class="c-opt-icon icon-nooch"></span><span class="c-desktop"> &nbsp;Nooch</span></a></li>
 						
 						<li id="tip-count-' . $contentID . '" class="c-bubble bub-tip">' . $coreData['tips'] . '</li>
-						<li id="tip-track-' . $contentID . '" class="c-tip"><a href="javascript:track_tip(' . $contentID . ');"><span class="c-opt-icon icon-coin"></span><span class="c-desktop"> &nbsp;Tip</span></a></li>
+						<li id="tip-track-' . $contentID . '" class="c-tip"><a href="javascript:track_tip(' . $contentID . $jsAgg . ');"><span class="c-opt-icon icon-coin"></span><span class="c-desktop"> &nbsp;Tip</span></a></li>
 					</ul>
 				</div>';
 			}
