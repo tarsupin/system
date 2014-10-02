@@ -11,6 +11,11 @@ The ContentFeed plugin provides methods to display content feeds and otherwise i
 abstract class ContentFeed {
 	
 	
+/****** Plugin Variables ******/
+	public static $backTagTitle = "";		// <str> The title of the back tag.
+	public static $backTagURL = "/";		// <str> The URL to go to when the bag tag is clicked.
+	
+	
 /****** Prepare a page for handling a content feed ******/
 	public static function prepare (
 	)							// RETURNS <void> runs the appropriate preparation methods.
