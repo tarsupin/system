@@ -64,7 +64,8 @@ abstract class ModuleText {
 			<select name="class[' . $blockID . ']">' . $dropdownOptions . '</select> &nbsp; &nbsp; ' . UniMarkup::buttonLine("module_text_" . $blockID) . '
 		</div>
 		<div style="margin-top:10px;">
-			<textarea id="module_text_' . $blockID . '" name="body[' . $blockID . ']" placeholder="Body or paragraph . . ." tabindex="20" style="height:120px; width:95%;">' . $result['body'] . '</textarea>
+			<div id="remaining-chars-' . $blockID . '"></div>
+			<textarea id="module_text_' . $blockID . '" name="body[' . $blockID . ']" placeholder="Body or paragraph . . ." tabindex="20" style="height:120px; width:95%;" maxlength="45000" onkeyup="CheckCharsRemaining(\'module_text_' . $blockID . '\', \'remaining-chars-' . $blockID . '\', 45000)">' . $result['body'] . '</textarea>
 		</div>';
 	}
 	
@@ -82,9 +83,9 @@ abstract class ModuleText {
 		$_POST['class'][$blockID] = Sanitize::variable($_POST['class'][$blockID], "-");
 		$_POST['body'][$blockID] = (isset($_POST['body'][$blockID]) ? Text::convertWindowsText($_POST['body'][$blockID]) : '');
 		
-		if(strlen($_POST['body'][$blockID]) > 4500)
+		if(strlen($_POST['body'][$blockID]) > 50000)
 		{
-			$_POST['body'][$blockID] = substr($_POST['body'][$blockID], 0, 4500);
+			$_POST['body'][$blockID] = substr($_POST['body'][$blockID], 0, 50000);
 			
 			Alert::info("Body Length", "The length of one of your text boxes was cut short.");
 		}

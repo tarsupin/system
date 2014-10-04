@@ -438,11 +438,11 @@ class ContentForm {
 		{
 			Database::startTransaction();
 			
-			if($pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($this->contentData['url_slug'])))
+			if($pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($this->urlPrefix . $this->contentData['url_slug'])))
 			{
 				if($pass = Database::query("UPDATE IGNORE content_entries SET url_slug=? WHERE id=? LIMIT 1", array($_POST['url_slug'], $this->contentID)))
 				{
-					$pass = Database::query("INSERT INTO content_by_url (url_slug, content_id) VALUES (?, ?)", array($_POST['url_slug'], $this->contentID));
+					$pass = Database::query("INSERT INTO content_by_url (url_slug, content_id) VALUES (?, ?)", array($this->urlPrefix . $_POST['url_slug'], $this->contentID));
 				}
 			}
 			
@@ -883,7 +883,7 @@ class ContentForm {
 		{
 			if(method_exists("Module" . $result['type'], "get"))
 			{
-				$body .= call_user_func(array("Module" . $result['type'], "get"), (int) $result['block_id'], $this);
+				$body .= call_user_func(array("Module" . $result['type'], "get"), (int) $result['block_id']);
 			}
 		}
 		

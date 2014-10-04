@@ -49,7 +49,8 @@ abstract class UniMarkup {
 		// Parse the UniMarkup
 		$text = preg_replace('#\[b\](.+)\[\/b\]#iUs', '<span style="font-weight:bold;">$1</span>', $text);
 		$text = preg_replace('#\[u\](.+)\[\/u\]#iUs', '<span style="text-decoration:underline;">$1</span>', $text);
-		$text = preg_replace('#\[i\](.+)\[\/i\]#iUs', '<em>$1</em>', $text);
+		$text = preg_replace('#\[i\](.+)\[\/i\]#iUs', '<span style="font-style:italic;">$1</span>', $text);
+		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '<div style="text-align:center;">$1</div>', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '<span style="font-size:0.8em;">$1</span>', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '<pre class="code">$1</pre>', $text);
 		$text = preg_replace('#\[link\](.+)\[\/link\]#iUs', '<a href="$1" rel="nofollow">$1</a>', $text);
@@ -79,6 +80,7 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[b\](.+)\[\/b\]#iUs', '$1', $text);
 		$text = preg_replace('#\[u\](.+)\[\/u\]#iUs', '$1', $text);
 		$text = preg_replace('#\[i\](.+)\[\/i\]#iUs', '$1', $text);
+		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '$1', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '$1', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '$1', $text);
 		$text = preg_replace('#\[link\](.+)\[\/link\]#iUs', '$1', $text);
@@ -141,6 +143,11 @@ abstract class UniMarkup {
 		<span class="icon-pen"></span>
 		&nbsp;';
 		*/
+		
+		// Draw Center Paragraph 
+		$html .= '
+		<a onclick=\'UniMarkup("' . $elementID . '", "center")\'><span class="icon-paragraph-center"></span></a>
+		&nbsp;';
 		
 		// Draw Link
 		$html .= '

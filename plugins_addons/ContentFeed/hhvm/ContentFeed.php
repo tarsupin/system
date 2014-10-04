@@ -12,8 +12,10 @@ abstract class ContentFeed {
 	
 	
 /****** Plugin Variables ******/
+	public static string $activeHashtag = "";		// <str> The hashtag for this page.
 	public static string $backTagTitle = "";		// <str> The title of the back tag.
 	public static string $backTagURL = "/";		// <str> The URL to go to when the bag tag is clicked.
+	public static string $urlPrefix = "";			// <str> The prefix to use on each feed entry.
 	
 	
 /****** Prepare a page for handling a content feed ******/
@@ -92,7 +94,7 @@ abstract class ContentFeed {
 		}
 		else
 		{
-			$getList = Database::selectMultiple("SELECT u.content_id FROM content_by_user u INNER JOIN content_entries c ON u.content_id=c.id WHERE c.status >= ? WHERE u.uni_id=? ORDER BY u.content_id DESC LIMIT " . (($startPage - 1) * $rowsPerPage) . ", " . ($rowsPerPage + 0), array(Content::STATUS_OFFICIAL, $uniID));
+			$getList = Database::selectMultiple("SELECT u.content_id FROM content_by_user u INNER JOIN content_entries c ON u.content_id=c.id WHERE u.uni_id=? AND c.status >= ? ORDER BY u.content_id DESC LIMIT " . (($startPage - 1) * $rowsPerPage) . ", " . ($rowsPerPage + 0), array($uniID, Content::STATUS_OFFICIAL));
 		}
 		
 		foreach($getList as $getID)
@@ -124,7 +126,22 @@ abstract class ContentFeed {
 		}
 		
 		echo '
-			<div id="c-feed-head-title"><h1>' . $title . '</h1></div>
+			<div id="c-feed-head-title"><h1>' . $title . ' </h1></div>';
+		
+		if(self::$activeHashtag)
+		{
+			echo '
+			<div class="c-tag-wrap">
+				<div class="c-tag-prime">
+					<div class="c-tp-plus">
+						<a class="c-tp-plink" href="' . Feed::follow(self::$activeHashtag) . '"><span class="icon-circle-plus"></span></a>
+					</div>
+					<a class="c-hlink" href="' . URL::hashtag_unifaction_com() . '/' . self::$activeHashtag . '">#' . self::$activeHashtag . '</a>
+				</div>
+			</div>';
+		}
+		
+		echo '
 		</div>';
 	}
 	
@@ -132,7 +149,7 @@ abstract class ContentFeed {
 /****** Scan the content to retrieve core feed data ******/
 	public static function scanFeed
 	(
-		int $contentIDs			// <int> The array of content IDs to retrieve feed data for.
+		array <int, int> $contentIDs			// <int:int> The array of content IDs to retrieve feed data for.
 	,	bool $doTracking = true	// <bool> TRUE if you're going to show tracking values.
 	,	int $uniID = 0			// <int> The UniID that is viewing the feed (used for votes, nooches, etc).
 	): array <int, array<str, mixed>>						// RETURNS <int:[str:mixed]> the core data for the article.
@@ -238,7 +255,7 @@ abstract class ContentFeed {
 			
 			// Prepare Values
 			$aggregate = $coreData['url'] == "" ? false : true;
-			$articleURL = $aggregate ? $coreData['url'] . "/" . $coreData['url_slug'] : "/" . $coreData['url_slug'];
+			$articleURL = $aggregate ? $coreData['url'] . "/" . self::$urlPrefix . $coreData['url_slug'] : "/" . self::$urlPrefix . $coreData['url_slug'];
 			
 			// Display the Content
 			echo '
