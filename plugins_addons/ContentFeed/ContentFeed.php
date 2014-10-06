@@ -88,7 +88,7 @@ abstract class ContentFeed {
 		// Prepare Values
 		$contentIDs = array();
 		
-		if($uniID == Me::$id)
+		if($uniID == Me::$id or Me::$clearance >= 6)
 		{
 			$getList = Database::selectMultiple("SELECT content_id FROM content_by_user WHERE uni_id=? ORDER BY content_id DESC LIMIT " . (($startPage - 1) * $rowsPerPage) . ", " . ($rowsPerPage + 0), array($uniID));
 		}

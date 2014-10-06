@@ -222,7 +222,7 @@ abstract class ModuleHashtags {
 					{
 						if(ContentHashtags::tagEntry($formClass->contentID, $unsubmittedHashtags))
 						{
-							Hashtag::submitContentEntry($formClass->contentData['uni_id'], $formClass->contentType, $formClass->contentData['title'], $coreData['body'], $unsubmittedHashtags, SITE_URL . "/" . trim($formClass->contentData['url_slug'], "/"), $coreData['thumbnail'], $coreData['video_url'], $resubmit);
+							Hashtag::submitContentEntry($formClass->contentData['uni_id'], $formClass->contentType, $formClass->contentData['title'], $formClass->contentData['description'], $unsubmittedHashtags, SITE_URL . "/" . trim($formClass->contentData['url_slug'], "/"), $formClass->contentData['thumbnail'], $coreData['video_url'], $resubmit);
 						}
 					}
 				}
