@@ -24,6 +24,17 @@ if(DatabaseAdmin::tableExists("notifications"))
 	DatabaseAdmin::addColumn("users", "date_notes", "int(10) unsigned NOT NULL", 0);
 }
 
+if(DatabaseAdmin::tableExists("content_block_video"))
+{
+	DatabaseAdmin::renameColumn("content_block_video", "class", "video_class");
+	DatabaseAdmin::renameColumn("content_block_video", "caption", "video_caption");
+}
+
+if(DatabaseAdmin::tableExists("content_block_image"))
+{
+	DatabaseAdmin::renameColumn("content_block_image", "class", "img_class");
+}
+
 /*
 if(DatabaseAdmin::tableExists("content_block_text"))
 {

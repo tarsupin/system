@@ -27,10 +27,9 @@ class ModuleVideo_config {
 		(
 			`id`					int(10)			unsigned	NOT NULL	AUTO_INCREMENT,
 			
-			`class`					varchar(22)					NOT NULL	DEFAULT '',
-			
+			`video_class`			varchar(22)					NOT NULL	DEFAULT '',
 			`video_url`				varchar(72)					NOT NULL	DEFAULT '',
-			`caption`				varchar(180)				NOT NULL	DEFAULT '',
+			`video_caption`			varchar(180)				NOT NULL	DEFAULT '',
 			
 			PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8 PARTITION BY KEY(id) PARTITIONS 5;
@@ -47,7 +46,7 @@ class ModuleVideo_config {
 	// $plugin->isInstalled();
 	{
 		// Make sure the newly installed tables exist
-		return DatabaseAdmin::columnsExist("content_block_video", array("id", "video_url", "caption"));
+		return DatabaseAdmin::columnsExist("content_block_video", array("id", "video_url", "video_caption"));
 	}
 	
 }

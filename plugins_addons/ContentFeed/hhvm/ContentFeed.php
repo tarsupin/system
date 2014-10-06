@@ -228,6 +228,7 @@ abstract class ContentFeed {
 		array <int, int> $contentIDs			// <int:int> The array that contains the content entry IDs for the feed.
 	,	bool $doTracking = true	// <bool> TRUE if we're going to show the tracking row.
 	,	int $uniID = 0			// <int> The UniID viewing the feed, if applicable.
+	,	bool $blogUser = false	// <bool> TRUE if you need the URL prefix to set automatically to the user.
 	): void						// RETURNS <void> outputs the appropriate line.
 	
 	// ContentFeed::displayFeed($contentIDs, [$doTracking], [$uniID]);
@@ -252,6 +253,11 @@ abstract class ContentFeed {
 		{
 			// Retrieve the feed data relevant to this particular entry (main title, description, image, etc)
 			$coreData = $feedData[$contentID];
+			
+			if($blogUser)
+			{
+				self::$urlPrefix = $coreData['handle'] . "/";
+			}
 			
 			// Prepare Values
 			$aggregate = $coreData['url'] == "" ? false : true;

@@ -41,9 +41,9 @@ abstract class ModuleVideo {
 		
 		// Display the Video Block
 		return '
-		<div class="' . ($result['class'] == "" ? "content-vid" : $result['class']) . '">
+		<div class="' . ($result['video_class'] == "" ? "content-vid" : $result['video_class']) . '">
 			<div class="video-body">' . $embed . '</div>
-			' . ($result['caption'] == "" ? "" : '<div class="video-caption">' . nl2br(UniMarkup::parse($result['caption'])) . '</div>') . '
+			' . ($result['video_caption'] == "" ? "" : '<div class="video-caption">' . nl2br(UniMarkup::parse($result['video_caption'])) . '</div>') . '
 		</div>';
 	}
 	
@@ -60,17 +60,17 @@ abstract class ModuleVideo {
 		$result = Database::selectOne("SELECT * FROM content_block_video WHERE id=?", array($blockID));
 		
 		// Get the embed value for this URL
-		$embed = Attachment::getVideoEmbedFromURL($result['video_url'][$blockID]);
+		$embed = isset($result['video_url']) ? Attachment::getVideoEmbedFromURL($result['video_url']) : "";
 		
 		// Create the options for the class dropdown
-		$dropdownOptions = StringUtils::createDropdownOptions(self::$videoStyles, $result['class']);
+		$dropdownOptions = StringUtils::createDropdownOptions(self::$videoStyles, $result['video_class']);
 		
 		// Display the Form
 		echo '
-		<p><select name="class[' . $blockID . ']">' . $dropdownOptions . '</select></p>
+		<p><select name="video_class[' . $blockID . ']">' . $dropdownOptions . '</select></p>
 		<p>
 			' . UniMarkup::buttonLine() . '
-			<textarea id="video_caption_' . $blockID . '" name="caption[' . $blockID . ']" style="width:95%; height:100px;" placeholder="Caption or text for this video" tabindex="20" maxlength="255">' . $result['caption'] . '</textarea>
+			<textarea id="video_caption_' . $blockID . '" name="video_caption[' . $blockID . ']" style="width:95%; height:100px;" placeholder="Caption or text for this video" tabindex="20" maxlength="255">' . $result['video_caption'] . '</textarea>
 		</p>
 		<p>' . $embed . '</p>
 		<p>Set Video URL: <input type="text" name="video_url[' . $blockID . ']" value="' . $result['video_url'] . '" tabindex="10" autocomplete="off" autofocus maxlength="72" /></p>';
@@ -87,12 +87,12 @@ abstract class ModuleVideo {
 	// ModuleVideo::interpret($contentID, $blockID);
 	{
 		// Sanitize Values
-		$_POST['class'][$blockID] = Sanitize::variable($_POST['class'][$blockID], "-");
-		$_POST['caption'][$blockID] = Sanitize::safeword($_POST['title'][$blockID], "'?\"");
-		$_POST['video_url'][$blockID] = Sanitize::url($_POST['title'][$blockID]);
+		$_POST['video_class'][$blockID] = Sanitize::variable($_POST['video_class'][$blockID], "-");
+		$_POST['video_caption'][$blockID] = Sanitize::safeword($_POST['video_caption'][$blockID], "'?\"");
+		$_POST['video_url'][$blockID] = Sanitize::url($_POST['video_url'][$blockID]);
 		
 		// Update the Video Block
-		self::update($contentID, $blockID, $_POST['video_url'][$blockID], $_POST['caption'][$blockID], $_POST['class'][$blockID]);
+		self::update($contentID, $blockID, $_POST['video_url'][$blockID], $_POST['video_caption'][$blockID], $_POST['video_class'][$blockID]);
 	}
 	
 	
@@ -115,7 +115,7 @@ abstract class ModuleVideo {
 		}
 		
 		// Update the Text Block
-		Database::query("UPDATE content_block_video SET class=?, video_url=?, caption=? WHERE id=? LIMIT 1", array($class, $videoURL, $caption, $blockID));
+		Database::query("UPDATE content_block_video SET video_class=?, video_url=?, video_caption=? WHERE id=? LIMIT 1", array($class, $videoURL, $caption, $blockID));
 		
 		return $blockID;
 	}
@@ -130,7 +130,7 @@ abstract class ModuleVideo {
 	// ModuleVideo::create($contentID);
 	{
 		// Create the Content Block
-		if(!Database::query("INSERT INTO content_block_video (class, video_url, caption) VALUES (?, ?, ?)", array(self::$defaultClass, "", "")))
+		if(!Database::query("INSERT INTO content_block_video (video_class, video_url, video_caption) VALUES (?, ?, ?)", array(self::$defaultClass, "", "")))
 		{
 			return 0;
 		}

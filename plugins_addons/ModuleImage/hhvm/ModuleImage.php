@@ -21,7 +21,7 @@ abstract class ModuleImage {
 	public static array <str, str> $imageStyles = array(	// <str:str> A list of styles associated with the image content blocks.
 		"content-img"				=> "Centered Image, 100% Width"
 	,	"content-img-mid"			=> "Centered Image, 70% Width"
-	,	"content-img-sm"			=> "Centered Image, 40% Width"
+	,	"content-img-sm"			=> "Centered Image, 50% Width"
 	,	"content-img-left"			=> "Image on Left, 40% Width"
 	,	"content-img-left-sm"		=> "Image on Left, 25% Width"
 	,	"content-img-right"			=> "Image on Right, 40% Width"
@@ -46,7 +46,7 @@ abstract class ModuleImage {
 		
 		// Display the Image Block
 		return '
-		<div class="' . ($result['class'] == "" ? "content-img" : $result['class']) . '">
+		<div class="' . ($result['img_class'] == "" ? "content-img" : $result['img_class']) . '">
 			' . ($result['credits'] == "" ? "" : '<div class="block-credits">' . $result['credits'] . '</div>') . '
 			' . (($result['image_url'] or $result['mobile_url']) ? Photo::responsive($result['image_url'], $result['mobile_url'], 450, "", 450, $photoClass) : '') . '
 			' . ($result['caption'] == "" ? "" : '<div class="block-caption">' . $result['caption'] . '</div>') . '
@@ -69,7 +69,7 @@ abstract class ModuleImage {
 		$photoClass = ($result['mobile_url'] != "" ? "post-image" : "post-image-mini");
 		
 		// Create the options for the class dropdown
-		$dropdownOptions = StringUtils::createDropdownOptions(self::$imageStyles, $result['class']);
+		$dropdownOptions = StringUtils::createDropdownOptions(self::$imageStyles, $result['img_class']);
 		
 		// Display the Form
 		echo '
@@ -88,7 +88,7 @@ abstract class ModuleImage {
 		}
 		
 		echo '
-				<p><select name="class[' . $blockID . ']">' . $dropdownOptions . '</select></p>
+				<p><select name="img_class[' . $blockID . ']">' . $dropdownOptions . '</select></p>
 				<p>Upload Image: <input type="file" name="image[' . $blockID . ']" value="" tabindex="30" /></p>
 				<p><input type="text" name="caption[' . $blockID . ']" value="' . htmlspecialchars($result['caption']) . '" placeholder="Write caption here . . ." size="64" maxlength="120" tabindex="10" autocomplete="off" /></p>
 				<p>Image credit: <input type="text" name="credits[' . $blockID . ']" value="' . $result['credits'] . '" placeholder="" size="64" maxlength="120" tabindex="10" autocomplete="off" /></p>
@@ -113,7 +113,7 @@ abstract class ModuleImage {
 		$mobileURL = "";
 		
 		// Sanitize Values
-		$_POST['class'][$blockID] = Sanitize::variable($_POST['class'][$blockID], '-');
+		$_POST['img_class'][$blockID] = Sanitize::variable($_POST['img_class'][$blockID], '-');
 		$_POST['credits'][$blockID] = Sanitize::safeword($_POST['credits'][$blockID], "'\"");
 		$_POST['caption'][$blockID] = Sanitize::safeword($_POST['caption'][$blockID], "'?\"");
 		
@@ -170,7 +170,7 @@ abstract class ModuleImage {
 		}
 		
 		// Update the Image Block
-		self::update($contentID, $blockID, $imageURL, $_POST['caption'][$blockID], $_POST['credits'][$blockID], $_POST['class'][$blockID], $mobileURL);
+		self::update($contentID, $blockID, $imageURL, $_POST['caption'][$blockID], $_POST['credits'][$blockID], $_POST['img_class'][$blockID], $mobileURL);
 	}
 	
 	
@@ -197,13 +197,13 @@ abstract class ModuleImage {
 		// If no image was provided, don't update the image values
 		if(!$imageURL)
 		{
-			Database::query("UPDATE content_block_image SET class=?, caption=?, credits=? WHERE id=? LIMIT 1", array($class, $caption, $credits, $blockID));
+			Database::query("UPDATE content_block_image SET img_class=?, caption=?, credits=? WHERE id=? LIMIT 1", array($class, $caption, $credits, $blockID));
 		}
 		
 		// Update the Image Block
 		else
 		{
-			Database::query("UPDATE content_block_image SET class=?, caption=?, credits=?, image_url=?, mobile_url=? WHERE id=? LIMIT 1", array($class, $caption, $credits, $imageURL, $mobileURL, $blockID));
+			Database::query("UPDATE content_block_image SET img_class=?, caption=?, credits=?, image_url=?, mobile_url=? WHERE id=? LIMIT 1", array($class, $caption, $credits, $imageURL, $mobileURL, $blockID));
 		}
 		
 		return $blockID;
@@ -219,7 +219,7 @@ abstract class ModuleImage {
 	// ModuleImage::create($contentID);
 	{
 		// Create the Content Block
-		if(!Database::query("INSERT INTO content_block_image (class, caption, credits, image_url, mobile_url) VALUES (?, ?, ?, ?, ?)", array(self::$defaultClass, "", "", "", "")))
+		if(!Database::query("INSERT INTO content_block_image (img_class, caption, credits, image_url, mobile_url) VALUES (?, ?, ?, ?, ?)", array(self::$defaultClass, "", "", "", "")))
 		{
 			return 0;
 		}

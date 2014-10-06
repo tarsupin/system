@@ -427,7 +427,7 @@ class ContentForm {
 			return false;
 		}
 		
-		if($this->contentData['status'] == Content::STATUS_GUEST and $formClass->openPost == false)
+		if($this->contentData['status'] == Content::STATUS_GUEST and $this->openPost == false)
 		{
 			return false;
 		}
@@ -566,7 +566,7 @@ class ContentForm {
 				$blockID = (int) $segment['block_id'];
 				
 				// For images, we need to see if there was an image set
-				if($segment['type'] == "Image" and isset($_FILES['image']) and $_FILES['image']['tmp_name'][$blockID] != "")
+				if($segment['type'] == "Image" and isset($_FILES['image']) and isset($_FILES['image']['tmp_name'][$blockID]) and $_FILES['image']['tmp_name'][$blockID] != "")
 				{
 					$runInterpreter = true;
 				}

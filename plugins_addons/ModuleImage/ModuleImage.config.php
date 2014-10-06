@@ -27,7 +27,7 @@ class ModuleImage_config {
 		(
 			`id`					int(10)			unsigned	NOT NULL	AUTO_INCREMENT,
 			
-			`class`					varchar(22)					NOT NULL	DEFAULT '',
+			`img_class`				varchar(22)					NOT NULL	DEFAULT '',
 			`caption`				varchar(64)					NOT NULL	DEFAULT '',
 			`credits`				varchar(180)				NOT NULL	DEFAULT '',
 			
