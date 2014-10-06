@@ -726,7 +726,7 @@ class Image {
 			$height = $maxHeight;
 		}
 		
-		$this->autoCrop($width, $height);
+		$this->autoCrop((int) $width, (int) $height);
 	}
 	
 	
@@ -749,7 +749,7 @@ class Image {
 			$width = $maxWidth;
 		}
 		
-		$this->autoCrop($width, $height);
+		$this->autoCrop((int) $width, (int) $height);
 	}
 	
 	

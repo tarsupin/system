@@ -44,12 +44,16 @@ abstract class ModuleImage {
 		// Get the image's class
 		$photoClass = ($result['mobile_url'] != "" ? "post-image" : "post-image-mini");
 		
+		$result['img_class'] = $result['img_class'] == "" ? "content-img" : $result['img_class'];
+		
 		// Display the Image Block
 		return '
-		<div class="' . ($result['img_class'] == "" ? "content-img" : $result['img_class']) . '">
+		<div class="' . $result['img_class'] . '">
+		<div class="' . $result['img_class'] . '-inner">
 			' . ($result['credits'] == "" ? "" : '<div class="block-credits">' . $result['credits'] . '</div>') . '
 			' . (($result['image_url'] or $result['mobile_url']) ? Photo::responsive($result['image_url'], $result['mobile_url'], 450, "", 450, $photoClass) : '') . '
-			' . ($result['caption'] == "" ? "" : '<div class="block-caption">' . $result['caption'] . '</div>') . '
+		</div>
+		' . ($result['caption'] == "" ? "" : '<div class="block-caption">' . $result['caption'] . '</div>') . '
 		</div>';
 	}
 	
