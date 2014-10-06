@@ -21,41 +21,6 @@ class notifications_schema {
 	public $permissionDelete = 6;		// <int> The clearance level required to delete an entry on this table.
 	
 	
-/****** Install the table ******/
-	public function install (
-	)			// RETURNS <bool> TRUE if the installation was success, FALSE if not.
-	
-	// $schema->install();
-	{
-		/*
-			`sender_id`			the uni_id that was responsible for sending the notification (usually 0, for server)
-			`category`			the category that a notification fits into
-			`url`				the url to go to if the notification is clicked
-		*/
-		Database::exec("
-		CREATE TABLE IF NOT EXISTS `notifications`
-		(
-			`uni_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
-			`sender_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
-			
-			`category`				varchar(22)					NOT NULL	DEFAULT '',
-			
-			`message`				varchar(150)				NOT NULL	DEFAULT '',
-			`url`					varchar(64)					NOT NULL	DEFAULT '',
-			
-			`sync_unifaction`		tinyint(1)		unsigned	NOT NULL	DEFAULT '0',
-			
-			`date_created`			int(10)			unsigned	NOT NULL	DEFAULT '0',
-			
-			INDEX (`uni_id`, `category`, `date_created`),
-			INDEX (`date_created`)
-		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 PARTITION BY KEY(uni_id) PARTITIONS 13;
-		");
-		
-		return DatabaseAdmin::tableExists($this->tableKey);
-	}
-	
-	
 /****** Build the schema for the table ******/
 	public function buildSchema (
 	)			// RETURNS <bool> TRUE on success, FALSE on failure.
@@ -69,7 +34,7 @@ class notifications_schema {
 		
 		$define->set("uni_id")->title("Uni ID")->description("The UniFaction User ID.")->isReadonly()->fieldType("number");
 		$define->set("sender_id")->description("The user responsible for sending the notification (0 is the server).")->isReadonly()->fieldType("number");
-		$define->set("category")->description("The notification category.")->fieldType("input");
+		$define->set("note_type")->description("The notification type.")->fieldType("input");
 		$define->set("message")->description("The message of the notification.")->fieldType("text");
 		$define->set("url")->description("The URL to visit if the notification is clicked.")->fieldType("url");
 		$define->set("sync_unifaction")->title("Sync to UniFaction")->description("Whether or not this notification is to be synced with UniFaction.")->fieldType("boolean")->pullType("select", "boolean");
@@ -100,22 +65,22 @@ class notifications_schema {
 		switch($name)
 		{
 			case "view":
-				$schema->addFields("uni_id", "category", "message", "url", "sender_id", "date_created", "sync_unifaction");
+				$schema->addFields("uni_id", "note_type", "message", "url", "sender_id", "date_created", "sync_unifaction");
 				$schema->sort("uni_id");
-				$schema->sort("category");
+				$schema->sort("note_type");
 				$schema->sort("date_created");
 				break;
 				
 			case "search":
-				$schema->addFields("uni_id", "sender_id", "category", "message", "url", "date_created", "sync_unifaction");
+				$schema->addFields("uni_id", "sender_id", "note_type", "message", "url", "date_created", "sync_unifaction");
 				break;
 				
 			case "create":
-				$schema->addFields("uni_id", "sender_id", "category", "message", "url", "date_created", "sync_unifaction");
+				$schema->addFields("uni_id", "sender_id", "note_type", "message", "url", "date_created", "sync_unifaction");
 				break;
 				
 			case "edit":
-				$schema->addFields("uni_id", "sender_id", "category", "message", "url", "date_created");
+				$schema->addFields("uni_id", "sender_id", "note_type", "message", "url", "date_created");
 				break;
 		}
 		

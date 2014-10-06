@@ -98,15 +98,14 @@ abstract class Comment {
 		if(Hashtag::hasHashtags($comment))
 		{
 			// Upload the Image URL
-			if(isset($hashData['image_url']))
+			if(isset($hashData['thumbnail']))
 			{
 				$hashtags = Hashtag::digHashtags($comment);
 				
-				$title = (isset($hashData['attach_title']) ? $hashData['attach_title'] : "");
-				$desc = (isset($hashData['attach_desc']) ? $hashData['attach_desc'] : "");
-				$mobileURL = (isset($hashData['mobile_url']) ? $hashData['mobile_url'] : "");
+				$title = (isset($hashData['title']) ? $hashData['title'] : "");
+				$desc = (isset($hashData['description']) ? $hashData['description'] : "");
 				
-				Hashtag::submitImage($uniID, $hashData['image_url'], $comment, $hashtags, $sourceURL, $title, $desc, $mobileURL);
+				Hashtag::submitImage($uniID, $hashData['thumbnail'], $comment, $hashtags, $sourceURL, $title, $desc);
 			}
 			
 			// Upload the Video URL
@@ -114,8 +113,8 @@ abstract class Comment {
 			{
 				$hashtags = Hashtag::digHashtags($comment);
 				
-				$title = (isset($hashData['attach_title']) ? $hashData['attach_title'] : "");
-				$desc = (isset($hashData['attach_desc']) ? $hashData['attach_desc'] : "");
+				$title = (isset($hashData['title']) ? $hashData['title'] : "");
+				$desc = (isset($hashData['description']) ? $hashData['description'] : "");
 				
 				Hashtag::submitVideo($uniID, $hashData['video_url'], $comment, $hashtags, $sourceURL, $title, $desc);
 			}

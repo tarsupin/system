@@ -21,23 +21,21 @@ abstract class Share {
 	public static function socialImage
 	(
 		int $uniID			// <int> The UniID posting the message.
-	,	string $imageURL		// <str> The URL of the image to share.
-	,	string $mobileURL = ""	// <str> The URL of the mobile version of image to share, if applicable.
+	,	string $thumbnail		// <str> The URL of the thumbnail to share.
 	,	string $desc = ""		// <str> The caption or message to associate with the image.
 	,	string $title = ""		// <str> The title to associate with the image.
 	,	string $sourceURL = ""	// <str> The URL to return to if this image is clicked.
 	): string					// RETURNS <str> the URL of the share link.
 	
-	// $href = Share::shareImage($uniID, $imageURL, [$mobileURL], [$desc], [$title], [$sourceURL]);
+	// $href = Share::shareImage($uniID, $thumbnail, [$desc], [$title], [$sourceURL]);
 	{
 		// Prepare the Share Image Array
 		$packet = array(
 			'uni_id'		=> $uniID		// The UniID of the page that you're posting to
 		,	'poster_id'		=> $uniID		// The person posting to the page (usually the same as UniID)
-		,	'image_url'		=> $imageURL	// Set this value (absolute url) if you're posting an image
-		,	'mobile_url'	=> $mobileURL	// Set this to the mobile verson of the image, if applicable
-		,	'attach_title'	=> $title		// If set, this is the title of the attachment
-		,	'attach_desc'	=> $desc		// If set, this is the description of the attachment
+		,	'thumbnail'		=> $thumbnail	// The URL of the thumbnail if you're posting an image
+		,	'title'			=> $title		// If set, this is the title of the attachment
+		,	'description'	=> $desc		// If set, this is the description of the attachment
 		,	'source'		=> $sourceURL	// The URL to link back to (if someone clicks on it)
 		);
 		
@@ -74,8 +72,8 @@ abstract class Share {
 			'uni_id'		=> $uniID		// The UniID of the page that you're posting to
 		,	'poster_id'		=> $uniID		// The person posting to the page (usually the same as UniID)
 		,	'video_url'		=> $videoURL	// The URL of the video to post
-		,	'attach_title'	=> $title		// If set, this is the title of the attachment
-		,	'attach_desc'	=> $desc		// If set, this is the description of the attachment
+		,	'title'			=> $title		// If set, this is the title of the attachment
+		,	'description'	=> $desc		// If set, this is the description of the attachment
 		,	'source'		=> $sourceURL	// The URL to link back to (if someone clicks on it)
 		);
 		
@@ -102,29 +100,25 @@ abstract class Share {
 	,	string $title				// <str> The title of the article.
 	,	string $desc				// <str> The description / blurb for the article.
 	,	string $sourceURL = ""		// <str> The URL to return to (where the article is sourced).
-	,	string $imageURL = ""		// <str> The URL of the image to set.
-	,	string $mobileURL = ""		// <str> The URL of the mobile version of the image.
+	,	string $thumbnail = ""		// <str> The URL of the thumbnail to set.
 	,	string $type = "article"	// <str> The type of content being shared; e.g. "blog", "article", etc.
 	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Share::socialArticle($uniID, $title, $desc, $sourceURL, $imageURL, $mobileURL, $type);
+	// Share::socialArticle($uniID, $title, $desc, $sourceURL, $thumbnail, $type);
 	{
 		// Prepare the Share Article Array
 		$packet = array(
 			'uni_id'		=> $uniID		// The UniID of the page that you're posting to
 		,	'type'			=> $type		// The type of content to share
 		,	'poster_id'		=> $uniID		// The person posting to the page (usually the same as UniID)
-		,	'image_url'		=> $imageURL	// Set this value (absolute url) if you're posting an image
-		,	'mobile_url'	=> $mobileURL	// Set this to the mobile verson of the image, if applicable
-		,	'attach_title'	=> $title		// If set, this is the title of the attachment
-		,	'attach_desc'	=> $desc		// If set, this is the description of the attachment
+		,	'thumbnail'		=> $thumbnail	// The thumbnail URL for the article
+		,	'title'			=> $title		// If set, this is the title of the attachment
+		,	'description'	=> $desc		// If set, this is the description of the attachment
 		,	'source'		=> $sourceURL	// The URL to link back to (if someone clicks on it)
 		);
 		
 		// Connect to Social's Publishing API
-		$success = Connect::to("social", "PublishAPI", $packet);
-		
-		if($success)
+		if($success = Connect::to("social", "PublishAPI", $packet))
 		{
 			Alert::saveSuccess("Social Share", "You have successfully shared content to your Social Wall.");
 		}
@@ -151,15 +145,13 @@ abstract class Share {
 		// Prepare the Packet
 		$packet = array(
 			'uni_id'		=> $uniID		// The UniID posting the message
-		,	'message'		=> $message		// Set this value to the message or caption to write
+		,	'description'	=> $message		// Set this value to the message or caption to write
 		,	'source'		=> $sourceURL	// The URL to link back to (if someone clicks on it)
 		,	'orig_handle'	=> $origHandle	// The handle of the user that originall posted the comment
 		);
 		
 		// Connect to Chat's Publishing API
-		$success = Connect::to("fastchat", "PublishAPI", $packet);
-		
-		if($success)
+		if($success = Connect::to("fastchat", "PublishAPI", $packet))
 		{
 			Alert::saveSuccess("Chat Share", "You have successfully shared content to your Chat Page.");
 		}
@@ -176,31 +168,27 @@ abstract class Share {
 	public static function chatImage
 	(
 		int $uniID				// <int> The UniID posting the message.
-	,	string $imageURL			// <str> The URL of the image to share.
-	,	string $mobileURL = ""		// <str> The URL of the mobile version of image to share, if applicable.
+	,	string $thumbnail			// <str> The URL of the image to share.
 	,	string $desc = ""			// <str> The caption or message to associate with the image.
 	,	string $title = ""			// <str> The title to associate with the image.
 	,	string $sourceURL = ""		// <str> The URL to return to if this image is clicked.
 	,	string $origHandle = ""	// <str> The handle of the user that originally posted the image.
 	): string						// RETURNS <str> the URL of the share link.
 	
-	// Share::chatImage($uniID, $imageURL, [$mobileURL], [$desc], [$title], [$sourceURL], [$origHandle]);
+	// Share::chatImage($uniID, $thumbnail, [$desc], [$title], [$sourceURL], [$origHandle]);
 	{
 		// Prepare the Chat Image Array
 		$packet = array(
 			'uni_id'		=> $uniID		// The UniID of the page that you're posting to
-		,	'image_url'		=> $imageURL	// Set this value (absolute url) if you're posting an image
-		,	'mobile_url'	=> $mobileURL	// Set this to the mobile verson of the image, if applicable
-		,	'attach_title'	=> $title		// If set, this is the title of the attachment
-		,	'attach_desc'	=> $desc		// If set, this is the description of the attachment
+		,	'thumbnail'		=> $thumbnail	// The thumbnail URL of the image
+		,	'title'			=> $title		// If set, this is the title of the attachment
+		,	'description'	=> $desc		// If set, this is the description of the attachment
 		,	'source'		=> $sourceURL	// The URL to link back to (if someone clicks on it)
 		,	'orig_handle'	=> $origHandle	// The handle of the user that originally posted the comment
 		);
 		
 		// Connect to Chat's Publishing API
-		$success = Connect::to("fastchat", "PublishAPI", $packet);
-		
-		if($success)
+		if($success = Connect::to("fastchat", "PublishAPI", $packet))
 		{
 			Alert::saveSuccess("Chat Share", "You have successfully shared content to your Chat Page.");
 		}
@@ -230,16 +218,14 @@ abstract class Share {
 		$packet = array(
 			'uni_id'		=> $uniID		// The UniID of the page that you're posting to
 		,	'video_url'		=> $videoURL	// The URL of the video to post
-		,	'attach_title'	=> $title		// If set, this is the title of the attachment
-		,	'attach_desc'	=> $desc		// If set, this is the description of the attachment
+		,	'title'			=> $title		// If set, this is the title of the attachment
+		,	'description'	=> $desc		// If set, this is the description of the attachment
 		,	'source'		=> $sourceURL	// The URL to link back to (if someone clicks on it)
 		,	'orig_handle'	=> $origHandle	// The handle of the user that originally posted the comment
 		);
 		
 		// Connect to Chat's Publishing API
-		$success = Connect::to("fastchat", "PublishAPI", $packet);
-		
-		if($success)
+		if($success = Connect::to("fastchat", "PublishAPI", $packet))
 		{
 			Alert::saveSuccess("Chat Share", "You have successfully shared content to your Chat Page.");
 		}
@@ -256,8 +242,7 @@ abstract class Share {
 	public static function chatArticle
 	(
 		int $uniID				// <int> The UniID posting the message.
-	,	string $imageURL			// <str> The URL of the image to share.
-	,	string $mobileURL = ""		// <str> The URL of the mobile version of image to share, if applicable.
+	,	string $thumbnail			// <str> The URL of the thumbnail.
 	,	string $desc = ""			// <str> The message to associate with the article, usually the first few sentences.
 	,	string $title = ""			// <str> The title to associate with the article.
 	,	string $sourceURL = ""		// <str> The URL of the article itself.
@@ -265,24 +250,21 @@ abstract class Share {
 	,	string $type = "article"	// <str> The type of article content, e.g. "article", "blog", etc.
 	): string						// RETURNS <str> the URL of the share link.
 	
-	// Share::chatArticle($uniID, $imageURL, [$mobileURL], [$desc], [$title], [$sourceURL], [$authorHandle], [$type]);
+	// Share::chatArticle($uniID, $thumbnail, [$desc], [$title], [$sourceURL], [$authorHandle], [$type]);
 	{
 		// Prepare the Chat Article Array
 		$packet = array(
 			'uni_id'		=> $uniID			// The UniID of the page that you're posting to
 		,	'type'			=> $type			// The type of content being chatted
-		,	'image_url'		=> $imageURL		// Set this value (absolute url) if you're posting an image
-		,	'mobile_url'	=> $mobileURL		// Set this to the mobile verson of the image, if applicable
-		,	'attach_title'	=> $title			// If set, this is the title of the attachment
-		,	'attach_desc'	=> $desc			// If set, this is the description of the attachment
+		,	'thumbnail'		=> $thumbnail		// The URL of the thumbnail
+		,	'title'			=> $title			// If set, this is the title of the attachment
+		,	'description'	=> $desc			// If set, this is the description of the attachment
 		,	'source'		=> $sourceURL		// The URL of the sourced content
 		,	'orig_handle'	=> $authorHandle	// The handle of the user that originally posted the content
 		);
 		
 		// Connect to Chat's Publishing API
-		$success = Connect::to("fastchat", "PublishAPI", $packet);
-		
-		if($success)
+		if($success = Connect::to("fastchat", "PublishAPI", $packet))
 		{
 			Alert::saveSuccess("Chat Share", "You have successfully shared content to your Chat Page.");
 		}
@@ -293,5 +275,4 @@ abstract class Share {
 		
 		return ($success === true);
 	}
-
 }

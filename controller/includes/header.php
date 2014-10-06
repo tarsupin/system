@@ -9,7 +9,9 @@ echo '
 	<div class="viewport-wrap">
 		<nav id="nav-right">
 			' . Search::searchEngineBar() . '
-			<ul id="nav-list">
+			<ul id="nav-list">';
+			
+			/*
 				<li class="nav-link" id="nav-menu">
 					<a href="">More &#x25BC;</a>
 					<ul>
@@ -17,8 +19,8 @@ echo '
 						<li><a href="#">Illustrator</a></li>
 						<li><a href="#">Web Design</a></li>
 					</ul>
-				</li>';
-			
+				</li>
+			*/
 			//<li class="nav-icon"><a href=""><span class="icon-image"></span></a></li>
 			
 			// See the person that you're viewing
@@ -35,7 +37,7 @@ echo '
 			{
 				echo '
 				<li id="nav-user"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(Me::$id, "small") . '" /></a>
-					<ul style="line-height:22px;">
+					<ul style="line-height:22px; min-width:150px;">
 						<li><a href="/login?logAct=switch">Switch User</a></li>
 						<li><a href="/logout">Log Out</a></li>
 					</ul>
@@ -47,7 +49,7 @@ echo '
 			{
 				echo '
 				<li id="nav-user"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(0, "small") . '" /></a>
-					<ul style="line-height:22px;">
+					<ul style="line-height:22px; min-width:150px;">
 						<li><a href="/login">Log In</a></li>
 					</ul>
 				</li>';

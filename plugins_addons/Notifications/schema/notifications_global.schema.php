@@ -21,37 +21,6 @@ class notifications_global_schema {
 	public $permissionDelete = 6;		// <int> The clearance level required to delete an entry on this table.
 	
 	
-/****** Install the table ******/
-	public function install (
-	)			// RETURNS <bool> TRUE if the installation was success, FALSE if not.
-	
-	// $schema->install();
-	{
-		/*
-			Global Notifictions aren't provided to the user until they log in (that way inactive users don't get them).
-			Use the user's last login time to check what notifications to receive.
-			
-			Everyone's notifications are set to 2 when a global notification is posted (rather than 1)
-		*/
-		Database::exec("
-		CREATE TABLE IF NOT EXISTS `notifications_global`
-		(
-			`id`					int(10)			unsigned	NOT NULL	AUTO_INCREMENT,
-			
-			`message`				varchar(150)				NOT NULL	DEFAULT '',
-			`url`					varchar(64)					NOT NULL	DEFAULT '',
-			
-			`date_created`			int(10)			unsigned	NOT NULL	DEFAULT '0',
-			
-			PRIMARY KEY (`id`),
-			INDEX (`date_created`)
-		) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
-		");
-		
-		return DatabaseAdmin::tableExists($this->tableKey);
-	}
-	
-	
 /****** Build the schema for the table ******/
 	public function buildSchema (
 	)			// RETURNS <bool> TRUE on success, FALSE on failure.

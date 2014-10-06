@@ -15,9 +15,9 @@ This plugin also provides some custom hashtags that will allow you to tip the us
 
 Hashtag::submitComment($uniID, $message, $sourceURL);
 
-Hashtag::submitContentEntry($uniID, $type, $title, $desc, $hashtags, $sourceURL, [$imageURL], [$mobileURL], [$videoURL], [$resub]);
+Hashtag::submitContentEntry($uniID, $type, $title, $desc, $hashtags, $sourceURL, [$thumbnail], [$videoURL], [$resub]);
 
-Hashtag::submitImage($uniID, $imageURL, $message, $hashtags, $sourceURL, [$title], [$desc], [$mobileURL], [$type], [$resub]);
+Hashtag::submitImage($uniID, $thumbnail, $message, $hashtags, $sourceURL, [$title], [$desc], [$type], [$resub]);
 
 Hashtag::submitVideo($uniID, $videoURL, $message, $hashtags, $sourceURL, [$title], [$desc], [$type], [$resub]);
 
@@ -32,24 +32,24 @@ abstract class Hashtag {
 /****** Submit a comment to the official hashtag site ******/
 	public static function submitComment
 	(
-		$uniID		// <int> The uniID that submitted the comment.
-	,	$message	// <str> The comment message.
-	,	$sourceURL	// <str> The url that points back to where the comment originated.
-	)				// RETURNS <bool> TRUE on success, FALSE on failure.
+		$uniID			// <int> The uniID that submitted the comment.
+	,	$description	// <str> The comment message.
+	,	$sourceURL		// <str> The url that points back to where the comment originated.
+	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Hashtag::submitComment($uniID, $message, $sourceURL);
+	// Hashtag::submitComment($uniID, $description, $sourceURL);
 	{
 		// Prepare Variables
-		$message = Sanitize::text(strip_tags($message));
+		$description = Sanitize::text(strip_tags($description));
 		
-		if(strlen($message) > 1000) { $message = substr($message, 0, 1000); }
+		if(strlen($description) > 255) { $description = substr($description, 0, 252) . "..."; }
 		
 		// Prepare Packet
 		$packet = array(
 			'uni_id'		=> $uniID
-		,	'message'		=> $message
+		,	'description'	=> $description
 		,	'source'		=> $sourceURL
-		,	'hashtags'		=> self::digHashtags($message)
+		,	'hashtags'		=> self::digHashtags($description)
 		);
 		
 		// Run the API
@@ -63,59 +63,29 @@ abstract class Hashtag {
 		$uniID			// <int> The uniID that submitted the entry.
 	,	$type			// <str> The type of content entry ('article', 'blog', etc)
 	,	$title			// <str> The title of the entry.
-	,	$desc			// <str> The message of the entry.
+	,	$description	// <str> The description of the entry.
 	,	$hashtags		// <int:str> The hashtags that the entry used.
 	,	$sourceURL		// <str> The url that points back to where the entry originated.
-	,	$imageURL = ""	// <str> The URL to the photo.
-	,	$mobileURL = ""	// <str> The URL to the mobile version of the image.
+	,	$thumbnail = ""	// <str> The URL to the photo.
 	,	$videoURL = ""	// <str> The URL to the video.
 	,	$resub = false	// <bool> TRUE if this is a resubmission of an earlier post.
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Hashtag::submitContentEntry($uniID, $type, $title, $desc, $hashtags, $sourceURL, [$imageURL], [$mobileURL], [$videoURL], [$resub]);
+	// Hashtag::submitContentEntry($uniID, $type, $title, $description, $hashtags, $sourceURL, [$thumbnail], [$videoURL], [$resub]);
 	{
 		// If the content entry is attaching an image
-		if($imageURL or $mobileURL)
+		if($thumbnail)
 		{
-			return self::submitImage($uniID, $imageURL, "", $hashtags, $sourceURL, $title, $desc, $mobileURL, $type, $resub);
+			return self::submitImage($uniID, $thumbnail, $hashtags, $sourceURL, $title, $description, $type, $resub);
 		}
 		
 		// If the content entry is attaching a video
 		if($videoURL)
 		{
-			return self::submitVideo($uniID, $videoURL, "", $hashtags, $sourceURL, $title, $desc, $type, $resub);
+			return self::submitVideo($uniID, $videoURL, $hashtags, $sourceURL, $title, $description, $type, $resub);
 		}
 		
-		// Prepare Variables
-		$title = Sanitize::safeword(strip_tags($title));
-		$desc = Sanitize::text(strip_tags($desc));
-		
-		if(strlen($title) > 80) { $title = substr($title, 0, 80); }
-		if(strlen($desc) > 255) { $desc = substr($desc, 0, 255); }
-		
-		// Prepare Packet
-		$packet = array(
-			'uni_id'		=> $uniID
-		,	'attach_title'	=> $title
-		,	'attach_desc'	=> $desc
-		,	'hashtags'		=> $hashtags
-		,	'source'		=> $sourceURL
-		);
-		
-		// Send a unique type with the hashtag, if applicable
-		if($type)
-		{
-			$packet['type'] = $type;
-		}
-		
-		// Indicate that this is a resubmission, if applicable
-		if($resub)
-		{
-			$packet['resubmitted'] = true;
-		}
-		
-		// Run the API
-		return (bool) Connect::to("hashtag", "PublishAPI", $packet);
+		return false;
 	}
 	
 	
@@ -123,36 +93,30 @@ abstract class Hashtag {
 	public static function submitImage
 	(
 		$uniID			// <int> The uniID that submitted the photo.
-	,	$imageURL		// <str> The URL to the photo.
-	,	$message		// <str> The message to include with the photo.
+	,	$thumbnail		// <str> The URL to the thumbnail.
 	,	$hashtags		// <int:str> An array of hashtags that were listed on the photo.
 	,	$sourceURL		// <str> The url to link to if the photo is clicked.
-	,	$title = ""		// <str> The title of the image, if applicable.
-	,	$desc = ""		// <str> The description of the image, if applicable.
-	,	$mobileURL = ""	// <str> The URL to the mobile version of the image.
+	,	$title			// <str> The title of the image, if applicable.
+	,	$description	// <str> The description of the image, if applicable.
 	,	$type = ""		// <str> If set, this may alter the type of hashtag submission ('article', 'blog', etc)
 	,	$resub = false	// <bool> TRUE if this is a resubmission of an earlier post.
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Hashtag::submitImage($uniID, $imageURL, $message, $hashtags, $sourceURL, [$title], [$desc], [$mobileURL], [$type], [$resub]);
+	// Hashtag::submitImage($uniID, $thumbnail, $hashtags, $sourceURL, [$title], [$description], [$type], [$resub]);
 	{
 		// Prepare Variables
-		$message = Sanitize::text(strip_tags($message));
 		$title = Sanitize::safeword(strip_tags($title));
-		$desc = Sanitize::text(strip_tags($desc));
+		$description = Sanitize::text(strip_tags($description));
 		
-		if(strlen($message) > 1000) { $message = substr($message, 0, 1000); }
 		if(strlen($title) > 80) { $title = substr($title, 0, 80); }
-		if(strlen($desc) > 255) { $desc = substr($desc, 0, 255); }
+		if(strlen($description) > 253) { $description = substr($description, 0, 250) . "..."; }
 		
 		// Prepare Packet
 		$packet = array(
 			'uni_id'		=> $uniID
-		,	'image_url'		=> $imageURL
-		,	'mobile_url'	=> $mobileURL
-		,	'attach_title'	=> $title
-		,	'attach_desc'	=> $desc
-		,	'message'		=> $message
+		,	'thumbnail'		=> $thumbnail
+		,	'title'			=> $title
+		,	'description'	=> $description
 		,	'hashtags'		=> $hashtags
 		,	'source'		=> $sourceURL
 		);
@@ -179,33 +143,29 @@ abstract class Hashtag {
 	(
 		$uniID			// <int> The uniID that submitted the video.
 	,	$videoURL		// <str> The URL to the video.
-	,	$message		// <str> The message to include with the video.
 	,	$hashtags		// <int:str> An array of hashtags that were listed on the video.
 	,	$sourceURL		// <str> The url to return to if the return link is checked.
-	,	$title = ""		// <str> The title of the image, if applicable.
-	,	$desc = ""		// <str> The description of the image, if applicable.
+	,	$title			// <str> The title of the image, if applicable.
+	,	$description	// <str> The description of the image, if applicable.
 	,	$type = ""		// <str> If set, this may alter the type of hashtag submission ('article', 'blog', etc)
 	,	$resub = false	// <bool> TRUE if this is a resubmission of an earlier post.
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Hashtag::submitVideo($uniID, $videoURL, $message, $hashtags, $sourceURL, [$title], [$desc], [$type], [$resub]);
+	// Hashtag::submitVideo($uniID, $videoURL, $hashtags, $sourceURL, [$title], [$description], [$type], [$resub]);
 	{
 		// Prepare Variables
-		$message = Sanitize::text(strip_tags($message));
 		$title = Sanitize::safeword(strip_tags($title));
-		$desc = Sanitize::text(strip_tags($desc));
+		$description = Sanitize::text(strip_tags($description));
 		
-		if(strlen($message) > 1000) { $message = substr($message, 0, 1000); }
 		if(strlen($title) > 80) { $title = substr($title, 0, 80); }
-		if(strlen($desc) > 255) { $desc = substr($desc, 0, 255); }
+		if(strlen($description) > 253) { $description = substr($description, 0, 250) . "..."; }
 		
 		// Prepare Packet
 		$packet = array(
 			'uni_id'		=> $uniID
 		,	'video_url'		=> $videoURL
-		,	'attach_title'	=> $title
-		,	'attach_desc'	=> $desc
-		,	'message'		=> $message
+		,	'title'			=> $title
+		,	'description'	=> $description
 		,	'hashtags'		=> $hashtags
 		,	'source'		=> $sourceURL
 		);

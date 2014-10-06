@@ -18,7 +18,13 @@ Due to the increased need for security of this page, it cannot be accessed direc
 Database::initRoot();
 
 // Prepare your script(s) below:
+if(DatabaseAdmin::tableExists("notifications"))
+{
+	DatabaseAdmin::renameColumn("notifications", "category", "note_type");
+	DatabaseAdmin::addColumn("users", "date_notes", "int(10) unsigned NOT NULL", 0);
+}
 
+/*
 if(DatabaseAdmin::tableExists("content_block_text"))
 {
 	DatabaseAdmin::dropColumn("content_block_text", "title");
@@ -95,6 +101,7 @@ if(strpos(SITE_HANDLE, "article") !== false)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 	");
 }
+*/
 
 //*
 if(DatabaseAdmin::tableExists("ads_sponsored"))

@@ -8,27 +8,38 @@ if(!Me::$loggedIn)
 
 // Get Notifications
 $globalNotes = Notifications::getGlobal();
-$standardNotes = Notifications::get(Me::$id, true);
+$standardNotes = Notifications::getFullList(Me::$id);
 
 // Set User's Notifications to 0
-if(Database::query("UPDATE users SET has_notifications=? WHERE uni_id=? AND has_notifications > ? LIMIT 1", array(0, Me::$id, 0)))
+if(Database::query("UPDATE users SET has_notifications=?, date_notes=? WHERE uni_id=? AND has_notifications > ? LIMIT 1", array(0, time(), Me::$id, 0)))
 {
 	// Remove the cache for the notification widget
 	Cache::delete("noti:" . Me::$id);
 }
 
-// Run Header
-require(APP_PATH . "/includes/user_panel_header.php");
+// Run Global Script
+require(APP_PATH . "/includes/global.php");
+
+// Display the Header
+require(SYS_PATH . "/controller/includes/metaheader.php");
+require(SYS_PATH . "/controller/includes/header.php");
+
+// Display Side Panel
+require(SYS_PATH . "/controller/includes/side-panel.php");
+
+echo '
+<div id="panel-right"></div>
+<div id="content" class="content-open">' . Alert::display();
 
 echo '
 <style>
-.notices>h2 { padding:0px; margin-bottom:4px; }
 .notices>h2:nth-child(n+2) { padding-top:24px; }
-.notices>p { margin:0px; padding:5px 0 0 0; }
-.notices>p:nth-child(even) { background-color:#c2d3e4; }
+.notices>p { margin:0px; padding:2px 6px 2px 6px; }
+.notices>p:nth-child(even) { background-color:#ccddff; }
 .notices>p:nth-child(odd) { background-color:#ddeeff; }
 </style>
 
+<h2 style="margin-bottom:4px;">Notifications</h2>
 <div class="notices">';
 
 // Scan through Global Notifications
@@ -56,24 +67,21 @@ echo '
 
 foreach($standardNotes as $key => $note)
 {
-	if(!isset($standardNotes[$key - 1]) or $standardNotes[$key - 1]['category'] != $note['category'])
-	{
-		echo '
-		<h2>' . $note['category'] . '</h2>';
-	}
-	
 	if($note['url'] != "")
 	{
 		$note['message'] = '<a href="' . $note['url'] . '">' . $note['message'] . '</a>';
 	}
 	
 	echo '
-		<p>' . $note['message'] . ' (' . Time::fuzzy($note['date_created']) . ')</p>';
+	<p>' . $note['message'] . ' (' . Time::fuzzy($note['date_created']) . ')</p>';
 }
 
 echo '
 </div>
 </div>';
 
+echo '
+</div>';
+
 // Display the Footer
-require(SYS_PATH . "/controller/includes/user_panel_footer.php");
+require(SYS_PATH . "/controller/includes/footer.php");

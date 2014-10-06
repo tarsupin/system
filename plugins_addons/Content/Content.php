@@ -32,7 +32,6 @@ ModuleAuthor::widget(Me::$id);
 
 // Prepare Values
 $config['pageTitle'] = $coreData['title'];
-Button::$returnURL = "/" . $coreData['url_slug'];
 
 // Run Comment Form, if applicable
 if($contentData['comments'])
@@ -583,10 +582,9 @@ abstract class Content {
 		$packet = array(
 			'uni_id'		=> $uniID					// The UniID of the page that you're posting to
 		,	'type'			=> $type					// The type of content being chatted (blog, article, etc)
-		,	'image_url'		=> $coreData['image_url']	// Set this value (absolute url) if you're posting an image
-		,	'mobile_url'	=> $coreData['mobile_url']	// Set this to the mobile verson of the image, if applicable
-		,	'attach_title'	=> $coreData['title']		// If set, this is the title of the attachment
-		,	'attach_desc'	=> $coreData['body']		// If set, this is the description of the attachment
+		,	'thumbnail'		=> $coreData['thumbnail']	// The thumbnail URL if you're posting an image
+		,	'title'			=> $coreData['title']		// If set, this is the title of the attachment
+		,	'description'	=> $coreData['body']		// If set, this is the description of the attachment
 		,	'source'		=> SITE_URL . "/" . $coreData['url_slug']		// The URL of the sourced content
 		,	'orig_handle'	=> $coreData['handle']		// The handle of the user that originally posted the content
 		);
@@ -658,10 +656,9 @@ abstract class Content {
 			'uni_id'		=> $uniID					// The UniID of the page that you're posting to
 		,	'type'			=> $type					// The type of content being chatted (blog, article, etc)
 		,	'poster_id'		=> $uniID					// The person posting to the page (usually the same as UniID)
-		,	'image_url'		=> $coreData['image_url']	// Set this value (absolute url) if you're posting an image
-		,	'mobile_url'	=> $coreData['mobile_url']	// Set this to the mobile verson of the image, if applicable
-		,	'attach_title'	=> $coreData['title']		// If set, this is the title of the attachment
-		,	'attach_desc'	=> $coreData['body']		// If set, this is the description of the attachment
+		,	'thumbnail'		=> $coreData['thumbnail']	// Set this value (absolute url) if you're posting an image
+		,	'title'			=> $coreData['title']		// If set, this is the title of the attachment
+		,	'description'	=> $coreData['body']		// If set, this is the description of the attachment
 		,	'source'		=> SITE_URL . "/" . $coreData['url_slug']		// The URL of the sourced content
 		,	'orig_handle'	=> $coreData['handle']		// The handle of the user that originally posted the content
 		);

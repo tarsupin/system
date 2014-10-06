@@ -24,8 +24,9 @@ Notifications::createGlobal($message, $url, [$sync]);
 
 Notifications::notifyStaff($category, $message, [$minClearance], [$maxClearance], [$url], [$senderID], [$sync]);
 
-$notifications = Notifications::get($uniID);
+$notifications = Notifications::getCount($uniID);
 $notifications = self::getFullList($uniID);
+
 $globalNotes = Notifications::getGlobal($page, $numToShow);
 
 Notifications::sideWidget();
@@ -42,22 +43,22 @@ abstract class Notifications {
 	public static function create
 	(
 		$uniID				// <int> The UniID to create a notification for.
-	,	$category			// <str> The category (type) of notification.
+	,	$noteType			// <str> The type of notification.
 	,	$message			// <str> The message (what the notification says); 150 characters.
 	,	$url = ""			// <str> The url that you can follow (if you click the notification).
 	,	$senderID = 0		// <int> The uni_id responsible for sending the notification (0 if server).
 	,	$sync = false		// <bool> Set to TRUE to sync this notification with Auth.
 	)						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Notifications::create($uniID, $category, $message, [$url], [$senderID], [$sync]);
+	// Notifications::create($uniID, $noteType, $message, [$url], [$senderID], [$sync]);
 	{
 		Database::startTransaction();
 		
 		// Create the new Notification
-		if($success = Database::query("INSERT INTO notifications (uni_id, sender_id, category, message, url, date_created, sync_unifaction) VALUES (?, ?, ?, ?, ?, ?, ?)", array($uniID, $senderID, $category, $message, $url, time(), ($sync ? 1 : 0))))
+		if($success = Database::query("INSERT INTO notifications (uni_id, sender_id, note_type, message, url, date_created, sync_unifaction) VALUES (?, ?, ?, ?, ?, ?, ?)", array($uniID, $senderID, $noteType, $message, $url, time(), ($sync ? 1 : 0))))
 		{
 			// Check for excess Notifications
-			Database::query("DELETE FROM `notifications` WHERE uni_id=? AND category=? AND date_created <= (SELECT date_created FROM (SELECT date_created FROM `notifications` WHERE uni_id=? AND category=? ORDER BY date_created DESC LIMIT 1 OFFSET 5) foo)", array($uniID, $category, $uniID, $category));
+			Database::query("DELETE FROM `notifications` WHERE uni_id=? AND note_type=? AND date_created <= (SELECT date_created FROM (SELECT date_created FROM `notifications` WHERE uni_id=? AND note_type=? ORDER BY date_created DESC LIMIT 1 OFFSET 5) foo)", array($uniID, $noteType, $uniID, $noteType));
 			
 			// Clear old notifications every once in a while
 			if(mt_rand(0, 10000) == 250)
@@ -99,7 +100,7 @@ abstract class Notifications {
 /****** Create a Notification for Staff Members ******/
 	public static function notifyStaff
 	(
-		$category			// <str> The category (type) of notification.
+		$noteType			// <str> The type of notification.
 	,	$message			// <str> The message (what the notification says); 150 characters.
 	,	$minClearance = 5	// <int> The minimum clearance level to send this notification to.
 	,	$maxClearance = 10	// <int> The maximum clearance level to send this notification to.
@@ -108,7 +109,7 @@ abstract class Notifications {
 	,	$sync = false		// <bool> Set to TRUE to sync this notification with Auth.
 	)						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// Notifications::notifyStaff($category, $message, [$minClearance], [$maxClearance], [$url], [$senderID], [$sync]);
+	// Notifications::notifyStaff($noteType, $message, [$minClearance], [$maxClearance], [$url], [$senderID], [$sync]);
 	{
 		// Prepare Values
 		$minClearance = max(5, $minClearance);
@@ -124,7 +125,7 @@ abstract class Notifications {
 			foreach($staff as $member)
 			{
 				$staffList[] = (int) $member['uni_id'];
-				$success = self::create((int) $member['uni_id'], $category, $message, $url, $senderID, $sync) ? $success : false;
+				$success = self::create((int) $member['uni_id'], $noteType, $message, $url, $senderID, $sync) ? $success : false;
 			}
 			
 			Database::endTransaction();
@@ -134,17 +135,14 @@ abstract class Notifications {
 	}
 	
 	
-/****** Get Standard Notifications ******/
-	public static function get
+/****** Get Standard Notification Counts ******/
+	public static function getCount
 	(
 		$uniID				// <int> The UniID to return notifications for.
-	,	$fullList = false	// <bool> Set to TRUE to get the full list (rather than a small list).
 	)						// RETURNS <str:int> the list of notifications, array() on failure.
 	
-	// $notifications = Notifications::get($uniID, [$fullList]);
+	// $notifications = Notifications::getCount($uniID);
 	{
-		if($fullList) { return self::getFullList($uniID); }
-		
 		// Get Notifications by Cache (if available)
 		$checkData = Cache::get("noti:" . $uniID);
 		
@@ -153,31 +151,31 @@ abstract class Notifications {
 			return json_decode($checkData);
 		}
 		
-		// Get Notifications by Database
+		// Get Notifications
 		$retList = array();
-		$results = Database::selectMultiple("SELECT category, COUNT(*) as totalNum FROM notifications WHERE uni_id=? GROUP BY category", array($uniID));
+		$results = Database::selectMultiple("SELECT n.note_type, COUNT(*) as totalNum FROM notifications n INNER JOIN users u ON n.uni_id=u.uni_id WHERE n.uni_id=? AND n.date_created > u.date_notes GROUP BY n.note_type", array($uniID));
 		
 		foreach($results as $res)
 		{
-			$retList[$res['category']] = (int) $res['totalNum'];
+			$retList[$res['note_type']] = (int) $res['totalNum'];
 		}
 		
-		// Store the notifications for 10 minutes
-		Cache::set("noti:" . $uniID, json_encode($retList), 600);
+		// Store the notifications for 3 minutes
+		Cache::set("noti:" . $uniID, json_encode($retList), 180);
 		
 		return $retList;
 	}
 	
 	
 /****** Get Full List of Standard Notifications ******/
-	private static function getFullList
+	public static function getFullList
 	(
 		$uniID				// <int> The Uni-Account to return notifications for.
 	)						// RETURNS <int:[str:str]> the list of notifications, array() on failure.
 	
 	// $notifications = self::getFullList($uniID);
 	{
-		return Database::selectMultiple("SELECT * FROM notifications WHERE uni_id=? ORDER BY category, date_created DESC", array($uniID));
+		return Database::selectMultiple("SELECT * FROM notifications WHERE uni_id=? ORDER BY note_type, date_created DESC", array($uniID));
 	}
 	
 	
@@ -203,7 +201,7 @@ abstract class Notifications {
 		// If the user has notifications, attempt to call notifications
 		if(isset(Me::$vals['has_notifications']) && Me::$vals['has_notifications'] > 0)
 		{
-			$sideBarNotes = self::get(Me::$id);
+			$sideBarNotes = self::getCount(Me::$id);
 			
 			if(count($sideBarNotes) > 0)
 			{
@@ -260,7 +258,7 @@ abstract class Notifications {
 		// Cycle through the results and add them to the packet
 		foreach($results as $res)
 		{
-			$packet[] = array((int) $res['uni_id'], $res['sender_id'], substr($res['message'], 0, 255), $res['url'], (int) $res['date_created']);
+			$packet[] = array($res['note_type'], (int) $res['uni_id'], $res['sender_id'], substr($res['message'], 0, 255), $res['url'], (int) $res['date_created']);
 		}
 		
 		// Set the API to use the Post Method

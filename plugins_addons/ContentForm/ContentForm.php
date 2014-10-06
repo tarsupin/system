@@ -155,7 +155,7 @@ class ContentForm {
 	// Values that the system sets
 	public $urlLength = 42;			// <int> The maximum length allowed with the URL.
 	public $urlUpdate = true;		// <bool> TRUE if you can update the URL, FALSE if not.
-	public $hashtagsAllow = false;	// <bool> Sets to TRUE once you're allowed to add hashtags.
+	public $hashtagsUpdate = false;	// <bool> Sets to TRUE once you're allowed to add hashtags.
 	
 	
 /****** Content Form Constructor ******/
@@ -262,12 +262,39 @@ class ContentForm {
 				}
 			}
 			
+			// Prepare Final Update
+			$this->settingUpdate = false;
+			$this->statusUpdate = false;
+			
 			// Run the Core Interpreters
 			$this->updateSettings();
 			$this->updateHashtags();
 			$this->updateURL();
 			$this->updateSegments();
 			$this->updateCustom();
+			
+			// If the thumbnail was updated
+			if(isset($_FILES['thumb_image']) and $_FILES['thumb_image']['tmp_name'])
+			{
+				$this->updateThumbnail();
+			}
+			
+			// Process the Settings, if applicable
+			if($this->statusUpdate)
+			{
+				// If they're trying to make this a visible post
+				if($this->contentData['status'] >= Content::STATUS_OFFICIAL or ($this->contentData['status'] == Content::STATUS_GUEST and $this->openPost == true))
+				{
+					if(!$this->contentData['thumbnail'])
+					{
+						Alert::warning("Thumbnail Required", "A thumbnail is required to submit your post.");
+						
+						$this->contentData['status'] = Content::STATUS_DRAFT;
+						$this->statusUpdate = false;
+						$this->hashtagsUpdate = false;
+					}
+				}
+			}
 			
 			// Interpret Setting Modules
 			foreach($this->settings as $module => $bool)
@@ -278,12 +305,6 @@ class ContentForm {
 				}
 			}
 			
-			// If the thumbnail was updated
-			if(isset($_FILES['thumb_image']) and $_FILES['thumb_image']['tmp_name'])
-			{
-				$this->updateThumbnail();
-			}
-			
 			// Update Blocks
 			$this->updateBlocks();
 			
@@ -291,6 +312,18 @@ class ContentForm {
 			if(!$this->contentData['thumbnail'])
 			{
 				$this->updateThumbnailAuto();
+			}
+			
+			// Process the Settings
+			if($this->settingUpdate)
+			{
+				Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($this->contentData['title'], $this->contentData['primary_hashtag'], $this->contentData['comments'], $this->contentData['voting'], $this->contentData['date_posted'], $this->contentID));
+			}
+			
+			// Process the Status
+			if($this->statusUpdate)
+			{
+				Database::query("UPDATE IGNORE content_entries SET status=? WHERE id=? LIMIT 1", array($this->contentData['status'], $this->contentID));
 			}
 		}
 		else
@@ -313,26 +346,24 @@ class ContentForm {
 	
 	// $contentForm->updateSettings();
 	{
-		$settingUpdate = false;
-		
 		// Title of the Post
 		if(isset($_POST['title']) and $_POST['title'] != $this->contentData['title'])
 		{
 			$this->contentData['title'] = Sanitize::safeword($_POST['title'], "'\"?");
-			$settingUpdate = true;
+			$this->settingUpdate = true;
 		}
 		
 		// Post Status
 		if(isset($_POST['save_official']) and $this->contentData['status'] < Content::STATUS_OFFICIAL and Me::$clearance >= 6)
 		{
 			$this->contentData['status'] = Content::STATUS_OFFICIAL;
-			$settingUpdate = true;
+			$this->statusUpdate = true;
 		}
 		
 		else if(isset($_POST['save_publish']) and $this->contentData['status'] < Content::STATUS_GUEST)
 		{
 			$this->contentData['status'] = Content::STATUS_GUEST;
-			$settingUpdate = true;
+			$this->statusUpdate = true;
 			
 			// Add the entry to the queue
 			Content::queue($this->contentID);
@@ -341,21 +372,21 @@ class ContentForm {
 		else if(isset($_POST['save_guest']) and $this->contentData['status'] > Content::STATUS_GUEST and Me::$clearance >= 6)
 		{
 			$this->contentData['status'] = Content::STATUS_GUEST;
-			$settingUpdate = true;
+			$this->statusUpdate = true;
 		}
 		
 		// Date Posted
 		if($this->contentData['status'] >= Content::STATUS_GUEST and $this->contentData['date_posted'] == 0)
 		{
 			$this->contentData['date_posted'] = time();
-			$settingUpdate = true;
+			$this->statusUpdate = true;
 		}
 		
 		// Primary Hashtag
 		if(isset($_POST['primary_hashtag']) and $_POST['primary_hashtag'] != $this->contentData['primary_hashtag'])
 		{
 			$this->contentData['primary_hashtag'] = $_POST['primary_hashtag'];
-			$settingUpdate = true;
+			$this->settingUpdate = true;
 		}
 		
 		if(Me::$clearance >= 6)
@@ -364,24 +395,18 @@ class ContentForm {
 			if(isset($_POST['comments']) and $_POST['comments'] != $this->contentData['comments'])
 			{
 				$this->contentData['comments'] = (int) $_POST['comments'];
-				$settingUpdate = true;
+				$this->settingUpdate = true;
 			}
 			
 			// Voting
 			if(isset($_POST['voting']) and $_POST['voting'] != $this->contentData['voting'])
 			{
 				$this->contentData['voting'] = (int) $_POST['voting'];
-				$settingUpdate = true;
+				$this->settingUpdate = true;
 			}
 		}
 		
-		if(!$settingUpdate)
-		{
-			return true;
-		}
-		
-		// Process the Update
-		return Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, status=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($this->contentData['title'], $this->contentData['primary_hashtag'], $this->contentData['status'], $this->contentData['comments'], $this->contentData['voting'], $this->contentData['date_posted'], $this->contentID));
+		return $this->settingUpdate;
 	}
 	
 	
@@ -397,13 +422,20 @@ class ContentForm {
 			return false;
 		}
 		
-		if($this->contentData['status'] <= Content::STATUS_GUEST)
+		if($this->contentData['status'] < Content::STATUS_GUEST)
+		{
+			return false;
+		}
+		
+		if($this->contentData['status'] == Content::STATUS_GUEST and $formClass->openPost == false)
 		{
 			return false;
 		}
 		
 		// Allow Hashtags to be updated
-		$this->hashtagsAllow = true;
+		$this->hashtagsUpdate = true;
+		
+		return true;
 	}
 	
 	
@@ -618,18 +650,27 @@ class ContentForm {
 		<div id="setting-box" style="margin-top:22px;"><fieldset style="border:solid 1px #bbbbbb; overflow:hidden;"><legend style="font-size:1.2em;">Article Settings</legend>';
 		
 		// Show the Thumbnail, if applicable
+		echo '
+		<span style="font-weight:bold;">Current Thumbnail:</span>
+		<div style="position:relative; height:200px;">';
+		
 		if($this->contentData['thumbnail'])
 		{
 			echo '
-			<span style="font-weight:bold;">Current Thumbnail:</span>
-			<div style="position:relative; height:200px;">
-				<img src="' . $this->contentData['thumbnail'] . '?cache=' . time() . '" style="position:absolute; left:0px; top:0px;" />
-				<img src="' . CDN . '/images/upload-thumb.png" style="position:absolute; left:0px; top:0px;" />
-				<div style="position:absolute; left:0px; top:0px; height:60px; width:100px;">
-					<input type="file" name="thumb_image" value="" style="height:60px; width:100px; overflow:hidden; opacity:0; cursor:pointer;" />
-				</div>
-			</div>';
+			<img src="' . $this->contentData['thumbnail'] . '?cache=' . time() . '" style="position:absolute; left:0px; top:0px;" />';
 		}
+		else
+		{
+			echo '
+			<div style="position:absolute; left:0px; top:0px; width:320px; height:180px; background-color:#ddffff; border:solid 1px #cccccc;"></div>';
+		}
+		
+		echo '
+			<img src="' . CDN . '/images/upload-thumb.png" style="position:absolute; left:0px; top:0px;" />
+			<div style="position:absolute; left:0px; top:0px; height:60px; width:100px;">
+				<input type="file" name="thumb_image" value="" style="height:60px; width:100px; overflow:hidden; opacity:0; cursor:pointer;" />
+			</div>
+		</div>';
 		
 		// Display the hashtag dropdown
 		if(Me::$clearance >= 6 or $this->openPost)
@@ -986,6 +1027,8 @@ class ContentForm {
 			
 			// Save the thumbnail
 			Database::query("UPDATE content_entries SET thumbnail=? WHERE id=? LIMIT 1", array($coreData['thumbnail'], $this->contentID));
+			
+			Alert::info("Thumbnail Generated", "A thumbnail is being generated from your post's content.");
 		}
 		
 		$this->contentData['thumbnail'] = $coreData['thumbnail'];

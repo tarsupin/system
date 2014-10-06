@@ -126,7 +126,7 @@ abstract class ModuleHashtags {
 				<div class="hashtag"><a href="' . $hashtagURL . '/' . $hashtag . '">#' . $hashtag . '</a> <a href="' . $formClass->baseURL . '?id=' . ($formClass->contentID + 0) . '&delHash=' . $hashtag . '">[X]</a></div>';
 			}
 			
-			echo ' <input type="submit" name="confirm_hashtags" value="Confirm Hashtags" /></div>';
+			echo '</div>';
 		}
 		
 		// If there are no hashtags available
@@ -199,7 +199,7 @@ abstract class ModuleHashtags {
 		}
 		
 		// Confirm Hashtags
-		if(isset($_POST['confirm_hashtags']))
+		if($formClass->hashtagsUpdate)
 		{
 			// Submit hashtags, if applicable
 			if($formClass->contentData['status'] >= Content::STATUS_OFFICIAL or ($formClass->contentData['status'] >= Content::STATUS_GUEST and $formClass->openPost == true))
@@ -222,7 +222,7 @@ abstract class ModuleHashtags {
 					{
 						if(ContentHashtags::tagEntry($formClass->contentID, $unsubmittedHashtags))
 						{
-							Hashtag::submitContentEntry($formClass->contentData['uni_id'], $formClass->contentType, $formClass->contentData['title'], $coreData['body'], $unsubmittedHashtags, SITE_URL . "/" . trim($formClass->contentData['url_slug'], "/"), $coreData['image_url'], $coreData['mobile_url'], $coreData['video_url'], $resubmit);
+							Hashtag::submitContentEntry($formClass->contentData['uni_id'], $formClass->contentType, $formClass->contentData['title'], $coreData['body'], $unsubmittedHashtags, SITE_URL . "/" . trim($formClass->contentData['url_slug'], "/"), $coreData['thumbnail'], $coreData['video_url'], $resubmit);
 						}
 					}
 				}
