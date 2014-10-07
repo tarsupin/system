@@ -157,7 +157,7 @@ abstract class User {
 	public static function silentRegister
 	(
 		$user		// <mixed> UniID or Handle that you want to silently register.
-	)				// RETURNS <str:mixed> the user data that was registered, array() on failure.
+	)				// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// $userData = User::silentRegister($user);
 	{

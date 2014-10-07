@@ -282,17 +282,23 @@ class ContentForm {
 			// Process the Settings, if applicable
 			if($this->statusUpdate)
 			{
-				// If they're trying to make this a visible post
-				if($this->contentData['status'] >= Content::STATUS_OFFICIAL or ($this->contentData['status'] == Content::STATUS_GUEST and $this->openPost == true))
+				// Require a Thumbnail
+				if(!$this->contentData['thumbnail'])
 				{
-					if(!$this->contentData['thumbnail'])
-					{
-						Alert::warning("Thumbnail Required", "A thumbnail is required to submit your post.");
-						
-						$this->contentData['status'] = Content::STATUS_DRAFT;
-						$this->statusUpdate = false;
-						$this->hashtagsUpdate = false;
-					}
+					Alert::warning("Thumbnail Required", "A thumbnail is required to publish this content.");
+					
+					$this->contentData['status'] = Content::STATUS_DRAFT;
+					$this->statusUpdate = false;
+					$this->hashtagsUpdate = false;
+				}
+				
+				// Require a URL
+				if(!$this->contentData['url_slug'])
+				{
+					Alert::warning("URL Required", "A URL must be provided to publish this content.");
+					
+					$this->contentData['status'] = Content::STATUS_DRAFT;
+					$this->statusUpdate = false;
 				}
 			}
 			
@@ -379,7 +385,6 @@ class ContentForm {
 		if($this->contentData['status'] >= Content::STATUS_GUEST and $this->contentData['date_posted'] == 0)
 		{
 			$this->contentData['date_posted'] = time();
-			$this->statusUpdate = true;
 		}
 		
 		// Primary Hashtag
@@ -640,9 +645,19 @@ class ContentForm {
 		echo '
 		<input type="text" name="title" style="width:97%; height:38px; font-size:32px; font-weight:bold; margin-bottom:10px;" placeholder="Article Title . . ." value="' . $this->contentData['title'] . '" maxlength="72" />
 		
-		<div style="border:solid 1px #bbbbbb; font-size:18px; height:38px; margin-bottom:10px; width:97%; padding-left:14px;">
-			' . SITE_URL . '/' . ($this->urlPrefix ? trim($this->urlPrefix, "/") . '/' : "") . '
-			<input type="text" name="url_slug" style="border:none; color:#5abcde; height:26px; font-size:18px; font-weight:bold; padding-left:0px; min-width:280px;" value="' . str_replace($this->urlPrefix, "", $this->contentData['url_slug']) . '" maxlength="72" placeholder="enter-desired-url-here..." maxlength="' . $this->urlLength . '"' . ($this->urlUpdate ? "" : " disabled") . ' />
+		<div style="border:solid 1px #bbbbbb; font-size:18px; margin-bottom:10px; width:97%; padding-left:14px;">';
+		
+		if($this->urlUpdate)
+		{
+			echo SITE_URL . '/' . ($this->urlPrefix ? trim($this->urlPrefix, "/") . '/' : "") . '
+			<input type="text" name="url_slug" style="border:none; color:#5abcde; height:26px; font-size:18px; font-weight:bold; padding-left:0px; min-width:280px;" value="' . str_replace($this->urlPrefix, "", $this->contentData['url_slug']) . '" maxlength="72" placeholder="enter-desired-url-here..." maxlength="' . $this->urlLength . '" />';
+		}
+		else
+		{
+			echo '<a href="/' . $this->urlPrefix . $this->contentData['url_slug'] . '">' . SITE_URL . '/' . ($this->urlPrefix ? trim($this->urlPrefix, "/") . '/' : "") . str_replace($this->urlPrefix, "", $this->contentData['url_slug']) . '</a>';
+		}
+		
+		echo '
 		</div>';
 		
 		// Display the Metadata Block
@@ -1043,8 +1058,8 @@ class ContentForm {
 	,	$status = 0			// <int> The current status to assign to the entry (e.g. Content::STATUS_DRAFT)
 	,	$clearanceView = 0	// <int> The clearance required to view this entry.
 	,	$primeHashtag = ""	// <str> Assigns a primary hashtag, if applicable ("" to ignore).
-	,	$comments = 2		// <int> The type of comments for this entry (0 is disallow).
-	,	$voting = 2			// <int> The type of voting to allow for this entry (0 is disallow).
+	,	$comments = 4		// <int> The type of comments for this entry (0 is disallow).
+	,	$voting = 4			// <int> The type of voting to allow for this entry (0 is disallow).
 	,	$urlSlug = ""		// <str> The URL that you want to enforce in this entry.
 	)						// RETURNS <int> The ID of the entry on success, or 0 on failure.
 	

@@ -48,7 +48,7 @@ abstract class ModuleImage {
 		
 		// Display the Image Block
 		return '
-		<div class="' . $result['img_class'] . '">
+		<div class="cmob-img ' . $result['img_class'] . '">
 		<div class="' . $result['img_class'] . '-inner">
 			' . ($result['credits'] == "" ? "" : '<div class="block-credits">' . $result['credits'] . '</div>') . '
 			' . (($result['image_url'] or $result['mobile_url']) ? Photo::responsive($result['image_url'], $result['mobile_url'], 450, "", 450, $photoClass) : '') . '

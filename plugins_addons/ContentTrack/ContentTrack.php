@@ -118,7 +118,7 @@ class ContentTrack {
 		if(!$trackingData) { return false; }
 		
 		// Run the algorithms to determine the ratings
-		$rating = Ranking::contentRatings((int) $trackingData['views'], (int) $trackingData['votes_up'], (int) $trackingData['votes_down'], (int) $trackingData['comments'], (int) $trackingData['shared'], (int) $trackingData['tipped_amount']);
+		$rating = Ranking::contentRatings((int) $trackingData['views'], (int) $trackingData['votes_up'], (int) $trackingData['votes_down'], (int) $trackingData['comments'], (int) $trackingData['shared'], (float) $trackingData['tipped_amount']);
 		
 		// Update the tracker with the new rating
 		return Database::query("UPDATE content_tracking SET rating=? WHERE content_id=? LIMIT 1", array($rating, $this->contentID));

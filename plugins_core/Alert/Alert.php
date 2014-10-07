@@ -338,7 +338,7 @@ abstract class Alert {
 		foreach(self::$warningList as $key => $alert)
 		{
 			$html .= '
-			<div class="alert-message">' . $alert . '</div>';
+			<div class="alert-error">' . $alert . '</div>';
 		}
 		
 		$html .= '

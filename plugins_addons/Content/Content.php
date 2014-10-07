@@ -281,6 +281,7 @@ abstract class Content {
 		// <a href="' . Content::$returnURL . "?" . Link::prepareData("send-tip-article", self::$contentData['uni_id']) . '">Tip the Author</a
 		// <a href="' . Content::setVote($contentID) . '">Boost</a>
 		
+		// Extra Buttons
 		echo '
 		<style>
 			.but-share { padding:8px; background-color:#4bc7c7; color:white !important; border-radius:6px; }
@@ -289,7 +290,15 @@ abstract class Content {
 
 		<p style="margin-top:16px;">
 			<a class="but-share" href="' . Content::shareContent($contentID, "article") . '"><span class="icon-group"></span> Share</a>
-			<a class="but-share" href="' . Content::chatContent($contentID, "article") . '"><span class="icon-comments"></span> Chat</a>
+			<a class="but-share" href="' . Content::chatContent($contentID, "article") . '"><span class="icon-comments"></span> Chat</a>';
+		
+		if(Me::$clearance >= 6 or self::$contentData['uni_id'] == Me::$id)
+		{
+			echo '
+			<a class="but-share" href="/write?id=' . $contentID . '"><span class="icon-pencil"></span> Edit Post</a>';
+		}
+		
+		echo '
 			<a class="but-share" href="' . Content::flag($contentID) . '"><span class="icon-flag"></span> Flag</a>
 		</p>';
 		
