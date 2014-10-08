@@ -15,7 +15,6 @@ abstract class ContentFeed {
 	public static string $activeHashtag = "";		// <str> The hashtag for this page.
 	public static string $backTagTitle = "";		// <str> The title of the back tag.
 	public static string $backTagURL = "/";		// <str> The URL to go to when the bag tag is clicked.
-	public static string $urlPrefix = "";			// <str> The prefix to use on each feed entry.
 	
 	
 /****** Prepare a page for handling a content feed ******/
@@ -228,7 +227,6 @@ abstract class ContentFeed {
 		array <int, int> $contentIDs			// <int:int> The array that contains the content entry IDs for the feed.
 	,	bool $doTracking = true	// <bool> TRUE if we're going to show the tracking row.
 	,	int $uniID = 0			// <int> The UniID viewing the feed, if applicable.
-	,	bool $blogUser = false	// <bool> TRUE if you need the URL prefix to set automatically to the user.
 	): void						// RETURNS <void> outputs the appropriate line.
 	
 	// ContentFeed::displayFeed($contentIDs, [$doTracking], [$uniID]);
@@ -254,14 +252,9 @@ abstract class ContentFeed {
 			// Retrieve the feed data relevant to this particular entry (main title, description, image, etc)
 			$coreData = $feedData[$contentID];
 			
-			if($blogUser)
-			{
-				self::$urlPrefix = $coreData['handle'] . "/";
-			}
-			
 			// Prepare Values
 			$aggregate = $coreData['url'] == "" ? false : true;
-			$articleURL = $aggregate ? $coreData['url'] . "/" . self::$urlPrefix . $coreData['url_slug'] : "/" . self::$urlPrefix . $coreData['url_slug'];
+			$articleURL = $aggregate ? $coreData['url'] . "/" . $coreData['url_slug'] : "/" . $coreData['url_slug'];
 			
 			// Display the Content
 			echo '
@@ -276,7 +269,7 @@ abstract class ContentFeed {
 			}
 			
 			// If you have the clearance to edit this article
-			if(Me::$clearance >= 6 or ($uniID and $uniID == Me::$id))
+			if(Me::$clearance >= 6 or ($coreData['uni_id'] == Me::$id))
 			{
 				echo '<div class="c-feed-edit"><a href="/write?id=' . $contentID . '">Edit Post</a></div>';
 			}

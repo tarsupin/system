@@ -19,7 +19,7 @@ abstract class ModuleRelated {
 	public static function get
 	(
 		int $contentID		// <int> The ID of the content entry.
-	,	int $limit = 5		// <int> The number of related content entries to show.
+	,	int $limit = 4		// <int> The number of related content entries to show.
 	): array <int, array<str, mixed>>					// RETURNS <int:[str:mixed]> the data array of each content entry for a related content slot.
 	
 	// $relatedArticles = ModuleRelated::get($contentID, [$limit]);

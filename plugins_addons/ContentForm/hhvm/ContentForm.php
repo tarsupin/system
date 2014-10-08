@@ -184,7 +184,6 @@ class ContentForm {
 		
 		// Prepare Values
 		$this->urlLength = 42 - (strlen($this->urlPrefix));
-		$this->contentData['url_slug'] = str_replace($this->urlPrefix, "", $this->contentData['url_slug']);
 		
 		// Prevent any updates to the URL slug if one has been set, and status is higher than DRAFT
 		if($this->contentData['url_slug'] and $this->contentData['status'] > Content::STATUS_DRAFT)
@@ -323,13 +322,13 @@ class ContentForm {
 			// Process the Settings
 			if($this->settingUpdate)
 			{
-				Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($this->contentData['title'], $this->contentData['primary_hashtag'], $this->contentData['comments'], $this->contentData['voting'], $this->contentData['date_posted'], $this->contentID));
+				Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, comments=?, voting=? WHERE id=? LIMIT 1", array($this->contentData['title'], $this->contentData['primary_hashtag'], $this->contentData['comments'], $this->contentData['voting'], $this->contentID));
 			}
 			
 			// Process the Status
 			if($this->statusUpdate)
 			{
-				Database::query("UPDATE IGNORE content_entries SET status=? WHERE id=? LIMIT 1", array($this->contentData['status'], $this->contentID));
+				Database::query("UPDATE IGNORE content_entries SET status=?, date_posted=? WHERE id=? LIMIT 1", array($this->contentData['status'], $this->contentData['date_posted'], $this->contentID));
 			}
 		}
 		else
@@ -382,7 +381,7 @@ class ContentForm {
 		}
 		
 		// Date Posted
-		if($this->contentData['status'] >= Content::STATUS_GUEST and $this->contentData['date_posted'] == 0)
+		if($this->contentData['status'] >= Content::STATUS_GUEST and !$this->contentData['date_posted'])
 		{
 			$this->contentData['date_posted'] = time();
 		}
@@ -475,9 +474,9 @@ class ContentForm {
 		{
 			Database::startTransaction();
 			
-			if($pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($this->urlPrefix . $this->contentData['url_slug'])))
+			if($pass = Database::query("DELETE FROM content_by_url WHERE url_slug=? LIMIT 1", array($this->contentData['url_slug'])))
 			{
-				if($pass = Database::query("UPDATE IGNORE content_entries SET url_slug=? WHERE id=? LIMIT 1", array($_POST['url_slug'], $this->contentID)))
+				if($pass = Database::query("UPDATE IGNORE content_entries SET url_slug=? WHERE id=? LIMIT 1", array($this->urlPrefix . $_POST['url_slug'], $this->contentID)))
 				{
 					$pass = Database::query("INSERT INTO content_by_url (url_slug, content_id) VALUES (?, ?)", array($this->urlPrefix . $_POST['url_slug'], $this->contentID));
 				}
@@ -654,7 +653,7 @@ class ContentForm {
 		}
 		else
 		{
-			echo '<a href="/' . $this->urlPrefix . $this->contentData['url_slug'] . '">' . SITE_URL . '/' . ($this->urlPrefix ? trim($this->urlPrefix, "/") . '/' : "") . str_replace($this->urlPrefix, "", $this->contentData['url_slug']) . '</a>';
+			echo '<a href="/' . $this->contentData['url_slug'] . '">' . SITE_URL . '/' . $this->contentData['url_slug'] . '</a>';
 		}
 		
 		echo '
