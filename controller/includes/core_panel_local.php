@@ -12,7 +12,7 @@ echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 			<li class="core-link is-social"><a href="http://unifaction.social.test/' . $xQ . '"><span class="icon-group core-icon"></span><span class="core-txt">Social</span></a></li>
 			<li class="core-link is-fastchat"><a href="http://fastchat.social.test/' . $xQ . '"><span class="icon-comments core-icon"></span><span class="core-txt">FastChat</span></a></li>
 			<li class="core-link is-hashtag"><a href="http://hashtag.test/' . $xQ . '"><span class="icon-tag core-icon"></span><span class="core-txt">Hashtags</span></a></li>
-			<li class="core-link is-microfaction"><a href="http://unifaction.test/microfactions' . $xQ . '"><span class="icon-newspaper core-icon"></span><span class="core-txt">MicroFactions</span></a></li>
+			<li class="core-link is-microfaction"><a href="http://community.microfaction.test/' . $xQ . '"><span class="icon-newspaper core-icon"></span><span class="core-txt">MicroFactions</span></a></li>
 			<li class="core-link is-blogfrog"><a href="http://blogfrog.social.test/' . $xQ . '"><span class="icon-pen core-icon"></span><span class="core-txt">BlogFrog</span></a></li>
 			<li class="core-link is-credits"><a href="http://unijoule.test/' . $xQ . '"><span class="icon-coin core-icon"></span><span class="core-txt">UniJoule</span></a></li>
 			<li class="core-link is-avatar"><a href="http://avatar.test/' . $xQ . '"><span class="icon-user core-icon"></span><span class="core-txt">Avatar</span></a></li>
