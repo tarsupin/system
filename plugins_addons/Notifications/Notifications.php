@@ -148,7 +148,7 @@ abstract class Notifications {
 		
 		if($checkData)
 		{
-			return json_decode($checkData);
+			return json_decode($checkData, true);
 		}
 		
 		// Get Notifications

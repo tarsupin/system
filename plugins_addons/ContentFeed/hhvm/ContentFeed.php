@@ -355,7 +355,7 @@ abstract class ContentFeed {
 					$coreData['nooch'] = "?";
 					$jsAgg = ', 1';
 				}
-				else if(is_int($coreData['views']))
+				else if($coreData['views'])
 				{
 					$coreData['tips'] = round($coreData['tipped_amount'] * 10);
 					$boostClicked = $coreData['user_vote'] == 1 ? "-track" : "";
