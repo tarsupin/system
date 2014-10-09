@@ -73,7 +73,7 @@ foreach($standardNotes as $key => $note)
 	}
 	
 	echo '
-	<p>' . $note['message'] . ' (' . Time::fuzzy($note['date_created']) . ')</p>';
+	<p>' . $note['message'] . ' (' . Time::fuzzy((int) $note['date_created']) . ')</p>';
 }
 
 echo '

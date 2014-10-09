@@ -569,13 +569,13 @@ abstract class Content {
 /****** "Chat This Content" Action ******/
 	public static function chatContent_TeslaAction
 	(
-		$contentInfo	// <str> The data for the content that we're chatting.
+		$contentInfo	// <int:mixed> The data for the content that we're chatting.
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// URL: /action/Content/chatContent?param[0]={$contentInfo}
 	{
 		// Prepare Values
-		$contentInfo = Decrypt::run("cCData", $contentInfo);
+		$contentInfo = Decrypt::run("cCData", $contentInfo[0]);
 		
 		list($contentID, $uniID, $type) = Serialize::decode($contentInfo);
 		
@@ -646,13 +646,13 @@ abstract class Content {
 /****** "Share This Content" Action ******/
 	public static function shareContent_TeslaAction
 	(
-		$contentInfo	// <int:int> The data for the content that we're sharing.
+		$contentInfo	// <int:mixed> The data for the content that we're sharing.
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// URL: /action/Content/shareContent?param[0]={$contentInfo}
 	{
 		// Prepare Values
-		$contentInfo = Decrypt::run("shareCData", $contentInfo);
+		$contentInfo = Decrypt::run("shareCData", $contentInfo[0]);
 		
 		list($contentID, $uniID, $type) = Serialize::decode($contentInfo);
 		
@@ -726,7 +726,7 @@ abstract class Content {
 	// URL: /action/Content/vote?param[0]={$voteData}
 	{
 		// Prepare Values
-		$voteData = Decrypt::run("doVoteDataChk", $voteData);
+		$voteData = Decrypt::run("doVoteDataChk", $voteData[0]);
 		
 		list($contentID, $uniID, $voteUp) = Serialize::decode($voteData);
 		
@@ -782,7 +782,7 @@ abstract class Content {
 	// URL: /action/Content/flag?param[0]={$voteData}
 	{
 		// Prepare Values
-		$voteData = Decrypt::run("flagContentbtn", $voteData);
+		$voteData = Decrypt::run("flagContentbtn", $voteData[0]);
 		
 		list($contentID, $uniID) = Serialize::decode($voteData);
 		

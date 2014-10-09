@@ -406,7 +406,7 @@ abstract class Plugin {
 		if(method_exists($plugin, $action . "_TeslaAction"))
 		{
 			// Run the plugin's action
-			return call_user_func_array(array($plugin, $action . "_TeslaAction"), $params);
+			return call_user_func(array($plugin, $action . "_TeslaAction"), $params);
 		}
 	}
 	

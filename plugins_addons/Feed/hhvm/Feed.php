@@ -58,13 +58,13 @@ abstract class Feed {
 /****** Run the "Follow" Action ******/
 	public static function follow_TeslaAction
 	(
-		string $followData		// <str> The encrypted data string to be interpreted.
+		array <int, mixed> $followData		// <int:mixed> The encrypted data string to be interpreted.
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// URL: /action/Feed/follow?param[0]={$followData}
 	{
 		// Prepare Values
-		$followData = Decrypt::run(self::$feedSalt, $followData);
+		$followData = Decrypt::run(self::$feedSalt, $followData[0]);
 		list($uniID, $hashtag, $isFollow) = Serialize::decode($followData);
 		
 		if(!$hashtag) { return false; }
