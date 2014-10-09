@@ -249,7 +249,7 @@ abstract class Content {
 		}
 		
 		// Display the Content Tracking Data
-		if(isset($trackingData['views']) and is_int($trackingData['views']))
+		if(isset($trackingData['views']) and $trackingData['views'])
 		{
 			$trackingData['tips'] = round($trackingData['tipped_amount'] * 10);
 			$boostClicked = $trackingData['user_vote'] == 1 ? "-track" : "";
