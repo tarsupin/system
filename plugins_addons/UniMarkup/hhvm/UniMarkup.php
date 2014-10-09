@@ -61,8 +61,8 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[quote\=(.+)\](.+)\[\/quote]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text);
 		
 		// Comment Syntax
-		$text = preg_replace('#(?<![:&])\#([\w]+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
-		$text = preg_replace('#\@([\w]+?)#iUs', '<a href="' . URL::fastchat_social(). '/$1">@$1</a>', $text);
+		//$text = preg_replace('#(?<![:&])\#([\w]+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
+		//$text = preg_replace('#\@([\w]+?)#iUs', '<a href="' . URL::fastchat_social(). '/$1">@$1</a>', $text);
 		
 		// Return Text
 		return $text;
@@ -86,6 +86,7 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '$1', $text);
 		$text = preg_replace('#\[link\](.+)\[\/link\]#iUs', '$1', $text);
 		$text = preg_replace('#\[link\=(.+)\](.+)\[\/link\]#iUs', '$2', $text);
+		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '$2', $text);
 		$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '$2', $text);
 		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '', $text); 
 		$text = preg_replace('#\[quote\=(.+)\](.+)\[\/quote]#iUs', '', $text);

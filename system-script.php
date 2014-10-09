@@ -35,6 +35,11 @@ if(DatabaseAdmin::tableExists("content_block_image"))
 	DatabaseAdmin::renameColumn("content_block_image", "class", "img_class");
 }
 
+if(DatabaseAdmin::tableExists("users_friends"))
+{
+	DatabaseAdmin::dropTable("users_friends");
+}
+
 /*
 if(DatabaseAdmin::tableExists("content_block_text"))
 {

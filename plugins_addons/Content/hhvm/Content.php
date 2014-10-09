@@ -569,7 +569,7 @@ abstract class Content {
 /****** "Chat This Content" Action ******/
 	public static function chatContent_TeslaAction
 	(
-		array <int, int> $contentInfo	// <int:int> The data for the content that we're chatting.
+		string $contentInfo	// <str> The data for the content that we're chatting.
 	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// URL: /action/Content/chatContent?param[0]={$contentInfo}
@@ -583,6 +583,10 @@ abstract class Content {
 		{
 			return false;
 		}
+		
+		// Recognize Integers
+		$contentID = (int) $contentID;
+		$uniID = (int) $uniID;
 		
 		// Get the Article Data
 		$coreData = Content::scanForCoreData($contentID);
