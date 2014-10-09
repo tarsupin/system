@@ -140,7 +140,7 @@ abstract class Content {
 		
 		// Prepare Modules for this Entry
 		ModuleRelated::widget($contentID);
-		ModuleAuthor::widget(Me::$id);
+		ModuleAuthor::widget(self::$contentData['uni_id']);
 		
 		// Prepare Values
 		self::$returnURL = "/" . self::$contentData['url_slug'];
