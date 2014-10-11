@@ -358,11 +358,25 @@ class ContentForm {
 			$this->settingUpdate = true;
 		}
 		
+		// Primary Hashtag
+		if(isset($_POST['primary_hashtag']) and $_POST['primary_hashtag'] != $this->contentData['primary_hashtag'])
+		{
+			$this->contentData['primary_hashtag'] = $_POST['primary_hashtag'];
+			$this->settingUpdate = true;
+		}
+		
 		// Post Status
 		if(isset($_POST['save_official']) and $this->contentData['status'] < Content::STATUS_OFFICIAL and Me::$clearance >= 6)
 		{
-			$this->contentData['status'] = Content::STATUS_OFFICIAL;
-			$this->statusUpdate = true;
+			if(!$this->contentData['primary_hashtag'])
+			{
+				Alert::warning("Primary Hashtag", "You must have a primary hashtag selected to finish publication.");
+			}
+			else
+			{
+				$this->contentData['status'] = Content::STATUS_OFFICIAL;
+				$this->statusUpdate = true;
+			}
 		}
 		
 		else if(isset($_POST['save_publish']) and $this->contentData['status'] < Content::STATUS_GUEST)
@@ -384,13 +398,6 @@ class ContentForm {
 		if($this->contentData['status'] >= Content::STATUS_GUEST and !$this->contentData['date_posted'])
 		{
 			$this->contentData['date_posted'] = time();
-		}
-		
-		// Primary Hashtag
-		if(isset($_POST['primary_hashtag']) and $_POST['primary_hashtag'] != $this->contentData['primary_hashtag'])
-		{
-			$this->contentData['primary_hashtag'] = $_POST['primary_hashtag'];
-			$this->settingUpdate = true;
 		}
 		
 		if(Me::$clearance >= 6)

@@ -40,6 +40,12 @@ if(DatabaseAdmin::tableExists("users_friends"))
 	DatabaseAdmin::dropTable("users_friends");
 }
 
+if(DatabaseAdmin::tableExists("content_block_image"))
+{
+	DatabaseAdmin::editColumn("content_block_image", "caption", "varchar(180) not null", 0);
+}
+
+
 /*
 if(DatabaseAdmin::tableExists("content_block_text"))
 {

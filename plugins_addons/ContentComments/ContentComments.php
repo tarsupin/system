@@ -151,7 +151,7 @@ abstract class ContentComments {
 	,	$sourceURL		// <str> The source of the URL, where links can return to.
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// ContentComments::create($contentID, $uniID, $comment);
+	// ContentComments::create($contentID, $uniID, $comment, $sourceURL);
 	{
 		Database::startTransaction();
 		

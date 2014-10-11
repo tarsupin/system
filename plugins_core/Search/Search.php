@@ -302,19 +302,29 @@ class Search {
 	
 	
 /****** Add the official search engine bar ******/
-	public static function searchEngineBar
-	(
-		$name = "search"						// <str> The name of this custom search.
-	,	$scriptName = "response"				// <str> The /ajax/{scriptName} to load.
-	,	$placeholder = "search anything . . ."	// <str> The placeholder for the search bar.
-	,	$funcOnKeyUp = ""						// <str> An extra JS function to run on key-up.
-	,	$defaultValue = ""						// <str> The default value for the search bar.
-	,	$classPrefix = "search"					// <str> The class to style the box with.
-	)											// RETURNS <str> HTML to insert a search bar.
+	public static function searchEngineBar (
+	)			// RETURNS <str> HTML to insert a search bar.
 	
-	// Search::searchEngineBar($name, $scriptName, $placeholder, [$funcOnKeyUp], [$defaultValue], [$classPrefix]);
+	// Search::searchEngineBar();
 	{
-		return self::searchBar($name, URL::search_unifaction_com(), $scriptName, $placeholder, $funcOnKeyUp, $defaultValue, $classPrefix);
+		// return self::searchBar($name, URL::search_unifaction_com(), $scriptName, $placeholder, $funcOnKeyUp, $defaultValue, $classPrefix);
+		
+		// Prepare Custom Functions
+		$funcOnKeyUP = "";
+		//$funcOnKeyUp = $funcOnKeyUp != "" ? " " . Sanitize::variable($funcOnKeyUp) . '(event)' : '';
+		
+		return '
+		<div id="search-search" class="searchWrap">
+			<div class="searchWrapInput">
+				<input id="searchInputID" class="searchInput"
+					type="text" name="searchInput" placeholder="search anything . . ." autocomplete="off"
+					onkeyup=\'searchEngineAjax(); showSelectedSearch(event, "searchHoverID");' . $funcOnKeyUP  . '\'
+					onfocus=\'focusSearch(event, "searchHoverID");\'
+					onblur=\'blurSearch(event, "searchHoverID");\'
+					/>
+			</div>
+			<div id="searchHoverID" class="searchHover"></div>
+		</div>';
 	}
 	
 	
