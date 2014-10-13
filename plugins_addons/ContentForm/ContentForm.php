@@ -469,7 +469,7 @@ class ContentForm {
 		}
 		
 		// Validate the URL Slug
-		FormValidate::url("URL", $_POST['url_slug'], 10, 42, "-");
+		FormValidate::variable("URL", $_POST['url_slug'], 10, 42, "-");
 		
 		if(strpos($_POST['url_slug'], "-") === false)
 		{

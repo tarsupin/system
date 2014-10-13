@@ -15,7 +15,7 @@ abstract class Cache {
 /****** Set Cached Variable ******/
 	public static function set
 	(
-		$key				// <str> The variable name (key) that you want to add to the cache.x
+		$key				// <str> The variable name (key) that you want to add to the cache.
 	,	$value				// <str> The value that you'd like to store in cache.
 	,	$expire	= 60		// <int> The duration of the cache (in seconds).
 	,	$expireFlux = 0		// <int> An optional expiration flux, to help alleviate potential cache dumping.
@@ -23,12 +23,13 @@ abstract class Cache {
 	
 	// Cache::set("usersOnline", "100", $expire, $expireFlux);
 	{
-		$expire += time() + $expire;
+		$expire = time() + $expire;
 		
 		if($expireFlux > 0)
 		{
 			$expire += mt_rand(0, $expireFlux);
 		}
+		if(Me::$id <= 10) { var_dump($expire); }
 		
 		return apc_store($key, $value, $expire);
 	}

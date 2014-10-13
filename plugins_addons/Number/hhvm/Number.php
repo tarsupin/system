@@ -205,17 +205,18 @@ abstract class Number {
 		
 		// Prepare Variables
 		$extraSpace = ($strNum[1] == 0 ? "" : " ");
+		$secondVal = (int) $strNum[1];
 		
 		switch($strNum[0])
 		{
-			case "2":	return "twenty" . $extraSpace . self::oneDigitToWord($strNum[1]);                
-			case "3":	return "thirty" . $extraSpace . self::oneDigitToWord($strNum[1]);
-			case "4":	return "forty" . $extraSpace . self::oneDigitToWord($strNum[1]);
-			case "5":	return "fifty" . $extraSpace . self::oneDigitToWord($strNum[1]);
-			case "6":	return "sixty" . $extraSpace . self::oneDigitToWord($strNum[1]);
-			case "7":	return "seventy" . $extraSpace . self::oneDigitToWord($strNum[1]);
-			case "8":	return "eighty" . $extraSpace . self::oneDigitToWord($strNum[1]);
-			case "9":	return "ninety" . $extraSpace . self::oneDigitToWord($strNum[1]);
+			case "2":	return "twenty" . $extraSpace . self::oneDigitToWord($secondVal);                
+			case "3":	return "thirty" . $extraSpace . self::oneDigitToWord($secondVal);
+			case "4":	return "forty" . $extraSpace . self::oneDigitToWord($secondVal);
+			case "5":	return "fifty" . $extraSpace . self::oneDigitToWord($secondVal);
+			case "6":	return "sixty" . $extraSpace . self::oneDigitToWord($secondVal);
+			case "7":	return "seventy" . $extraSpace . self::oneDigitToWord($secondVal);
+			case "8":	return "eighty" . $extraSpace . self::oneDigitToWord($secondVal);
+			case "9":	return "ninety" . $extraSpace . self::oneDigitToWord($secondVal);
 		}
 		
 		return "";

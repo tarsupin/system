@@ -20,9 +20,10 @@ abstract class Cache {
 	
 	// Cache::initialize();
 	{
-		self::$memConn = new Memcache();
+		self::$memConn = new Memcached();
+		self::$memConn->addServer('localhost', 11211);
 		
-		return self::$memConn->connect('localhost', 11211);
+		return true;
 	}
 	
 	
@@ -37,14 +38,14 @@ abstract class Cache {
 	
 	// Cache::set("usersOnline", "100", $expire, $expireFlux);
 	{
-		$expire += time() + $expire;
+		$expire = time() + $expire;
 		
 		if($expireFlux > 0)
 		{
 			$expire += mt_rand(0, $expireFlux);
 		}
 		
-		return self::$memConn->set($key, $value, 0, $expire);
+		return self::$memConn->set($key, $value, $expire);
 	}
 	
 	

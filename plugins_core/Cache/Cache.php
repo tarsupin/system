@@ -75,13 +75,15 @@ Cache::clear()
 */
 
 // Attempt to Load APC Caching
+/*
 if(function_exists("apc_fetch"))
 {
 	require(CORE_PLUGIN_PATH . "/Cache/includes/Cache_APC.php");
 }
+*/
 
 // If previous attempt didn't work, attempt to Load Memcache Caching
-else if(class_exists("Memcache"))
+if(class_exists("Memcached"))
 {
 	require(CORE_PLUGIN_PATH . "/Cache/includes/Cache_Memcache.php");
 }
