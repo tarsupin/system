@@ -4,7 +4,9 @@
 ------ About the ProfilePic Plugin ------
 -----------------------------------------
 
-This plugin allows you to display user's profile picture and site icons (the images that represent each site).
+This plugin allows you to display user's profile picture and site icons (the images that represent each site). The user's profile picture is the image that appears in the upper right corner when you log in. Profile pictures are used throughout the entire system. When you see someone's page, you'll often see their profile picture somewhere on it.
+
+The profile pictures are saved at http://profilepic.unifaction.com - and they are saved in three separate sizes. The sizes are small, medium, and large.
 
 To return a direct link to a user's profile pic, simply use the following code:
 
@@ -14,14 +16,6 @@ For example, it could be used in an HTML image tag like this:
 
 	echo '<img src="' . ProfilePic::image($uniID) . "' />';
 
-	
-To return a direct link to a site's icon:
-	
-	$siteIcon = ProfilePic::site($siteHandle);
-	
-For example, it could be used like this:
-	
-	
 	
 
 ------------------------------------------------------------
