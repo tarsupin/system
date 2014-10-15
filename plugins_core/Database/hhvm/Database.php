@@ -1,15 +1,12 @@
 <?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
 
---------------------------------------
------- About the Database Class ------
---------------------------------------
+---------------------------------------
+------ About the Database Plugin ------
+---------------------------------------
 
-This class provides a SQL wrapper that safely handles connections and queries with the database. For database commands
-that affect tables, refer to the "DatabaseAdmin" class, which requires root control.
+This plugin provides an SQL wrapper that safely handles connections and queries with the database. For database commands that affect the structure of tables, refer to the "DatabaseAdmin" class, which requires root access.
 
-This class does NOT try to oversimplify SQL with additional wrappers, such as ->table($table)->columns($columns)->run()
-Vanilla SQL is already simple and straightforward, and rebuilding queries with additional functions just requires more
-function calls. Therefore, we've opted against that method and instead use direct SQL.
+This plugin does NOT try to oversimplify SQL with wrappers for each individual SQL function, such as ->table($table)->columns($columns)->run(). Vanilla SQL is already simple and straightforward, and rebuilding queries with additional functions requires more function calls that add an unnecessary burden. Therefore, we've opted against that method and instead use direct SQL.
 
 There are a five primary uses of the Database class:
 
@@ -26,34 +23,31 @@ There are a five primary uses of the Database class:
 
 There are three methods that we use to gather data from the database:
 
-	Database::selectOne() returns an array of data from the database.
-	Database::selectMultiple() returns an array of arrays, with inner arrays being rows of data from the database
-	Database::selectValue() returns a single entry from the database
+	Database::selectOne() returns a single array of data with a <str:mixed> structure. It is most commonly used to return a single row, such as to pull a user's row from the `users` table. It is a proper practice to add "LIMIT 1" to the end of all queries done with this method.
+	
+	Database::selectMultiple() returns an array of arrays, with inner arrays being rows of data from the database. This is used to retrieve many rows, such as when trying to retrieve a list of friends. It would be common practie to use "LIMIT 20" (or something similar) when using this method.
+	
+	Database::selectValue() returns a single entry from the database, and it will ONLY return the first value listed in the query. For example, `SELECT handle FROM users_handle WHERE handle="JoeSmith" LIMIT 1` would return "JoeSmith".
 
-All of these methods have exactly two parameters: the SQL query, and the input array.
 
-	// An example of gathering all of the addresses in Ohio
-	$addresses = Database::selectMultiple("SELECT * FROM addresses WHERE country=? AND state=?", array("US", "Ohio"));
+All three of these methods have exactly two parameters: the SQL query, and the input array.
+	
+	// An example of gathering the first twenty addresses in Ohio
+	$addresses = Database::selectMultiple("SELECT * FROM addresses WHERE country=? AND state=? LIMIT 20", array("US", "Ohio"));
 	
 	// An example of getting a username
 	$username = Database::selectValue("SELECT username FROM users WHERE uni_id=? LIMIT 1", array(Me::$id));
 	
-	// An example of getting all the user's data
+	// An example of getting a single user's data
 	$userData = Database::selectOne("SELECT * FROM users WHERE uni_id=? LIMIT 1", array(Me::$id));
 	
 If you are familiar with PDO, then this will look natural to you. Otherwise, the basics of it are pretty simple:
 
-The first parameter is standard SQL. However, question marks are used in place of the input. The input for the query
-is stored in the second parameter (the input array). This allows the method to distinguish instances of user input,
-making it possible sanitize the input before running it through the database. This helps to protect the database from
-SQL injection attacks.
+The first parameter is standard SQL. However, question marks are used in place of the input. The input for the query is stored in the second parameter (the input array). This allows the method to distinguish instances of user input, making it possible sanitize the input before running it through the database. This helps to protect the database from SQL injection attacks.
 
-Though you aren't REQUIRED to use the input array, it's much safer to do so. In some cases, you'll have to put user
-input directly into the SQL, such as if you want to determine which table to call based on what the user chose. If you
-do this, you must be very certain that your data is properly sanitized.
+Though you aren't REQUIRED to use the input array, it's much safer to do so. In some cases, you'll have to put user input directly into the SQL, such as if you want to determine which table to call based on what the user chose. If you do this, you must be very certain that your data is properly sanitized.
 
-To use the input array, just put a ? where your input would normally be, and then add the input to the input array. The
-order of the input must match the order of the ?'s that are meant to correspond with them.
+To use the input array, just put a ? where your input would normally be, and then add the input to the input array. The order of the input must match the order of the ?'s that are meant to correspond with them.
 
 
 ---------------------------------------------------------
@@ -68,6 +62,7 @@ The Database::query() and Database::exec() methods can be used to run all other 
 	// An example of inserting a new row
 	Database::query("INSERT INTO config (name, number) VALUES (?, ?)", array("last_update", time()));
 	
+	
 To get the last ID that was inserted after an "INSERT" query, use Database::$lastID; Note that this only works on
 tables that have an auto-incrementing primary ID value.
 
@@ -81,9 +76,7 @@ tables that have an auto-incrementing primary ID value.
 ------ Handling Transactions ------
 -----------------------------------
 
-Transactions allow you to maintain the integrity of the database by ensuring that every query that is part of the
-transaction must succeed. If any part of the query fails, all of them can be rolled back. If everything worked as
-desired, you can commit the transaction normally.
+Transactions allow you to maintain the integrity of the database by ensuring that every query that is part of the transaction must succeed. If any part of the query fails, all of them can be rolled back. If everything worked as desired, you can commit the transaction normally.
 
 	// An example of trading items between two owners
 	Database::startTransaction();
@@ -95,30 +88,25 @@ desired, you can commit the transaction normally.
 	
 	Database::endTransaction($pass);
 	
-The Database::startTransaction() method must always be closed with a Database::endTransaction() method, even if it
-fails. You can wrap several transactions inside of each other, which helps maintain integrity between functions that
-use transactions.
+The Database::startTransaction() method must always be closed with a Database::endTransaction() method, even if it fails. You can wrap several transactions inside of each other, which helps maintain integrity between functions that use transactions.
 
-The Database::endTransaction() method has a single parameter ($success = true) that indicates whether the transaction
-SUCCEEDED or FAILED. If the method succeeds, it will commit all of the queries that were made. If it fails, all of the
-queries will be "rolled back" and not succeed.
+The Database::endTransaction($success) method has a single parameter ($success) that indicates whether the transaction SUCCEEDED or FAILED. If the method succeeds, it will commit all of the queries that were made. If it fails, all of the queries will be "rolled back" and not succeed.
 
 
 ------------------------------------------------
 ------ Access Advanced Database Functions ------
 ------------------------------------------------
 
-Some functions will not be accessible unless you are loading your SQL with root. In general, it is not advisable to run
-SQL as root unless you need to. It's faster to run as a user with fewer privileges, and also more secure. There's less
-of a chance that someone can do something dangerous (not that they can't with a regular user).
+Some functions will not be accessible unless you are loading your SQL with root. In general, it is not advisable to run SQL as root unless you need to. It's faster to run as a user with fewer privileges, and also more secure. There's less of a chance that someone can do something dangerous (not that they can't with a regular user).
 
-To initiate a connection with your root user, run Database::initRoot(). This will activate the root user for your
-database, as long as your configurations are set properly in your /{application}/config/environment-{env}.php file.
+To initiate a connection with your root user, run Database::initRoot(). This will activate the root user for your database, as long as your configurations are set properly in the /global-config.php file.
 
 
 -------------------------------
 ------ Methods Available ------
 -------------------------------
+
+Database::$lastID								// Returns the last insert ID.
 
 Database::initRoot();							// Reinitializes the database with root connection.
 
@@ -132,7 +120,9 @@ Database::exec($query)							// Runs a static query (no preparation - must be tr
 Database::startTransaction()					// Starts transaction: validates multiple changes at once, much faster
 Database::endTransaction($commit = true)		// Confirms a transaction and commits it.
 
-Database::$lastID								// Returns the last insert ID.
+// Prepare a list of multiple SQL filters (for the input values)
+list($sqlWhere, $sqlArray) = Database::sqlFilters(array($column => array($values), ...);
+
 Database::showQuery($query, $inputArray)		// Show what the query would look like.
 
 */

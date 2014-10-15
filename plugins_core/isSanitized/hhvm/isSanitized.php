@@ -6,6 +6,8 @@
 
 This plugin provides all the functionality of the Sanitize class without returning a sanitized value. Instead, it returns TRUE or FALSE as to whether or not the value was actually sanitized.
 
+For example, isSanitized::word($input) will return TRUE if the $input is only using letters. If the method has anything non-letter characters, it would return FALSE. Using the same logic, Sanitize::word($input) will strip all non-letter characters from the input and then return the sanitized data.
+
 
 -------------------------------------------
 ------ Examples of using this plugin ------

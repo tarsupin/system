@@ -4,38 +4,50 @@
 ------ About the Me Plugin ------
 ---------------------------------
 
-This plugin sets up and handles the active user - that is, the user currently browsing the site (that is interacting with the server).
+This plugin stores information regarding the "active user", or the user currently browsing the site. For example, if you log into a site with the handle "JoeSmith", Me::$vals['handle'] would be set to "JoeSmith", and Me::$id would be set to that user's UniID.
 
-This plugin is based around the session variable $_SESSION[SITE_HANDLE], which tracks your personal information.
-
-
--------------------------------------------
------- Examples of using this plugin ------
--------------------------------------------
-
-// Me::$getColumns = "*";	// Uncomment to retrieve all rows
-
-// Initialize and Test Active User's Behavior
-if(Me::initialize())
-{
-	Me::runBehavior($url);
-}
-
-// See the results of what was returned
-var_dump(Me::$id);
-var_dump(Me::$clearance);
-var_dump(Me::$vals);
+This plugin is based around the session variable $_SESSION[SITE_HANDLE], which tracks the user's UniID. On every page load, it pulls information the `users` table about that user.
+	
+	// An example of what information is gathered
+	Me::$vals = Database::selectOne("SELECT * FROM users WHERE id=?", array($_SESSION[SITE_HANDLE]['id']));
 
 
------------------------------------------------------------
------- Important Variables for Feeds and Advertising ------
------------------------------------------------------------
+The Me:: plugin is called on the index.php file in every site using the Me::initialize() and Me::runBehavior() methods. These will prepare the following values to use on the page:
+	
+	Me::$id				// The user's UniID, or 0 if the user is not logged in.
+	Me::$clearance		// Clearance level of the user. 0 = guest, 6+ = mod permissions, 8+ = admin permissions.
+	Me::$device			// Value of the device (1 = mobile, 2 = tablet, 3 = desktop).
+	Me::$vals[]			// Contains an array of the user's data.
+	Me::$loggedIn		// TRUE if the user is logged in, FALSE if not. (Could alternatively use Me::$id)
+	
+	
+---------------------------------------
+------ Understanding Soft Logins ------
+---------------------------------------
 
-While browsing UniFaction, the user may follow sites (or certain sections within those sites). This information is recorded in the Me:: class so that it can be reused in other plugin, such as to assist with advertising or preferential data that could be loaded.
+"Soft Logins" refer to the users being logged onto our sites automatically, as long as they are logged into the Authentication site (or "Auth").
 
-Me::$vals['follow'][$referenceID] is a (str:bool) array that contains any page-relevant referenceID as a key, indicating that it has been followed by the user.
+When visiting another site, you may have a value like "?slg=10" that appears. The "slg" is the "soft login" variable that is telling the site that it wants to silently log into the site you're visiting using that UniID.
 
-Me::$vals['follow_site'] is a boolean (generally only set to true). If set, it means that the user is following the site.
+For example, if you're currently logged into FastChat under the UniID of 10, you may see a link to Social that looks like this:
+	
+	http://unifaction.social?slg=10
+	
+In the phpTesla.php file, it will check to see if the "slg" value is present. If it is, it will then check if you're already logged in under that UniID. If you're not logged in with that UniID, it will communicate with the Auth server and confirm that you own the UniID and have permissions to log in with it. Then, it will log you in. This happens automatically without the user knowing it (hence the terminology "soft login").
+
+
+-------------------------------------
+------ User Login Redirections ------
+-------------------------------------
+
+A common requirement for pages is to make sure that the user is logged in. For example, you cannot view your "friends" page unless you're logged into it. There are two ways to handle a page that requires a login. You could either say that a login is required, or you could redirect the user to the opportunity to log in.
+
+To redirect a user to login, use the Me::redirectLogin() method. Here's an example of how it looks:
+
+	Me::redirectLogin("/friends?info=RequestsOnly", "/");
+
+In this example, the user would first be asked to log in (or automatically logged in), and then redirected to the page "/friends?info=RequestsOnly". If something goes wrong during this process (such as an infinite loop), the fallback will cause the user to be redirected to "/" (the home page).
+
 
 -------------------------------
 ------ Methods Available ------
@@ -44,13 +56,13 @@ Me::$vals['follow_site'] is a boolean (generally only set to true). If set, it m
 Me::initialize();				// Initializes the user for the page view.
 Me::runBehavior();				// Runs behavior tests and checks if there are any special instructions.
 
-Me::update($userID, $colVals)	// Returns your current role, or sets it if a new role is passed.
+Me::softLog([$chooseID]);		// Attempts to log in the user silently to a specific UniID.
 Me::login($uniID)				// Login as a particular user (sets session variable).
-Me::load($uniID)				// Loads your personal user data.
 Me::logout()					// Logs the current user out.
-Me::resetToken()				// Resets the user's token.
+Me::load($uniID)				// Loads your personal user data.
 Me::setCookie()					// Set cookies to remember the user.
 Me::rememberMe()				// Auto-log user if they have authentic cookies.
+Me::resetToken()				// Resets the user's token.
 
 Me::redirectLogin($returnTo)	// Redirects to login, but returns you to $returnTo page after login
 
@@ -323,7 +335,7 @@ abstract class Me {
 	public static function redirectLogin
 	(
 		string $returnTo		// <str> The page to return to after login.
-	,	string $fallback = ""	// <str> The URL to fall back to if the redirect fails.
+	,	string $fallback = "/"	// <str> The URL to fall back to if the redirect fails.
 	): void					// RETURNS <void> REDIRECTS to login.
 	
 	// Me::redirectLogin("/page-to-return-to?extraVal=yep");
@@ -332,9 +344,7 @@ abstract class Me {
 		{
 			unset($_SESSION[SITE_HANDLE]['return_to']);
 			
-			$fallback = $fallback == "" ? URL::auth_unifaction_com() : Sanitize::url($fallback);
-			
-			header("Location: " . $fallback); exit;
+			header("Location: " . Sanitize::url($fallback)); exit;
 		}
 		
 		$_SESSION[SITE_HANDLE]['return_to'] = $returnTo;

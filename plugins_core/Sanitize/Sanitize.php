@@ -8,26 +8,29 @@ User input can never be trusted. The best way to ensure that user input is safe 
 
 If any of these Sanitize methods catch a value that doesn't belong, it will attempt to alert the "ThreatTracker" plugin of the unsanitized data being used. It will provide a suspicion / threat level of the input, allowing you to filter out anything you deem low priority. In addition to the attempt, it will inform you of the user that was making the attempt, the IP, and other details.
 
-
 ----------------------------------
 ------ How the plugin works ------
 ----------------------------------
 
-The Sanitization methods each take a variable that you provide it (always a string, except for the ::number() method) and cleanse it of any characters that were not explicitly allowed to be used.
+The Sanitize methods each take a single variable that you provide it (always a string, except for the ::number() method) and cleanse it of any characters that were not explicitly allowed to be used.
 
 For example, you can set your variables to:
 
 	$value = Sanitize::word($value);			// only use letters
+	$value = Sanitize::variable($value)			// only use letters, numbers, and underscores
 	$value = Sanitize::punctuation($value);		// only use letters, numbers, and certain punctuation
+
 
 These methods also include a parameter called $extraChars. The $extraChars parameter allows you to add additional characters to pre-defined whitelists. For example:
 
 	$value = Sanitize::word($value, "123");			// only use letters and the numbers 1, 2, and 3
+	$value = Sanitize::variable($value, "!#"		// only use letters, numbers, underscores, !, and #
 	$value = Sanitize::punctuation($value, "{}");	// use punctuation and these brackets: {  }
 
-------------------------------------------
------- Examples of using this class ------
-------------------------------------------
+
+-------------------------------------------
+------ Examples of using this plugin ------
+-------------------------------------------
 
 // User goes to the URL: page.php?myInput=YES;*!_123.01
 
@@ -37,7 +40,6 @@ echo Sanitize::word($_GET['myInput']);					// Returns "YES"
 echo Sanitize::word($_GET['myInput'], "123");			// Returns "YES12301"
 echo Sanitize::whitelist($_GET['myInput'], "_.123");	// Returns "_123.1"
 echo Sanitize::whitelist($_GET['myInput'], "ABCDE");	// Returns "E"
-
 
 -------------------------------
 ------ Methods Available ------
