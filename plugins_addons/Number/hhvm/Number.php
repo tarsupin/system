@@ -4,14 +4,16 @@
 ------ About the Number Class ------
 ------------------------------------
 
-This plugin allows you to manipulate numbers in useful ways, such as to translate integers to human words.
+This plugin is primarily used to integers to human words, though it can also house other important uses with numbers.
+
+To translate a number to a human word, use the following structure:
+	
+	echo Number::toWord(22);		// Outputs "twenty two".
 
 
 ------------------------------------
 ------ About the Number Class ------
 ------------------------------------
-
-
 
 // Changes an integer to a human word.
 $word = Number::toWord($number);

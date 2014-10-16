@@ -6,17 +6,27 @@
 
 This plugin allows content to be written with the UniMarkup language, enabling a variety of syntax that would not otherwise be allowed.
 
+Using UniMarkup instead of HTML directly will allow us to whitelist the content that gets added into the system. This is a much more secure way to handle the system, and also allows us to make the markup simpler.
+
+There are two important UniMarkup methods to use.
+
+	1. The UniMarkup::parse($text) method will take a box of text and convert it to special HTML.
+	
+	2. The UniMarkup::strip($text) method will convert it to text without any HTML or UniMarkup. This is used when you need to show a description or highlight of the full text before the actual page.
+	
 
 ---------------------------------
 ------ UniMarkup Available ------
 ---------------------------------
 
-[imp]		// Important: Indicates a strong SEO presence, as well as [generally] bolds the text.
-[bold]		// Bold: Bolds the text without indicating any SEO relevance.
-[em]		// Emphasize: Emphasizes the text, helping the reader to visually clarify it as important.
+[b]			// Bold: Bolds the text without indicating any SEO relevance.
+[u]			// Underlines the text.
+[i]			// Italicizes the text.
+[center]	// Centers the text (on a new line).
 [note]		// Note: Provides a side-note with smaller text.
 [code]		// Code: Provides a block of text that maintains spacing rules by code.
 [link]		// Link: Creates a URL link to another page.
+[size]		// Sets the size of text.
 [color]		// Color: Assigns an HTML color or word color to the section.
 [img]		// Image: Posts an image.
 [quote]		// Quote: Provides a quote block, generally for quoting another user.
