@@ -4,23 +4,32 @@
 ------ About the Form Plugin ------
 -----------------------------------
 
-This plugin provides simple functionality to forms to secure them, help mitigate bot submissions, and prevent accidental re-submissions.
+This plugin provides functionality to secure forms, such as to help mitigate bot submissions, resist XSS attacks, and prevent accidental re-submissions. It is also designed to ensure that the form can only be used by the user (and computer) that was used to load the page.
+
+NOTE: This plugin MUST be used for ALL forms that are created on the UniFaction system.
+
+To use this plugin, you need to use the following two methods:
+	
+	Form::submitted($identifier);
+	
+	Form::prepare($identifier);
+	
+The Form::prepare($identifier) method is used to add special input fields to the form. It adds fields that expect very specific sessions to be set by the user. Without those sessions present, the form will fail.
 
 
 -----------------------------------------------
 ------ Example of how to use this plugin ------
 -----------------------------------------------
 
-// Check if the form was submitted successfully (with Form::submitted())
-if(Form::submitted())
+// Check if the form was submitted successfully
+if(Form::submitted("example-form-name"))
 {
 	echo "Your name was submitted successfully!";
 }
 
-// Display the form (and add Form::prepare())
+// Display the form
 echo '
-<form action="thispage.php" method="post">
-	' . Form::prepare() . '
+<form action="thispage.php" method="post">' . Form::prepare("example-form-name") . '
 	Name: <input type="text" name="user" value="" />
 	Submit: <input type="submit" name="submit" value="Submit" />
 </form>';

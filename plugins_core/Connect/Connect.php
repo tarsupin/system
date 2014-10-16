@@ -4,32 +4,31 @@
 ------ About the Connect Plugin ------
 --------------------------------------
 
-This plugin is used to connect with other UniFaction APIs. It treats APIs like they're a function and will automatically encrypt and decrypt the APIs so that no additional work is necessary.
+This plugin is used to connect with other UniFaction APIs. It treats APIs like they're a function and will automatically encrypt and decrypt the APIs so that no custom security work is necessary.
 
 To set up an API, you will need to review the API plugin.
+
 
 --------------------------------
 ------ How to call an API ------
 --------------------------------
 
-There are two ways to call APIs. If you have a connection established with that site (including a shared API key), you can call that site's private API's. To call a private API you only need to run one line:
+There are two ways to call APIs: a private API, and a public API. If you connect with a private API that you don't have a shared key with, UniFaction's Auth system will attempt to create a set of shared keys between the two sites. To call a private API you only need to run one line:
 	
 	$response = Connect::to($siteHandle, $apiName, $dataToSend);
 	
 	
 For example, your API may look like this:
 	
-	// Check if you are connected to "auth"
+	// Check if you have a connection established with "auth" (the Authentication site)
 	$response = Connect::to("auth", "IsSiteConnected", "hello!");
 	
 	
 The parameters do the following:
 
-	$siteHandle		// The handle of the site you're trying to call (such as "auth" or "social")
+	$siteHandle		// The handle of the site you're trying to call (such as "auth", "social", "fastchat", etc.)
 	$apiName		// The name of the API that you're connecting to
 	$dataToSend		// The variable (array, string, integer, etc) that you're passing to the API
-	$response		// Captures the API's response
-	
 	
 You can only send one variable to the API (with $dataToSend), but it can be an array of data (which is the most common type of variable to send).
 
@@ -55,7 +54,7 @@ You will have to know the URL public API, but the standard convention is to use 
 Sometimes an API needs to give you more of a response than just TRUE or FALSE. API's can also send alerts, such as error codes. This will provide additional information to the response in case there is something that needs to be learned about why the API failed (or, in rare cases, why it succeeded).
 
 To access the alerts that are sent by the API, just refer to the Connect::$alert value after the response has been gathered. For example:
-
+	
 	$response = Connect::to($siteHandle, $apiName, $dataTosend)
 	
 	if($response === false)
@@ -74,7 +73,7 @@ To access the alerts that are sent by the API, just refer to the Connect::$alert
 You can provide additional settings and instructions with your API call to adjust it's behavior. For example:
 
 	$settings = array(
-		"post"			=> true					// Use $_POST instead of $_GET
+		"post"			=> true					// Use $_POST instead of $_GET (important for large data being sent)
 	,	"encryption"	=> "fast"				// Use "fast" encryption algorithm rather than default
 	,	"filepath"		=> "./path/image"		// Send a file with the API call
 	);
@@ -86,10 +85,34 @@ The following settings are recognized:
 	"filepath"		// A string. The filepath to the file you want to send with the API call.
 
 	
-For example, if you want to pass a file:
+For example, if you want to pass a file and use POST instead of GET:
 
-	$settings = array("filepath" => $_FILES['image']['tmp_name']);
+	$settings = array("filepath" => $_FILES['image']['tmp_name'], "post" => true);
 	$response = Connect::to($siteHandle, $apiName, $dataTosend, $settings);
+	
+	
+------------------------------
+------ Debugging an API ------
+------------------------------
+
+To debug an API, you'll often need to know the data that was sent. Doing that will require you to use the URL that you sent. To retrieve the URL that was loaded, you can use the Connect::$url value. For example:
+	
+	// Connect to the API
+	$response = Connect::to($siteHandle, $apiName, $dataTosend, $settings);
+	
+	// Get the URL that was just accessed
+	echo Connect::$url;
+
+
+There are several potential issues with debugging, however. They include:
+	
+	1. Using POST instead of GET.
+		
+		If the connection settings used POST, the URl that you return will be invalid. You'll need to set the API settings to GET in order to get an accurate URL.
+		
+	2. Production servers will prevent any re-use of the same API code, and thus render this technique useless. There is an additional layer of protection for production servers, which ensures that APIs cannot be reused (to prevent illegitimate use).
+	
+	3. API connections have an encryption that prevents them from being valid roughly 2 minutes after they were created. This is done for security reasons. Therefore, while debugging locally, you will have to refresh the URL after 2 minutes has passed.
 	
 	
 -------------------------------

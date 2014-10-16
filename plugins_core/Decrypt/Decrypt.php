@@ -6,6 +6,14 @@
 
 This plugin provides allows you to decrypt data that originated from one of phpTesla's encryption algorithms. This is essential for private APIs and the like.
 
+The only method you'll need to run with the Decrypt plugin is Decrypt::run(). The plugin will automatically use the data provided to determine how to read the encryption. This is automated because the Encrypt plugin will automatically include a value that indicates what type of encryption it's using.
+
+For example, the encrypted data might look like this:
+	
+	"default|2t2LnNbJ4XvtFcM9EhQD9hJl=hO|c4S/fyDztw|F=OW290gIgnK6Ad+Clxsr=Yb3VWEsfiOli2otC"
+	
+The first segment says "default", which indicates that the Decrypt plugin should use the "default" style of decryption on the string.
+
 
 -------------------------------------------
 ------ Examples of using this plugin ------

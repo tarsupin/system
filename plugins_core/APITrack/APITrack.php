@@ -4,7 +4,7 @@
 ------ About the APITrack Plugin ------
 ---------------------------------------
 
-This plugin is used to track API usage per site, and to make sure that sites are not absuing their access rights to your APIs.
+This plugin is used to track API usage per site, and to make sure that sites are not abusing their access rights to your APIs.
 
 For example, if a site was checking to see if a user's avatar exists on every page view through the AvatarExists API (which would connected to our site on every page view) rather than storing that information locally in an efficient manner, this system will be able to identify that they are abusing the API system and shut down their API privileges.
 

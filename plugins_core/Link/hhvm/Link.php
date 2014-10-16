@@ -4,7 +4,7 @@
 ------ About the Link Plugin ------
 -----------------------------------
 
-This plugin provides simple functionality to links to protect them against cross-site forgery requests, as well as to prevent people from accidentally reusing the same link by refreshing.
+This plugin provides simple functionality to links to protect them against cross-site forgery requests, as well as to prevent people from accidentally reusing the same link by refreshing. It also provides the ability to encrypt data through GET values or make it URL-friendly.
 
 For example, a user clicks on a link to send twenty gold pieces to a friend. The page loads the URL that was linked and says "Gold Sent!". Now, if the page is reloaded (such as an accidental refresh), the page SHOULD NOT re-send another 20 gold, even though it was the same link. There are multiple ways to prevent this, but not running the process in the first place is a good way to start.
 
@@ -15,7 +15,7 @@ This sort of incident is easily prevented with this plugin.
 ------ Examples of using ::prepare() ------
 -------------------------------------------
 
-// Check if the form was submitted successfully (with Form::submitted())
+// Check if the link was clicked successfully (with Link::clicked())
 if($link = Link::clicked() and $link == "tip")
 {
 	echo "You have successfully tipped someone 10 coins!";

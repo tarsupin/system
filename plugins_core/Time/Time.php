@@ -15,9 +15,9 @@ This plugin is relied upon by other critical plugins, such as the API plugin.
 
 The Time::fuzzy() method is very useful for providing simple, human-readable strings from timestamp conversions. Most people won't know that the timestamp "1400376805" refers to early morning on May 18th in UTC, despite how useful the value is while programming. This is why converting timestamps to fuzzy time can be so helpful.
 
-When you convert a timestamp to fuzzy time a string is returned that describes how soon (or how long ago) the timestamp was, such as "in two minutes" or "yesterday".
+When you convert a timestamp to "fuzzy time" a string is returned that describes how soon (or how long ago) the timestamp was, such as "in two minutes" or "yesterday".
 
-Using fuzzy time is very easy. You just run the timestamp through the Time::fuzzy($timestamp) method.
+Using fuzzy time is very easy. You just run the unix timestamp through the Time::fuzzy($timestamp) method.
 
 	// Returns "in one hour"
 	echo Time::fuzzy(time() + 3600);

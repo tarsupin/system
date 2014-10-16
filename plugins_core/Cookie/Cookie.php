@@ -4,7 +4,7 @@
 ------ About the Cookie Plugin ------
 -------------------------------------
 
-This plugin allows you to create secure cookies. This is particularly helpful for remembering users that are returning to your site, but can also be used for other purposes.
+This plugin allows you to create secure cookies. This is primarily used to remember users that are returning to the site. Any uses other than this might benefit from an alternative system instead.
 
 
 -----------------------------------------

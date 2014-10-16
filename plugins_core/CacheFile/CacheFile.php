@@ -4,7 +4,7 @@
 ------ About the CacheFile Plugin ------
 ----------------------------------------
 
-This class is used to cache an entire chunk of text, such as a block of HTML. This can greatly reduce the load time of dynamic pages if they don't have to be updated constantly.
+This plugin is used to cache an large chunk of text, such as a block of HTML. This can greatly reduce the load time of dynamic pages if they don't have to be updated constantly.
 
 An example of why this function is useful is a "Today's Highlights" module on the site. The content needs to be updated every day, but the actual process of updating it might be somewhat intensive due to how many articles you need to parse through for the algorithm to complete.
 
@@ -16,12 +16,12 @@ Thus, rather than running the algorithm every single page view, we just run it o
 ----------------------------------------------------
 
 Saving the text is easy. Just decide on the name of the cache you'd like to save, and then add the data you want to cache. The code for this looks like this:
-
+	
 	// Get the text that you want to save
-	$textData = someAlgorithm(time());
+	$textData = someAlgorithm();
 	
 	// Add the text to a cached file
-	// In this case, save it with the "highlights_today" key
+	// In this case, save it as a "highlights_today" file
 	CacheFile::save("highlights_today", $textData);
 	
 	
@@ -32,16 +32,17 @@ Saving the text is easy. Just decide on the name of the cache you'd like to save
 The purpose of caching your data is so that you can refresh it every once in a while to prevent it from going stale. Therefore, you must set the "refresh" duration of the Cache. The "refresh" duration is how many seconds until the cache goes stale and will no longer serve content. When this happens, you need to run the algorithm again to save new content into the file.
 
 Here's an example of how loading a file cache works in practice:
-#!
-// Load a cache page that regenerates after 15 seconds
-if(!$cacheData = CacheFile::load("testCache", 15))
-{
-	CacheFile::save("testCache", "Save this value: " . md5(mt_rand()));
-	
-	$cachedData = CacheFile::load("testCache");
-}
-##!
 
+	// Load a cache page that regenerates after 15 seconds
+	if(!$cacheData = CacheFile::load("testCache", 15))
+	{
+		CacheFile::save("testCache", "Save this value: " . md5(mt_rand()));
+		
+		$cachedData = CacheFile::load("testCache");
+	}
+	
+	var_dump($cachedData);
+	
 
 -------------------------------
 ------ Methods Available ------

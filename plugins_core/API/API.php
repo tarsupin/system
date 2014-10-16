@@ -14,9 +14,9 @@ This plugin is used to create or handle APIs that other phpTesla sites can inter
 To create your own API, you need to do the following:
 
 	1. Create a plugin that extends the API class.
-	2. Set the API settings that apply to your API.
+	2. Set the API settings (class parameters) that apply to your API.
 	3. Create the runAPI() method.
-	4. Use $this->data to interact with the array (or value) that was sent to the API.
+	4. Use $this->data to interact with the data (usually an array) that was sent to the API.
 	5. Your runAPI() method must return the value you want your API to respond with.
 	
 	
@@ -59,7 +59,8 @@ There are a few API settings that you need to consider:
 	public $isPrivate = false;		// This is an open API. Anyone can call it, and the data sent is unencrypted.
 	
 	// Encrypted Response vs. Unencrypted Response
-	# Most APIs are unencrypted since they typically only respond with TRUE, NULL, or other non-private data.
+	# This value indicates which encryption type to respond with (back to the original API request).
+	# Most APIs don't encrypt the response, since they typically respond with TRUE, NULL, or other non-private data.
 	# However, if an API responds with private data, make sure you encrypt it with an appropriate algorithm.
 	# To encrypt an API with an encryption algorithm of your choice, just set the algorithm to use:
 	public $encryptType = "";			// The default setting. The response is unencrypted.	
@@ -94,7 +95,7 @@ For example, if the API was attempting to identify a user's timestamp, the API c
 	
 	if(!$user)
 	{
-		$this->error = "User was not found.";
+		$this->alert = "User was not found.";
 		return false;
 	}
 	else if(!$user['timestamp'] == "")

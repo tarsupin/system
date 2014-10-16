@@ -4,7 +4,7 @@
 ------ About the Pagination Plugin ------
 -----------------------------------------
 
-This plugin is designed to simplify pagination. Pagination is a common term on the internet that refers to the list of pages you can click through, such as a numerical page list from 1 to 5 (sometimes followed with " ... last", etc.).
+This plugin is designed to simplify pagination. Pagination refers to the list of pages you can click through, such as a numerical page list from 1 to 5 (sometimes followed with " ... last", etc.).
 
 To prepare this pagination, you need three inputs:
 	
@@ -23,7 +23,7 @@ Here's a simple working example to demonstrate it:
 ----------------------------------------
 ------ Setting up your pagination ------
 ----------------------------------------
-#!
+
 // Prepare Variables
 $resultsPerPage = 20;
 $currentPage = $_GET['page'];
@@ -33,7 +33,6 @@ $numberOfResults = (int) Database::selectValue("SELECT COUNT(*) as totalNum FROM
 
 // Construct the pagination object
 $paginate = new Pagination($numberOfResults, $resultsPerPage, $currentPage);
-##!
 
 
 ---------------------------------

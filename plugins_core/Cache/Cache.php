@@ -1,12 +1,14 @@
 <?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
 
------------------------------------
------- About the Cache Class ------
------------------------------------
+------------------------------------
+------ About the Cache Plugin ------
+------------------------------------
 
-This class is used to cache variables system-wide, typically into memory. This should only be used to cache expensive operations or algorithms that only need to be updated infrequently, but read frequently.
+This plugin is used to cache variables system-wide, typically into memory. This should only be used to cache expensive operations or algorithms that only need to be updated infrequently, but which are read frequently.
 
-This caching system will attempt to use the APC or Memcache modules. If neither of these modules are installed, it will use the database instead. The database is much less efficient than APC or Memcache, but it can still benefit your application when used properly. In fact, in some cases, it is more advantageous to use the database, since it can keep cached data even after a server reboot.
+This caching system will attempt to use the APC or Memcache modules. If neither of these modules are installed, it will use the database instead. The database is much less efficient than APC or Memcache, but it can still benefit your application when used properly.
+
+To keep cached data in a text file, use the CacheFile:: plugin.
 
 The primary mechanics of the Cache system include:
 
@@ -25,7 +27,7 @@ The cache system can only store strings. However, you can serialize data into st
 
 In the example below, the code uses json_encode() to change an array into a string, and then json_decode() to convert the string back into the original array.
 
-#!
+
 // Check if data is already cached
 $checkData = Cache::get("pageData:" . $currentPageID);
 
@@ -44,7 +46,6 @@ else
 
 // Dump the Content
 var_dump($expensiveData);
-##!
 
 
 -------------------------------

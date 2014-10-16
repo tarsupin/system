@@ -3,6 +3,7 @@
 ----------------------------------
 ------ About the URL Plugin ------
 ----------------------------------
+
 This plugin provides simple functionality for URLs, which is also essential for loading the URL segments into $url during system configuration.
 
 
@@ -14,13 +15,36 @@ Developers may use multiple environments where URLs point differently. To solve 
 
 For example, the following behavior may occur when loading URL::example_com()
 
-	Local Environment:			"http://example.local"
+	Local Environment:			"http://example.test"
 	Staging Environment:		"http://example.mydevserver.com"
 	Production Environment:		"http://example.com"
 
-In other words, when you're on your local server, URL::example_com() will point to "http://example.local" for your own testing purposes, but it will point to "http://example.com" on the live server. This allows you to run multiple sites without having to change hardcoded URLs between different environments.
+In other words, when you're on your local server, URL::example_com() will point to "http://example.test" for your own testing purposes, but it will point to "http://example.com" on the live server. This allows you to run multiple sites without having to change hard-coded URLs between different environments.
 
-Note that any instances of ".unifaction.com" will also be translated into .local (or development environment equivalent).
+Note that any instances of ".unifaction.com" will also be translated into .test (or development environment equivalent).
+
+Here's a list of examples how the URL plugin will interpret the dynamic values:
+	
+	// URL's that end in ".com"
+	URL::sports_microfaction_com()
+	
+		Local:	sports.microfaction.test
+		Dev:	sports.microfaction.phptesla.com
+		Live:	sports.microfaction.com
+	
+	// URL's that end in "unifaction.com"
+	URL::auth_unifaction_com()
+	
+		Local:	auth.test
+		Dev:	auth.phptesla.com
+		Live:	auth.unifaction.com
+	
+	// URL's that end in something other than ".com"
+	URL::fastchat_social()
+		
+		Local:	fastchat.social.test
+		Dev:	fastchat.social.phptesla.com
+		Live:	fastchat.social
 
 -------------------------------
 ------ Methods Available ------

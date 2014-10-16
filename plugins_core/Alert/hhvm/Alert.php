@@ -1,12 +1,12 @@
 <?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
 
------------------------------------
------- About the Alert Class ------
------------------------------------
+------------------------------------
+------ About the Alert Plugin ------
+------------------------------------
 
-This class will track any messages, notices, or errors that you want to display throughout the page (or on a following page load). This is particularly helpful for form validation when error messages (or success messages) are very common. It can also be used for general information boxes and notices.
+This plugin will track any messages, notices, or errors that you want to display throughout the page (or on a following page load). This is particularly helpful for form validation when error messages (or success messages) are very common. It can also be used for general information boxes and notices.
 
-The alert boxes are wrapped with CSS tags, so you can customize their appearance on each site. You can run multiple alerts simultaneously, such as if there are multiple errors with a form (e.g. "short password", "must enter age", etc).
+The alert boxes are wrapped with CSS tags when displayed, so you can customize their appearance on each site. You can run multiple alerts simultaneously, such as if there are multiple errors with a form (e.g. "short password", "must enter age", etc).
 
 
 ----------------------------------------------
@@ -21,7 +21,7 @@ Determining if the form has passed successfully or not can be done Alert::hasErr
 ----------------------------------------
 ------ Quick Examples with Alerts ------
 ----------------------------------------
-#!
+
 // Will run any alerts that were saved on an earlier page load
 echo Alert::display();
 
@@ -38,12 +38,12 @@ echo Alert::display();
 
 // Create an alert that won't load until the next page view
 echo Alert::saveSuccess("Try reloading the page. You should see this appear :)");
-##!
+
 
 -------------------------------------------------
 ------ Example of using Alerts with a Form ------
 -------------------------------------------------
-#!
+
 // If the form posts successfully
 if(Form::submitted("this-form"))
 {
@@ -69,7 +69,8 @@ echo '
 	<input type="text" name="value" value="YES" />
 	<input type="submit" name="submit" value="Submit" />
 </form>';
-##!
+
+
 -------------------------------
 ------ Methods Available ------
 -------------------------------

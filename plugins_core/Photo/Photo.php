@@ -4,18 +4,29 @@
 ------ About the Photo Plugin ------
 ------------------------------------
 
-This plugin allows you to post photos in a responsive manner to accomodate mobile devices.
+This plugin allows you to display photos in a responsive manner to accommodate mobile devices.
 
+The primary method of this plugin, ::responsive(), will allow you to provide a photo to be used for desktops, tablets, and mobile devices. You can set the breakpoints of the screen size where these responsive photos should change.
 
-------------------------------------------
------- Examples of using this class ------
-------------------------------------------
+For example, if you wanted to have a desktop image and a mobile image that gets used once the screen width has changed to 450 pixels or less, you could use the following command:
+	
+	// Provide a mobile image for <= 450 pixels
+	echo Photo::responsive("/images/desktop.jpg", "/images/mobile.jpg", 450);
 
-// Include Responsive Script (allows resposive images on the page)
+Since these images are being generated through a plugin, you must assign the CSS class through the $class parameter. To set the image above with the "resp-article" class, the command would change to the following:
+	
+	// Provide a mobile image for <= 450 pixels; apply the "resp-article" class
+	echo Photo::responsive("/images/desktop.jpg", "/images/mobile.jpg", 450, "", 0, "resp-article");
+
+-------------------------------------------
+------ Examples of using this plugin ------
+-------------------------------------------
+
+// Include Responsive Script (allows responsive images on the page)
 Photo::prepareResponsivePage();
 
 // Display the Image
-echo '<a href="/image-link">' . Photo::responsive("http://cdn.test/assets/image-standard.jpg", "http://cdn.test/assets/image-mobile.jpg", 600, "http://cdn.test/assets/image-tablet.jpg", 1200, "myClass") . '</a>';
+echo '<a href="/image-link">' . Photo::responsive("http://cdn.test/assets/image-standard.jpg", "http://cdn.test/assets/image-mobile.jpg", 600, "http://cdn.test/assets/image-tablet.jpg", 1200, "resp-article") . '</a>';
 
 
 -------------------------------

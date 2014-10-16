@@ -12,25 +12,26 @@ This plugin provides simple application benchmarking functions. The basic functi
 ---------------------------------------------------------------------------
 
 A good example of how this class is used is to identify how fast your different algorithms take, thus helping you decide which to use on your page.
-#!
-// Start the Benchmark
-Benchmark::get();
+	
+	
+	// Start the Benchmark
+	Benchmark::get();
+	
+	// Run a long algorithm	
+	myLongFunction();
+	
+	// Run the next benchmark, which tracks the duration of myLongFunction();
+	Benchmark::get();
+	
+	// Run another long algorithm	
+	mySecondLongFunction();
+	
+	// Tracks the duration of mySecondLongFunction();
+	Benchmark::get();
+	
+	// Shows a graph on the screen with results of the benchmarks.
+	Benchmark::graph();
 
-// Run a long algorithm	
-myLongFunction();
-
-// Run the next benchmark, which tracks the duration of myLongFunction();
-Benchmark::get();
-
-// Run another long algorithm	
-mySecondLongFunction();
-
-// Tracks the duration of mySecondLongFunction();
-Benchmark::get();
-
-// Shows a graph on the screen with results of the benchmarks.
-Benchmark::graph();
-##!
 	
 The Benchmark::get() method automatically knows what the last benchmark time was, so this is the only code you need.
 
@@ -43,15 +44,11 @@ If the Benchmark SQL was added to your database, the benchmark will automaticall
 
 If you require more advanced benchmarking options, there are other features you can use.
 
-	The Benchmark::get() method has a return value equal to the duration since the last Benchmark::get(). This would allow you to have custom benchmarking tracking if you like.</li>
+The Benchmark::get() method has a return value equal to the duration since the last Benchmark::get(). This would allow you to have custom benchmarking tracking if you like.
 
-		// Retrieves the duration since the last benchmark
-		$duration = Benchmark::get()
+If the Benchmark table is installed (generally is during installation), the benchmarks you run can automatically be added to the database (if MODE_LOG is set). This will allow you to track many more results across more pages and in different scenarios.
 
-	If you add the Benchmark SQL to your database, the benchmarks you run will automatically be added to the database. This will allow you to track many more results across more pages and in different scenarios.</li>
-	
-	The Benchmark::get() method accepts additional parameters for naming the benchmark and tracking modifiers that apply to it. This is very useful when combined with the benchmark database, since it allows you to identify categories of benchmarks, or indicate what values were passed.</li>
-
+The Benchmark::get() method accepts additional parameters for naming the benchmark and tracking modifiers that apply to it. This is very useful when combined with the benchmark database, since it allows you to identify categories of benchmarks, or indicate what values were passed.
 
 For example, if you're running benchmarks on a profile page on a live server, you could run this code:
 

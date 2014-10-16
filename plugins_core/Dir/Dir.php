@@ -6,8 +6,9 @@
 
 This plugin is used to create, delete, move, read, or otherwise work with directories in the file system. In some cases, these methods are simple wrappers for directory functions that already exist in PHP.
 
-Note: It is absolutely essential that you sanitize user input before running it through the "Dir" and "File" plugins. Do NOT assume that this plugin is sanitizing anything. You must be able to trust the data that you're passing to it.
+Note: It is absolutely essential that you sanitize user input before running it through the "Dir" and "File" plugins. Do NOT assume that this plugin is sanitizing anything. You must be able to trust the data that you're passing to it. If you are using any user input for something directory-related, it MUST be passed through the Sanitize::filepath() method.
 
+The methods in this plugin are fairly self-explanatory. You will need to make sure that PHP has the proper permissions to run some of these methods, however, such as to create a directory.
 
 -------------------------------
 ------ Methods Available ------
