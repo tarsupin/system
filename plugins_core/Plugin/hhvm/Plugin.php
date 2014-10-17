@@ -21,10 +21,6 @@ The Plugin Configuration File performs several important tasks:
 	
 	3. Prepares links that are used in the administration panel.
 	
-	4. Generates a schema that helps in many administrative functions.
-	
-	5. Prepares clearance levels for viewing and interacting with the schema and admin system.
-	
 Many of these functions are performed by accessing the "Plugin" plugin, which acts as a handler for other plugins and their configurations.
 
 
@@ -84,9 +80,6 @@ $pluginConfig = Plugin::getConfig($plugin);
 // Get the admin controllers of the plugin
 $controllerList = Plugin::getAdminPages($pluginPath);
 
-// Get the list of schemas that the plugin contains
-$schemaList = Plugin::getSchemas($pluginPath);
-
 // Run a plugin "action" (unique to phpTesla)
 Plugin::runAction($plugin, $action, $parameters, [$clearance]);
 
@@ -139,47 +132,15 @@ abstract class Plugin {
 			}
 		}
 		
-		// Check if there is any installation required
-		if($pluginConfig->data['schema'] == array() and !method_exists($pluginConfig, "install"))
-		{
-			return self::NO_INSTALL_NEEDED;
-		}
-		
-		// Prepare Success
-		$success = true;
-		
-		// Cycle through each schema for installation requirements
-		foreach($pluginConfig->data['schema'] as $tableName)
-		{
-			// Prepare Values
-			$schemaClass = $tableName . "_schema";
-			
-			// Attempt to install the schema
-			if(!class_exists($schemaClass))
-			{
-				include($pluginConfig->data['path'] . '/schema/' . $tableName . '.schema.php');
-			}
-			
-			$pluginSchema = new $schemaClass();
-			
-			if(method_exists($pluginSchema, "install"))
-			{
-				$success = $pluginSchema->install() ? $success : false;
-			}
-			
-			if(method_exists($pluginSchema, "buildSchema"))
-			{
-				$success = $pluginSchema->buildSchema() ? $success : false;
-			}
-		}
-		
 		// Run the installation for the dependency
 		if(method_exists($pluginConfig, "install"))
 		{
 			$success = $pluginConfig->install() ? $success : false;
+			
+			return ($success == true ? self::INSTALL_SUCCEEDED : self::INSTALL_FAILED);
 		}
 		
-		return ($success == true ? self::INSTALL_SUCCEEDED : self::INSTALL_FAILED);
+		return self::NO_INSTALL_NEEDED;
 	}
 	
 	
@@ -232,7 +193,6 @@ abstract class Plugin {
 				$pluginConfig = new $pluginConfig();
 				$pluginConfig->data['path'] = $dir . "/" . $plugin;
 				$pluginConfig->data['type'] = "???";
-				$pluginConfig->data['schema'] = self::getSchemas($pluginConfig->data['path']);
 				return $pluginConfig;
 			}
 			
@@ -249,7 +209,6 @@ abstract class Plugin {
 			$pluginConfig = new $pluginConfig();
 			$pluginConfig->data['path'] = APP_PATH . "/plugins/" . $plugin;
 			$pluginConfig->data['type'] = "app";
-			$pluginConfig->data['schema'] = self::getSchemas($pluginConfig->data['path']);
 			return $pluginConfig;
 		}
 		
@@ -263,7 +222,6 @@ abstract class Plugin {
 			$pluginConfig = new $pluginConfig();
 			$pluginConfig->data['path'] = CORE_PLUGIN_PATH . "/" . $plugin;
 			$pluginConfig->data['type'] = "core";
-			$pluginConfig->data['schema'] = self::getSchemas($pluginConfig->data['path']);
 			return $pluginConfig;
 		}
 		
@@ -277,7 +235,6 @@ abstract class Plugin {
 			$pluginConfig = new $pluginConfig();
 			$pluginConfig->data['path'] = ADDON_PLUGIN_PATH . "/" . $plugin;
 			$pluginConfig->data['type'] = "addon";
-			$pluginConfig->data['schema'] = self::getSchemas($pluginConfig->data['path']);
 			return $pluginConfig;
 		}
 		
@@ -339,40 +296,12 @@ abstract class Plugin {
 					continue;
 				}
 				
-				// Prepare the schema details
 				$fileName = Sanitize::variable(str_replace(".php", "", $filename), " -");
 				$controllerList[] = $fileName;
 			}
 		}
 		
 		return $controllerList;
-	}
-	
-	
-/****** Retrieve a list of Plugin Schemas ******/
-	public static function getSchemas
-	(
-		string $pluginPath = ""	// <str> The base plugin directory to scan for schema files.
-	): array <int, str>						// RETURNS <int:str> an array of schema names contained in the directory provided.
-	
-	// $schemaList = Plugin::getSchemas($pluginPath);
-	{
-		$schemaList = array();
-		
-		// Get the schemas for this plugin, if availble
-		if(is_dir($pluginPath . '/schema'))
-		{
-			$schemaFiles = Dir::getFiles($pluginPath . '/schema');
-			
-			foreach($schemaFiles as $filename)
-			{
-				// Prepare the schema details
-				$tableName = Sanitize::variable(str_replace(".schema.php", "", $filename));
-				$schemaList[] = $tableName;
-			}
-		}
-		
-		return $schemaList;
 	}
 	
 	
@@ -452,12 +381,6 @@ abstract class Plugin {
 			{
 				return false;
 			}
-		}
-		
-		// Check if there is are any schemas to be run
-		if($pluginConfig->data['schema'] !== array())
-		{
-			return true;
 		}
 		
 		// Check if there is an install method

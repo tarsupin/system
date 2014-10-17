@@ -51,7 +51,6 @@ if($madeSelection)
 		}
 		
 		$details = "";
-		$showTables = false;
 		
 		// If the plugin was intentionally installed
 		if(isset($_POST['addon'][$plugin]))
@@ -71,13 +70,6 @@ if($madeSelection)
 				
 				case Plugin::INSTALL_SUCCEEDED:
 					$details = '<span style="color:green; font-weight:700;">Installation was completed successfully.</span>';
-					
-					// Check if we should display the database tables
-					if(isset($pluginConfig->data['schema']) and count($pluginConfig->data['schema']) > 0)
-					{
-						$showTables = true;
-					}
-					
 					break;
 				
 				case Plugin::NO_INSTALL_NEEDED:
@@ -103,15 +95,6 @@ if($madeSelection)
 			<br />Description: ' . $pluginConfig->description . '
 			<br />' . $details . '
 		</p>';
-		
-		if($showTables)
-		{
-			foreach($pluginConfig->data['schema'] as $tableName)
-			{
-				echo '
-				<p>' . DatabaseAdmin::showTable($tableName) . '</p>';
-			}
-		}
 	}
 	
 	echo '

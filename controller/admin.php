@@ -12,10 +12,6 @@ This page will pull all of the functionality from the plugins available to the s
 
 	1. Any .php file saved in the /admin directory of a plugin will be loaded as an admin page here.
 	
-	2. Any .schema.php file saved in the /schema directory of a plugin will be loaded as a schema class / handler.
-	
-		* Schema handlers must be structured like a proper schema plugin in order to function properly.
-	
 */
 
 // Run Permissions
@@ -28,10 +24,10 @@ Sync::run();
 $plugin = isset($url[1]) ? Sanitize::variable($url[1]) : '';
 $page = isset($url[2]) ? Sanitize::variable($url[2], " -") : '';
 
-// Attempt to load the Schema Class
+// Attempt to load the Admin Pages
 if($plugin and $page)
 {
-	// Load the Plugin Config and retrieve the schema
+	// Load the Plugin Config
 	$pluginConfig = Plugin::getConfig($plugin);
 	
 	// Attempt to load an admin file
@@ -41,34 +37,6 @@ if($plugin and $page)
 	{
 		require($adminFile); exit;
 	}
-	
-	// Attempt to load the schema file
-	$schemaFile = $pluginConfig->data['path'] . "/schema/" . $page . ".schema.php";
-	
-	if(is_file($schemaFile))
-	{
-		// Prepare Schema Values
-		define("SCHEMA_HANDLER", true);
-		$actionType = isset($url[3]) ? Sanitize::word($url[3]) : 'view';
-		$table = $page;
-		$schemaClass = "";
-		
-		// Load the file
-		require($schemaFile);
-		
-		$schemaClass = $table . "_schema";
-		
-		if(class_exists($schemaClass))
-		{
-			$schema = new $schemaClass();
-			
-			// Show the Schema Form
-			if(in_array($actionType, array("view", "create", "edit", "search")))
-			{
-				require(SYS_PATH . "/controller/includes/schema/" . $actionType . ".php"); exit;
-			}
-		}
-	}
 }
 
 // Scan through the plugins directory
@@ -77,8 +45,7 @@ $pluginList = Plugin::getPluginList();
 // Prepare Values
 $linkList = array();
 
-// Cycle through the plugins to find any schema pages available.
-// If a plugin has a schema page, add it to the admin list.
+// Cycle through the plugins to find any admin pages available.
 foreach($pluginList as $plugin)
 {
 	// Reject class names that aren't valid
@@ -104,20 +71,6 @@ foreach($pluginList as $plugin)
 			foreach($controllerList as $controller)
 			{
 				$linkList[$pluginConfig->pluginName][$controller] = $controller;
-			}
-		}
-		
-		// Get list of schemas
-		if($getSchemas = Plugin::getSchemas($pluginConfig->data['path']))
-		{
-			foreach($getSchemas as $schema)
-			{
-				require_once($pluginConfig->data['path'] . '/schema/' . $schema . '.schema.php');
-				
-				$schemaClass = $schema . "_schema";
-				$getSchema = new $schemaClass();
-				
-				$linkList[$pluginConfig->pluginName][$getSchema->title] = $schema;
 			}
 		}
 	}

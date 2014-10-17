@@ -1,4 +1,4 @@
-<?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
+<?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
 
 -------------------------------
 ------ Transaction Class ------
@@ -29,10 +29,10 @@ abstract class AppTrade {
 /****** Exchange gold between two users ******
 	public static function sendGold_doTransaction
 	(
-		$senderID		// <int> The UniID sending the gold.
-	,	$recipientID	// <int> The UniID receiving the gold.
-	,	$goldAmount		// <int> The amount of gold being sent.
-	)					// RETURNS <bool> TRUE if the gold was sent, FALSE if it failed.
+		int $senderID		// <int> The UniID sending the gold.
+	,	int $recipientID	// <int> The UniID receiving the gold.
+	,	int $goldAmount		// <int> The amount of gold being sent.
+	): bool					// RETURNS <bool> TRUE if the gold was sent, FALSE if it failed.
 	
 	// AppTrade::sendGold_doTransaction($senderID, $recipientID, $goldAmount);
 	{
@@ -43,10 +43,10 @@ abstract class AppTrade {
 /****** Exchange an item between two users ******
 	public static function sendItem_doTransaction
 	(
-		$senderID		// <int> The UniID sending the gold.
-	,	$recipientID	// <int> The UniID receiving the gold.
-	,	$itemID			// <int> The ID of the item that the sender is exchanging.
-	)					// RETURNS <bool> TRUE if the item was sent, FALSE if it failed.
+		int $senderID		// <int> The UniID sending the gold.
+	,	int $recipientID	// <int> The UniID receiving the gold.
+	,	int $itemID			// <int> The ID of the item that the sender is exchanging.
+	): bool					// RETURNS <bool> TRUE if the item was sent, FALSE if it failed.
 	
 	// AppTrade::sendItem_doTransaction($senderID, $recipientID, $goldAmount);
 	{
@@ -126,9 +126,9 @@ abstract class Transaction {
 /****** Create Transaction ******/
 	public static function create
 	(
-		$title			// <str> The title of the transaction.
-	,	$expires = 0	// <int> Number of seconds before this transaction will expire (30 day default)
-	)					// RETURNS <int> The ID of the transaction created, or 0 on failure.
+		string $title			// <str> The title of the transaction.
+	,	int $expires = 0	// <int> Number of seconds before this transaction will expire (30 day default)
+	): int					// RETURNS <int> The ID of the transaction created, or 0 on failure.
 	
 	// $transactionID = Transaction::create($title, [$expires]);
 	{
@@ -149,8 +149,8 @@ abstract class Transaction {
 /****** Delete Transaction ******/
 	public static function delete
 	(
-		$transactionID		// <int> The ID of the transaction.
-	)						// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $transactionID		// <int> The ID of the transaction.
+	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::delete($transactionID);
 	{
@@ -174,8 +174,8 @@ abstract class Transaction {
 /****** Get the list of users in a Transaction ******/
 	public static function getUsers
 	(
-		$transactionID	// <int> The ID of the transaction.
-	)					// RETURNS <int:int> List of user ID's.
+		int $transactionID	// <int> The ID of the transaction.
+	): array <int, int>					// RETURNS <int:int> List of user ID's.
 	
 	// $users = Transaction::getUsers($transactionID);
 	{
@@ -194,9 +194,9 @@ abstract class Transaction {
 /****** Add User to a Transaction ******/
 	public static function addUser
 	(
-		$transactionID	// <int> The ID of the transaction.
-	,	$uniID			// <int> The UniID of the user to add to the transaction.
-	)					// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $transactionID	// <int> The ID of the transaction.
+	,	int $uniID			// <int> The UniID of the user to add to the transaction.
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::addUser($transactionID, $uniID);
 	{
@@ -212,9 +212,9 @@ abstract class Transaction {
 /****** Remove User from a Transaction ******/
 	public static function removeUser
 	(
-		$transactionID	// <int> The ID of the transaction.
-	,	$uniID			// <int> The UniID of the user to add to the transaction.
-	)					// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $transactionID	// <int> The ID of the transaction.
+	,	int $uniID			// <int> The UniID of the user to add to the transaction.
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::removeUser($transactionID, $uniID);
 	{
@@ -230,9 +230,9 @@ abstract class Transaction {
 /****** User approves a Transaction ******/
 	public static function approve
 	(
-		$transactionID	// <int> The ID of the transaction.
-	,	$uniID			// <int> The UniID of the user to approve the transaction.
-	)					// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $transactionID	// <int> The ID of the transaction.
+	,	int $uniID			// <int> The UniID of the user to approve the transaction.
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::approve($transactionID, $uniID);
 	{
@@ -261,9 +261,9 @@ abstract class Transaction {
 /****** Invalidate the Transaction Approvals ******/
 	public static function disapprove
 	(
-		$transactionID	// <int> The ID of the transaction.
-	,	$uniID = 0		// <int> The UniID of the user to disapprove of the transaction.
-	)					// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $transactionID	// <int> The ID of the transaction.
+	,	int $uniID = 0		// <int> The UniID of the user to disapprove of the transaction.
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::disapprove($transactionID)			// Sets disapproval to the entire transaction (all users).
 	// Transaction::disapprove($transactionID, $uniID)	// Sets disapproval for a single user in the transaction.
@@ -283,8 +283,8 @@ abstract class Transaction {
 /****** Process a valid Transaction ******/
 	public static function process
 	(
-		$transactionID	// <int> The ID of the transaction.
-	)					// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $transactionID	// <int> The ID of the transaction.
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::process($transactionID);
 	{
@@ -310,9 +310,9 @@ abstract class Transaction {
 /****** Get a list of Transaction entries ******/
 	public static function getEntry
 	(
-		$entryID		// <int> The ID of the transaction entry.
-	,	$sqlData = "*"	// <str> The columns that you'd like to retrieve, comma delimited.
-	)					// RETURNS <str:mixed> of the entity's data.
+		int $entryID		// <int> The ID of the transaction entry.
+	,	string $sqlData = "*"	// <str> The columns that you'd like to retrieve, comma delimited.
+	): array <str, mixed>					// RETURNS <str:mixed> of the entity's data.
 	
 	// $entry = Transaction::getEntry(513, "transaction_id");		// Get sql data from transaction entry #513
 	{
@@ -323,13 +323,13 @@ abstract class Transaction {
 /****** Add Entry to a Transaction ******/
 	public static function addEntry
 	(
-		$uniID				// <int> The UniID of the user to add to the transaction.
-	,	$transactionID		// <int> The ID of the transaction.
-	,	$class				// <str> The class that is being used for this transaction entry.
-	,	$method				// <str> The method used to exchange the entry.
-	,	$parameters			// <array> An array of parameters to use for the entry.
-	,	$display = array()	// <array> Stores whatever parameters you want to display the transaction.
-	)						// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $uniID				// <int> The UniID of the user to add to the transaction.
+	,	int $transactionID		// <int> The ID of the transaction.
+	,	string $class				// <str> The class that is being used for this transaction entry.
+	,	string $method				// <str> The method used to exchange the entry.
+	,	array $parameters			// <array> An array of parameters to use for the entry.
+	,	array $display = array()	// <array> Stores whatever parameters you want to display the transaction.
+	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::addEntry($uniID, $transactionID, $class, $method, $parameters, $displayParameters);
 	{
@@ -358,8 +358,8 @@ abstract class Transaction {
 /****** Remove Entry from a Transaction ******/
 	public static function removeEntry
 	(
-		$entryID		// <int> The ID of the transaction entry.
-	)					// RETURNS <bool> TRUE on success, FALSE on failure.
+		int $entryID		// <int> The ID of the transaction entry.
+	): bool					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::removeEntry($entryID);
 	{
@@ -376,4 +376,3 @@ abstract class Transaction {
 		return Database::query("DELETE FROM transactions_entries WHERE id=? LIMIT 1", array($entryID));
 	}
 }
-

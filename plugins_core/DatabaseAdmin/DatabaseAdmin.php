@@ -349,7 +349,7 @@ abstract class DatabaseAdmin {
 		$table			// <str> The table that you're adding a column to.
 	,	$columnToEdit	// <str> The name of the column you're adding.
 	,	$columnData		// <str> The remaining column data to insert (e.g. int(10) unsigned not null)
-	,	$default = ""	// <str> The default value you'd like to set.
+	,	$default = ""	// <mixed> The default value you'd like to set.
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// DatabaseAdmin::editColumn("users", "mailing_goodies", "tinyint(1) unsigned not null", 0);

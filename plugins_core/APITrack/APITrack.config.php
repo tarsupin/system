@@ -12,7 +12,6 @@ class APITrack_config {
 	public $license = "UniFaction License";
 	public $website = "http://unifaction.com";
 	public $description = "Tracks the API usage for every API on the site.";
-	public $dependencies = array("SchemaDefine");
 	
 	public $data = array();
 	

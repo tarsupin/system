@@ -20,7 +20,7 @@ class Debug_config {
 	public function install (
 	)			// RETURNS <bool> TRUE if the installation was success, FALSE if not.
 	
-	// $schema->install();
+	// $plugin->install();
 	{
 		Database::exec("
 		CREATE TABLE IF NOT EXISTS `log_errors`
@@ -79,7 +79,7 @@ class Debug_config {
 	public static function isInstalled (
 	)			// RETURNS <bool> TRUE if the installation was success, FALSE if not.
 	
-	// $schema->isInstalled();
+	// $plugin->isInstalled();
 	{
 		$pass1 = DatabaseAdmin::tableExists("log_errors");
 		$pass2 = DatabaseAdmin::tableExists("log_debug");

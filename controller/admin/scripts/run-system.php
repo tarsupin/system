@@ -24,12 +24,6 @@ if(Me::$clearance < 9)
 // Run Header
 require(SYS_PATH . "/controller/includes/admin_header.php");
 
-// Only allow this function on AUTH
-if(SITE_HANDLE != "auth")
-{
-	die("You must be on Auth to run this function.");
-}
-
 // Run Global Script (if applicable)
 if(isset($_GET['action']) and $_GET['action'] == "run")
 {
@@ -59,30 +53,23 @@ if(isset($_GET['action']) and $_GET['action'] == "run")
 	{
 		$fileContents = File::read($file);
 		
-		$siteHandle[] = Parse::between($fileContents, 'define("SITE_HANDLE", "', "\")");
+		$siteHandle[] = Parse::between($fileContents, '$config[\'database\'][\'name\'] = "', '";');
 	}
 	
 	// Make sure the system was able to collect the appropriate site handles
 	if($siteHandle != array())
 	{
-		// Prepare the SQL for the Network Filter
-		list($sqlWhere, $sqlArray) = Database::sqlFilters(array("site_handle" => $siteHandle));
-		
-		// Gather Sites
-		$siteList = Database::selectMultiple("SELECT site_handle, site_name FROM network_data WHERE " . $sqlWhere, $sqlArray);
-		
-		foreach($siteList as $site)
+		foreach($siteHandle as $sh)
 		{
-			$siteData = Network::get($site['site_handle']);
-			$success = Connect::call($siteData['site_url'] . "/api/AuthCommand", "system-script", $siteData['site_key']);
-			
-			if($success)
+			if($sh)
 			{
-				echo "<br /><span style='color:green;'>" . $site['site_name'] . " run their instructions SUCCESSFULLY!</span>";
-			}
-			else
-			{
-				echo "<br /><span style='color:red;'>" . $site['site_name'] . " FAILED! Some or all of the instructions did not run as desired.</span>";
+				// Attempt to initialize another database
+				Database::initialize($sh, $config['database']['admin-user'], $config['database']['admin-pass'], $config['database']['host'], $config['database']['type']);
+				
+				// Run the System Script
+				include(SYS_PATH . "/system-script.php");
+				
+				echo "Ran the script for the " . $sh . " database.<br />";
 			}
 		}
 	}

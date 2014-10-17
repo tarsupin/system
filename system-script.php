@@ -18,6 +18,7 @@ Due to the increased need for security of this page, it cannot be accessed direc
 Database::initRoot();
 
 // Prepare your script(s) below:
+/*
 if(DatabaseAdmin::tableExists("notifications"))
 {
 	DatabaseAdmin::renameColumn("notifications", "category", "note_type");
@@ -39,6 +40,7 @@ if(DatabaseAdmin::tableExists("users_friends"))
 {
 	DatabaseAdmin::dropTable("users_friends");
 }
+*/
 
 if(DatabaseAdmin::tableExists("content_block_image"))
 {
@@ -126,7 +128,7 @@ if(strpos(SITE_HANDLE, "article") !== false)
 */
 
 //*
-if(DatabaseAdmin::tableExists("ads_sponsored"))
+//if(DatabaseAdmin::tableExists("ads_sponsored"))
 {
 	//DatabaseAdmin::renameColumn("ads_sponsored", "reference_id", "targ_keyword");
 	

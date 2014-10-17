@@ -28,8 +28,8 @@ class ModuleImage_config {
 			`id`					int(10)			unsigned	NOT NULL	AUTO_INCREMENT,
 			
 			`img_class`				varchar(22)					NOT NULL	DEFAULT '',
-			`caption`				varchar(64)					NOT NULL	DEFAULT '',
-			`credits`				varchar(180)				NOT NULL	DEFAULT '',
+			`caption`				varchar(180)				NOT NULL	DEFAULT '',
+			`credits`				varchar(72)					NOT NULL	DEFAULT '',
 			
 			`image_url`				varchar(72)					NOT NULL	DEFAULT '',
 			`mobile_url`			varchar(72)					NOT NULL	DEFAULT '',

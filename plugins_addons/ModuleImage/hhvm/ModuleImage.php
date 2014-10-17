@@ -95,7 +95,7 @@ abstract class ModuleImage {
 				<p><select name="img_class[' . $blockID . ']">' . $dropdownOptions . '</select></p>
 				<p>Upload Image: <input type="file" name="image[' . $blockID . ']" value="" tabindex="30" /></p>
 				<p><input type="text" name="caption[' . $blockID . ']" value="' . htmlspecialchars($result['caption']) . '" placeholder="Write caption here . . ." size="64" maxlength="180" tabindex="10" autocomplete="off" /></p>
-				<p>Image credit: <input type="text" name="credits[' . $blockID . ']" value="' . $result['credits'] . '" placeholder="" size="64" maxlength="180" tabindex="10" autocomplete="off" /></p>
+				<p>Image credit: <input type="text" name="credits[' . $blockID . ']" value="' . $result['credits'] . '" placeholder="" size="64" maxlength="72" tabindex="10" autocomplete="off" /></p>
 			</div>
 		</div>';
 	}

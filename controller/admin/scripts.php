@@ -21,10 +21,11 @@ require(SYS_PATH . "/controller/includes/admin_header.php");
 if(SITE_HANDLE == "auth")
 {
 	echo '
-	<a href="/admin/scripts/run-system">Run Server-Wide Script</a> (activates all sites on the server)<br />';
+	<a href="/admin/scripts/run-universe">Run Universal Script</a> (activates all sites on the entire universe system)<br />';
 }
 
 echo '
+<a href="/admin/scripts/run-system">Run Server-Wide Script</a> (activates all sites on the server)<br />
 <a href="/admin/scripts/local">Run Local Script on this site</a>';
 
 // Display the Footer

@@ -79,16 +79,6 @@ foreach($plugins as $plugin)
 		<br />Description: ' . $pluginConfig->description . '
 		<br />' . $details . '
 	</p>';
-	
-	// Display the Database Tables
-	if($installed == Plugin::INSTALL_SUCCEEDED and isset($pluginConfig->data['schema']))
-	{
-		foreach($pluginConfig->data['schema'] as $tableName)
-		{
-			echo '
-			<p>' . DatabaseAdmin::showTable($tableName) . '</p>';
-		}
-	}
 }
 
 echo '

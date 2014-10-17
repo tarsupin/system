@@ -56,14 +56,19 @@ abstract class ContentFeed {
 	
 	
 /****** Get a list of the recent entry IDs (such as for the home page) ******/
-	public static function getRecentEntryIDs (
+	public static function getRecentEntryIDs
+	(
+		$status = 0		// <int> The minimum status allowed for content entries.
 	)					// RETURNS <int:int> a list of the content IDs based on recent posts.
 	
-	// $contentIDs = ContentFeed::getRecentEntryIDs();
+	// $contentIDs = ContentFeed::getRecentEntryIDs([$status]);
 	{
+		// Prepare Values
+		$status = $status == 0 ? Content::STATUS_OFFICIAL : $status;
 		$contentIDs = array();
 		
-		$getList = Database::selectMultiple("SELECT id FROM content_entries WHERE status >= ? ORDER BY id DESC LIMIT 0, 20", array(Content::STATUS_OFFICIAL));
+		// Retrieve the list of content entries
+		$getList = Database::selectMultiple("SELECT id FROM content_entries WHERE status >= ? ORDER BY id DESC LIMIT 0, 20", array($status));
 		
 		foreach($getList as $getID)
 		{
