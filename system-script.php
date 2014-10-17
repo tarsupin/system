@@ -47,6 +47,12 @@ if(DatabaseAdmin::tableExists("content_block_image"))
 	DatabaseAdmin::editColumn("content_block_image", "caption", "varchar(180) not null", 0);
 }
 
+if(DatabaseAdmin::tableExists("schema_fields"))
+{
+	DatabaseAdmin::dropTable("schema_fields");
+	DatabaseAdmin::dropTable("schema_selections");
+}
+
 
 /*
 if(DatabaseAdmin::tableExists("content_block_text"))

@@ -153,7 +153,7 @@ class ContentForm {
 	public int $voting = 4;				// <int> The level of voting allowance.
 	
 	// Values that the system sets
-	public int $urlLength = 42;			// <int> The maximum length allowed with the URL.
+	public int $urlLength = 55;			// <int> The maximum length allowed with the URL.
 	public bool $urlUpdate = true;		// <bool> TRUE if you can update the URL, FALSE if not.
 	public bool $hashtagsUpdate = false;	// <bool> Sets to TRUE once you're allowed to add hashtags.
 	
@@ -183,7 +183,7 @@ class ContentForm {
 		$this->contentData['date_posted'] = (int) $this->contentData['date_posted'];
 		
 		// Prepare Values
-		$this->urlLength = 42 - (strlen($this->urlPrefix));
+		$this->urlLength = 55 - (strlen($this->urlPrefix));
 		
 		// Prevent any updates to the URL slug if one has been set, and status is higher than DRAFT
 		if($this->contentData['url_slug'] and $this->contentData['status'] > Content::STATUS_DRAFT)
@@ -469,7 +469,7 @@ class ContentForm {
 		}
 		
 		// Validate the URL Slug
-		FormValidate::variable("URL", $_POST['url_slug'], 10, 42, "-");
+		FormValidate::variable("URL", $_POST['url_slug'], 10, 55, "-");
 		
 		if(strpos($_POST['url_slug'], "-") === false)
 		{

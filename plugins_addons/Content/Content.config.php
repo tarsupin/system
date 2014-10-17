@@ -32,8 +32,8 @@ class Content_config {
 			
 			`uni_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
 			
-			`url`					varchar(64)					NOT NULL	DEFAULT '',
-			`url_slug`				varchar(46)					NOT NULL	DEFAULT '',
+			`url`					varchar(100)				NOT NULL	DEFAULT '',
+			`url_slug`				varchar(60)					NOT NULL	DEFAULT '',
 			`title`					varchar(72)					NOT NULL	DEFAULT '',
 			
 			`primary_hashtag`		varchar(22)					NOT NULL	DEFAULT '',
@@ -78,7 +78,7 @@ class Content_config {
 		Database::exec("
 		CREATE TABLE IF NOT EXISTS `content_by_url`
 		(
-			`url_slug`				varchar(42)					NOT NULL	DEFAULT '',
+			`url_slug`				varchar(60)					NOT NULL	DEFAULT '',
 			`content_id`			int(10)			unsigned	NOT NULL	DEFAULT '0',
 			
 			UNIQUE (`url_slug`)
