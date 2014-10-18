@@ -1,7 +1,5 @@
 <?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
 
-# A new update.. this time about star wars. 222222222222 33333333
-
 ----------------------------------
 ------ About the Zip Plugin ------
 ----------------------------------
