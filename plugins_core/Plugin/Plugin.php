@@ -135,7 +135,7 @@ abstract class Plugin {
 		// Run the installation for the dependency
 		if(method_exists($pluginConfig, "install"))
 		{
-			$success = $pluginConfig->install() ? $success : false;
+			$success = $pluginConfig->install() ? true : false;
 			
 			return ($success == true ? self::INSTALL_SUCCEEDED : self::INSTALL_FAILED);
 		}

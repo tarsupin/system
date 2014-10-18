@@ -1,5 +1,8 @@
 <?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); }
 
+// Increase the amount of time allowed for this page to run
+set_time_limit(180);	// Three minutes
+
 // Installation Header
 require(SYS_PATH . "/controller/includes/install_header.php");
 
