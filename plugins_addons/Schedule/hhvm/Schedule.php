@@ -39,7 +39,7 @@ To build the schedule's trigger array, use the appropriate functions provided by
 ------ Examples of building a schedule ------
 ---------------------------------------------
 	
-#!
+
 // Sets a Schedule for every 5 minutes on every Sunday during the month of August
 // Note that every hour has to be set here (otherwise it defaults to just midnight)
 $schedule = new Schedule();
@@ -47,16 +47,16 @@ $schedule->setMonths("August")
 		->setDaysOfWeek("Sunday")
 		->setHours(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)
 		->setMinutes(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55);
-##!
 
-#!
+
+
 // Sets a schedule for 11 pm on the 3rd of each month
 // Note that every hour has to be set here (otherwise it defaults to just midnight)
 $schedule = new Schedule();
 $schedule->setDaysOfMonth(3)
 		->setHours("11 pm")
 		->setMinutes(0);
-##!
+
 
 
 ------------------------------------------

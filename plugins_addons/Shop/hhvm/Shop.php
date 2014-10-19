@@ -1,4 +1,32 @@
-<?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); }
+<?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
+
+-------------------------
+------ Shop Plugin ------
+-------------------------
+
+This plugin allows us to create shops with inventory in them. It can also automatically handle when items are added to the available inventory, sales on items, limits on how many items are available.
+
+This class has to interact with the MyShop:: class on the app that you're using it for. This includes:
+	MyShop::purchase()				// when the item is purchased from the shop
+	MyShop::replaceInventory()		// when an item need to be replaced
+
+
+-------------------------
+------ Shop Plugin ------
+-------------------------
+
+A lot of triggers are activated with the Shop class due to the customization required for each individualized shop.
+
+All triggers attempt to use methods in the `MyShop` class (in your /app/classes folder).
+
+
+-------------------------------
+------ Methods Available ------
+-------------------------------
+
+Shop::createCart($uniID);
+
+*/
 
 abstract class Shop {
 	

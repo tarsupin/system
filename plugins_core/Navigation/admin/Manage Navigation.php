@@ -93,4 +93,3 @@ echo '
 
 // Display the Footer
 require(SYS_PATH . "/controller/includes/admin_footer.php");
-

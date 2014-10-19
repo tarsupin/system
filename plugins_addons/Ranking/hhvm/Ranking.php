@@ -32,6 +32,7 @@ This class is used to determine what "rank" something gets.
 	
 	
 /****** Calculate Rank (Fast Algorithm: Moves content quickly) ******/
+# The higher the ranking, the better.
 	public static function fast
 	(
 		int $votesUp		// <int> The number of positive votes received.
@@ -45,14 +46,34 @@ This class is used to determine what "rank" something gets.
 		// There are two time degrades; a one-hour bonus burst of opportunity, which decays after the hour
 		// The slow decay is perpetual
 		$minutesPassed = floor($timePassed / 60);
-		$fastDegrade = min(1000, $minutesPassed * floor($minutesPassed / 4));
-		$slowDegrade = floor($minutesPassed / 2) * floor($minutesPassed / 30);
 		
-		// Likes and dislikes have a stronger impact right away, and degrade over time
-		$likeBoost = ($votesUp / ($votesDown + 1)) * (1200 - min(1200, $minutesPassed));
-		$actionBoost = $actions * (8 - min(8, $minutesPassed / 60));
+		// InitialDegrade subtracts 5 from the total ranking every minute, up to a total of 300 (in 60 minutes).
+		$initialDegrade = min(300, $minutesPassed * 5);
 		
-		$rating = 1000 - $fastDegrade - $slowDegrade + $likeBoost + $actionBoost + ($votesUp * 2) - $votesDown;
+		// FastDegrade subtracts 5 from the total ranking every minute.
+		$fastDegrade = $minutesPassed * 5;
+		
+		// The percentage of interest in the topic has a moderate impact at first, but may be negligible later.
+		// Every percent that is positive is a +10 value.
+		$percentBoost = ($votesUp / ($votesDown + 1)) * 100 * 10;
+		
+		// Up votes have a strong impact, while down votes have a lesser impact
+		$upvote = $votesUp * 25;
+		$downvote = $votesDown * 16;
+		
+		// Actions such as comments will increase the amount of attention drawn
+		$actionBoost = $actions * 5;
+		
+		// Calculate all of the boosts (values > 0)
+		$boosts = $percentBoost + $upvote + $actionBoost;
+		
+		// As time passes, we need to run a final degrade that cuts the value of the boosts.
+		// The minimum multiplier of the boosts is x0.25
+		$multiplier = (100 - min(75, floor($minutesPassed / 20))) / 100;
+		$boosts = $boosts * $multiplier;
+		
+		// Determine the rating value
+		$rating = 100000 - $initialDegrade - $fastDegrade - $downvote + $boosts;
 		
 		return (float) number_format($rating / 1000, 4);
 	}

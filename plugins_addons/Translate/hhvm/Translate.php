@@ -1,4 +1,31 @@
-<?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); }
+<?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
+
+------------------------------
+------ Translate Plugin ------
+------------------------------
+
+This plugin allows you to translate between multiple languages.
+
+Use of the plugin is like this:
+
+	$lang = new Translate("Spanish");
+	
+	$lang->Welcome		// Prints "Welcome" if there is no substitute in the language provided
+	$lang->Yes			// Prints "Si" (Spanish equivalent) if the substitute is provided by the language
+
+
+You can choose to disable the lookups when you launch Translate.
+
+	Such as $lang->noTranslate();
+
+	
+------------------------------
+------ Methods Available ------
+------------------------------
+
+$object = Translate::setLanguage();
+
+*/
 
 class Translate {
 	
@@ -9,7 +36,7 @@ class Translate {
 	
 	
 /****** Minimize an object's property name ******/
-	public function setLanguage
+	public function __construct
 	(
 		string $language			// <str> The language that you want to translate.
 	,	array $modules = array()	// <array> A list of the language modules to load. 
