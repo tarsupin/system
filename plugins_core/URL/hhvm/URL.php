@@ -70,13 +70,6 @@ abstract class URL {
 	
 	// $url = URL::unifaction_com();
 	{
-		$xq = "";
-		
-		if(Me::$id and isset($args[0]) and $args[0] == true)
-		{
-			$xq = "?slg=" . Me::$id;
-		}
-		
 		// Production URL
 		if(ENVIRONMENT == "production")
 		{
@@ -84,7 +77,7 @@ abstract class URL {
 			$name = str_replace("auth_unifaction_com", "auth_unifaction_cool", $name);
 			if($name == "unifaction_com") { $name = "unifaction_cool"; }
 			
-			return "http://" . str_replace("_", ".", $name) . $xq;
+			return "http://" . str_replace("_", ".", $name);
 		}
 		
 		if(strpos($name, "_unifaction_community") == false)
@@ -98,11 +91,11 @@ abstract class URL {
 		{
 			if($name == "unifaction") { return "http://phptesla.com"; }
 			
-			return "http://" . str_replace("_", ".", $name) . '.phptesla.com' . $xq;
+			return "http://" . str_replace("_", ".", $name) . '.phptesla.com';
 		}
 		
 		// Localhost URL
-		return "http://" . str_replace("_", ".", $name) . '.test' . $xq;
+		return "http://" . str_replace("_", ".", $name) . '.test';
 	}
 	
 	

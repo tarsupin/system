@@ -196,7 +196,7 @@ abstract class Comment {
 			}
 			
 			// Get the Hashtag
-			$user = Sanitize::whileValid(substr($message, $pos + 1, 22), "variable", '-');
+			$user = Sanitize::whileValid((string) substr($message, $pos + 1, 22), "variable", '-');
 			
 			if(strlen($user) > 0)
 			{

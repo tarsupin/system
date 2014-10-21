@@ -1,58 +1,37 @@
-<?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); }
+<?hh if(!defined("CONF_PATH")) { die("No direct script access allowed."); } /*
+
+-------------------------------------
+------ About the Paypal Plugin ------
+-------------------------------------
+
+This plugin provides a set of methods to work with the Paypal API.
+
+
+-------------------------------
+------ Methods Available ------
+-------------------------------
+
+$result = Paypal::runTransaction($postData);
+$txnData = Paypal::getTransaction($txnID, $columns = "*");
+
+$customData = Paypal::prepareCustomField($uniID);
+$customData = Paypal::getCustomData($customValue);
+
+Paypal::transactionCompleted($postData);
+Paypal::transactionPending($postData);
+Paypal::transactionCancel($postData);
+
+Paypal::insertTransaction($postData);
+Paypal::updateStatus($txnID, $status);
+Paypal::creditUser($postData, [$txnID]);
+
+*/
 
 abstract class Paypal {
-
-/****** Paypal Class ******
-* This class handles paypal transactions.
-* 
-****** Methods Available ******
-* $result = Paypal::runTransaction($postData);
-* $txnData = Paypal::getTransaction($txnID, $columns = "*");
-* 
-* $customData = Paypal::prepareCustomField($uniID);
-* $customData = Paypal::getCustomData($customValue);
-* 
-* 
-* Paypal::transactionCompleted($postData);
-* Paypal::transactionPending($postData);
-* Paypal::transactionCancel($postData);
-* 
-* Paypal::insertTransaction($postData);
-* Paypal::updateStatus($txnID, $status);
-* Paypal::creditUser($postData, [$txnID]);
-*/
 	
 	
 /****** Class Variables ******/
 	public static $paypalEmail = "unifaction@gmail.com";
-	
-	
-/****** Generate `Paypal` SQL ******/
-	public static function sql()
-	{
-		Database::exec("
-		CREATE TABLE IF NOT EXISTS `paypal_transactions`
-		(
-			`txn_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
-			
-			`auth_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
-			`uni_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
-			
-			`amount_paid`			float(7,2)		unsigned	NOT NULL	DEFAULT '0.00',
-			`user_received`			tinyint(1)		unsigned	NOT NULL	DEFAULT '0',
-			
-			`status`				varchar(20)					NOT NULL	DEFAULT '',
-			`email`					varchar(64)					NOT NULL	DEFAULT '',
-			
-			`date_paid`				int(10)			unsigned	NOT NULL	DEFAULT '0',
-			
-			UNIQUE (`txn_id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-		");
-		
-		// Display SQL
-		DatabaseAdmin::showTable("paypal_transactions");
-	}
 	
 	
 /****** Run a Transaction ******/

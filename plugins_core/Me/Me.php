@@ -75,6 +75,7 @@ abstract class Me {
 	public static $id = 0;					// <int> The active user's UniID
 	public static $clearance = 0;			// <int> The clearance level of the user (0 is guest)
 	public static $device = 3;				// <int> Value of the device (1 = mobile, 2 = tablet, 3 = desktop).
+	public static $slg = "";				// <str> The soft-login value to append if you're logged in.
 	public static $vals = array();			// <str:str> The active user's data (from their database row)
 	public static $loggedIn = false;		// <bool> TRUE if the user is logged in, FALSE if not.
 	public static $getColumns = "";			// <str> The database columns to retrieve when loading the user.
@@ -115,6 +116,9 @@ abstract class Me {
 				header("Location: /banned"); exit;
 			}
 		}
+		
+		// Set the user's soft login variable
+		Me::$slg = "?slg=" . Me::$id;
 		
 		// Check if there are any further instructions to follow
 		if(Me::$vals['has_instructions'] != 1) { return; }

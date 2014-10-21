@@ -355,7 +355,7 @@ abstract class Debug {
 /****** Saves a text file with debugging information ******/
 	public static function file
 	(
-		$value1			// <str> The content you would like to save as text.
+		$value1			// <mixed> The content you would like to save as text.
 	,	$value2 = ""	// <str> If set, the first value equals the "debug-{filename}.txt" to save to.
 	)					// RETURNS <bool> TRUE if the file is written, FALSE on failure.
 	

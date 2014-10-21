@@ -19,7 +19,7 @@ ignore this behaviour.
 
 1. The "Standard" login action is used by default. This activates when the user loads this page.
 
-2. The "Soft-Login" is used if the user is visiting this site from another UniFaction site, and it triggers the ?slg=1
+2. The "Soft-Login" is used if the user is visiting this site from another UniFaction site, and it triggers the ?slg=#
 query string. What this means is that the user is already logged in and it should log them in without disturbing them
 from their page visit.
 

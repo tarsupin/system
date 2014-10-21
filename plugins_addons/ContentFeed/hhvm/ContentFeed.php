@@ -126,7 +126,7 @@ abstract class ContentFeed {
 		if($backURL)
 		{
 			echo '
-			<div id="c-feed-head-tagcell"><div id="c-feed-navtag"><a href="' . $backURL . '">' . $backTitle . '</a></div></div>';
+			<div id="c-feed-head-tagcell"><div id="c-feed-navtag"><a href="' . $backURL . (strpos($backURL, "?") == false ? Me::$slg : "") . '">' . $backTitle . '</a></div></div>';
 		}
 		
 		echo '
@@ -140,7 +140,7 @@ abstract class ContentFeed {
 					<div class="c-tp-plus">
 						<a class="c-tp-plink" href="' . Feed::follow(self::$activeHashtag) . '"><span class="icon-circle-plus"></span></a>
 					</div>
-					<a class="c-hlink" href="' . URL::hashtag_unifaction_com() . '/' . self::$activeHashtag . '">#' . self::$activeHashtag . '</a>
+					<a class="c-hlink" href="' . URL::hashtag_unifaction_com() . '/' . self::$activeHashtag . Me::$slg . '">#' . self::$activeHashtag . '</a>
 				</div>
 			</div>';
 		}
