@@ -10,7 +10,7 @@ This plugin allows users to acquire, lose, or exchange credits. It can also set 
 -------------------------------------------
 ------ Example of Purchasing an Item ------
 -------------------------------------------
-#!
+
 // Prepare Values
 $uniID = 1;
 $amount = 0.55;
@@ -25,12 +25,12 @@ if($response && isset($response['transactionID']))
 }
 
 var_dump($response);
-##!
+
 
 ------------------------------------------
 ------ Example of Refunding an Item ------
 ------------------------------------------
-#!
+
 // Prepare Values
 $desc = "Refund ID-" . $transactionID;
 
@@ -43,12 +43,12 @@ if($response && isset($response['transactionID']))
 }
 
 var_dump($response);
-##!
+
 
 --------------------------------------------------
 ------ Example of Sending Credits to a User ------
 --------------------------------------------------
-#!
+
 // Prepare Values
 $senderUniID = 1;
 $receipientUniID = 2;
@@ -64,7 +64,7 @@ if($response && isset($response['sender_balance']))
 }
 
 var_dump($response);
-##!
+
 
 
 -------------------------------
@@ -117,7 +117,7 @@ abstract class Credits {
 		);
 		
 		// Set optional values for the transaction packet
-		if($desc) { $trans['desc'] = Sanitize::safeword($desc, "?"); }
+		if($desc) { $trans['desc'] = Sanitize::safeword($desc, "'@#?!.;:\""); }
 		if($minAmount) { $trans['min_amount'] = (float) $minAmount; }
 		if($maxAmount) { $trans['max_amount'] = (float) $maxAmount; }
 		if($defAmount) { $trans['def_amount'] = (float) $defAmount; }
@@ -139,7 +139,7 @@ abstract class Credits {
 		$transData = Encrypt::run(self::$transEncKey, json_encode($trans));
 		
 		// Return the URL for this transaction
-		return URL::unijoule_com() . "/transaction/amount?d=" . urlencode($transData) . "&slg=" . $trans['uni_id'];
+		return URL::unijoule_com() . "/transaction/amount?d=" . urlencode($transData) . "&slg=" . Me::$id;
 	}
 	
 	

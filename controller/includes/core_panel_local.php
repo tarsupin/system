@@ -5,7 +5,6 @@ echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 	<div id="core-nav">
 		<ul id="core-list">
 			<li class="core-link is-auth"><a href="http://auth.test"><span class="icon-home core-icon"></span><span class="core-txt">Dashboard</span></a></li>
-			<li class="core-link is-feed"><a href="http://feed.unifaction.me.test/' . Me::$slg . '"><span class="icon-document core-icon"></span><span class="core-txt">My Feed</span></a></li>
 			<li class="core-link is-my_uni"><a href="http://unifaction.me.test/' . Me::$slg . '"><span class="icon-globe core-icon"></span><span class="core-txt">My Uni</span></a></li>
 			<li class="core-link is-social"><a href="http://unifaction.social.test/' . Me::$slg . '"><span class="icon-group core-icon"></span><span class="core-txt">Social</span></a></li>
 			<li class="core-link is-fastchat"><a href="http://fastchat.social.test/' . Me::$slg . '"><span class="icon-comments core-icon"></span><span class="core-txt">FastChat</span></a></li>

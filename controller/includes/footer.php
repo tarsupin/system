@@ -11,22 +11,24 @@ echo '
 			<a href="javascript:toggleMenu();">Menu</a>
 		</li>
 		<li class="mn-link mobile-strict" style="padding-left:20px; padding-right:20px;">
-			<a href="' . URL::unifaction_com() . '/mobile-menu">All</a>
+			<a href="' . URL::unifaction_com() . '/mobile-menu' . Me::$slg . '">All</a>
 		</li>
 		<li class="mn-link mobile-strict">
-			<a href="' . URL::unifaction_social() . '">Social</a>
+			<a href="' . URL::unifaction_social() . Me::$slg . '">Social</a>
 		</li>
 	</ul>
 </div>';
 
 $uniCom = URL::unifaction_com();
 
+// <a href="' . URL::promote_unifaction_com() . '">Advertise</a>
+
 echo '
 <!-- Standard Footer -->
 <div class="spacer-giant"></div>
 <div id="footer">
 	<div style="padding-top:8px;">
-		<a href="' . $uniCom . '/faqs">FAQs</a> | <a href="' . $uniCom . '/tos">TOS</a> | <a href="' . $uniCom . '/privacy">Privacy</a> | <a href="' . $uniCom . '/acknowledgements">Thanks</a> | <a href="' . $uniCom . '/contact">Contact</a> | <a href="/user-panel/reports">Report</a> | <a href="' . URL::promote_unifaction_com() . '">Advertise</a>
+		<a href="' . $uniCom . '/contact' . Me::$slg . '">Contact</a> | <a href="' . $uniCom . '/faqs' . Me::$slg . '">FAQs</a> | <a href="' . $uniCom . '/privacy' . Me::$slg . '">Privacy</a> | <a href="' . $uniCom . '/user-panel/reports' . Me::$slg . '">Report</a> | <a href="' . $uniCom . '/acknowledgements' . Me::$slg . '">Thanks</a> | <a href="' . $uniCom . '/tos' . Me::$slg . '">TOS</a>
 	</div>
 </div>
 
