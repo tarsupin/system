@@ -14,9 +14,6 @@ if(Me::$clearance < 9)
 	header("Location: /admin"); exit;
 }
 
-// Run the Sync
-Sync::run();
-
 // Run Header
 require(SYS_PATH . "/controller/includes/admin_header.php");
 

@@ -28,7 +28,7 @@ echo '
 			{
 				echo '
 				<li id="viewing-user">
-					<img id="viewuser-avi" class="circimg-small" src="' . ProfilePic::image(You::$id, "small") . '" /> <div id="viewuser-text"><span style="font-size:13px;">Viewing</span><br /><span style="font-size:13px;">' . You::$name . 'manguything</span></div>
+					<img id="viewuser-avi" class="circimg-small" src="' . ProfilePic::image(You::$id, "small") . '" /> <div id="viewuser-text"><span style="font-size:13px;">Viewing</span><br /><span style="font-size:13px;">' . You::$name . '</span></div>
 				</li>';
 			}
 			
@@ -38,7 +38,6 @@ echo '
 				echo '
 				<li id="nav-user"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(Me::$id, "small") . '" /></a>
 					<ul style="line-height:22px; min-width:150px;">
-						<li><a href="/login?logAct=switch">Switch User</a></li>
 						<li><a href="/logout">Log Out</a></li>
 					</ul>
 				</li>';

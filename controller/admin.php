@@ -17,9 +17,6 @@ This page will pull all of the functionality from the plugins available to the s
 // Run Permissions
 require(SYS_PATH . "/controller/includes/admin_perm.php");
 
-// Check if the site needs to sync
-Sync::run();
-
 // Retrieve the URL segments to determine what to load
 $plugin = isset($url[1]) ? Sanitize::variable($url[1]) : '';
 $page = isset($url[2]) ? Sanitize::variable($url[2], " -") : '';

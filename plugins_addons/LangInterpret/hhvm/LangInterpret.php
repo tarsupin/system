@@ -86,10 +86,22 @@ sentanceType		// exclamation, declaration, question
 
 */
 
-class LangInterpretDetailed extends LangInterpret {
-	
-	
+class LangInterpret {
+
+
 /****** Plugin Variables ******/
+	
+	// Important Storage
+	public string $text = "";						// <str> The text being interpreted.
+	public string $textSanitized = "";				// <str> The text after being sanitized.
+	
+	// General information about the text
+	public int $wordCount = 0;					// <int> The number of words in the text.
+	
+	// Stores Large Data
+	public array $wordList = array();				// <array> The list of words in the text.
+	public array $relevantWords = array();		// <array> The list of relevant words.
+	public array $relevantWordGroups = array();	// <array> The list of relevant word groupings.
 	
 	// General information about the text
 	public int $characterCount = 0;			// <int> The number of characters contained in the text.
@@ -155,7 +167,7 @@ class LangInterpretDetailed extends LangInterpret {
 	public int $auxilaryVerbCount = 0;		// <int> be, must, have
 	
 	// Stores Large Data
-	public array $characterList = array();		// <array> The list of characters in the text.
+	public array $characterList = array();	// <array> The list of characters in the text.
 	
 	
 /****** Plugin Constructor ******/
@@ -174,6 +186,77 @@ class LangInterpretDetailed extends LangInterpret {
 		$this->getRelevantWords();
 	}
 	
+	
+/****** Get the words in this text ******/
+	public function getWordList (
+	): void				// RETURNS <void>
+	
+	// $phrase->getWordList()
+	{
+		// Separate into words
+		$this->textSanitized = str_replace("	", " ", $this->textSanitized);
+		$findDouble = true;
+		
+		while($findDouble == true)
+		{
+			$findDouble = false;
+			
+			if(strpos($this->textSanitized, "  "))
+			{
+				$this->textSanitized = str_replace("  ", " ", $this->textSanitized, $count);
+				// $this->whitespaceCount -= $count;
+				$findDouble = true;
+			}
+		}
+		
+		// Separate into individual words
+		$stripText = Sanitize::word($this->textSanitized, " 1234567890");
+		$this->wordList = explode(" ", $stripText);
+		
+		$this->wordCount = count($this->wordList);
+	}
+	
+	
+/****** Get relevant words from text ******/
+	public function getRelevantWords (
+	): void				// RETURNS <void>
+	
+	// $phrase->getRelevantWords()
+	{
+		// Prepare the relevant words
+		$relevant = array();
+		$wordPull = "";
+		
+		// Retrieve the list of words to remove from consideration
+		$eliminate = array("a", "able", "about", "above", "abroad", "according", "accordingly", "across", "actually", "adj", "after", "afterwards", "again", "against", "ago", "ahead", "ain't", "all", "allow", "allows", "almost", "alone", "along", "alongside", "already", "also", "although", "always", "am", "amid", "amidst", "among", "amongst", "an", "and", "another", "any", "anybody", "anyhow", "anyone", "anything", "anyway", "anyways", "anywhere", "apart", "appear", "appreciate", "appropriate", "are", "aren't", "...");
+		
+		// Cycle through each word and retrieve information about it
+		foreach($this->wordList as $word)
+		{
+			if(in_array(strtolower($word), $eliminate))
+			{
+				if($wordPull != "")
+				{
+					$this->relevantWordGroups[] = $wordPull;
+				}
+				
+				$wordPull = "";
+			}
+			else
+			{
+				$this->relevantWords[] = $word;
+				
+				$wordPull = $wordPull == "" ? $word : $wordPull . " " . $word;
+			}
+		}
+		
+		if($wordPull != "")
+		{
+			$this->relevantWordGroups[] = $wordPull;
+		}
+		
+		var_dump($this->relevantWordGroups);
+	}
 	
 /****** Get Simple Counts ******/
 	public function retrieveBase (

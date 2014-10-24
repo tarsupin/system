@@ -11,49 +11,19 @@ This plugin provides quick and easy debugging tools. If you LOG the result
 ------ Using the Debug Tools ------
 -----------------------------------
 
-The Debug::log($value) method will log whatever value you provide it. If VERBOSE mode is set, you will see the information displayed in the browser screen. If LOG mode is set, it will be logged into the database.
+The Debug::log($value) method will log whatever value you provide it. If Debug::$verbose is TRUE, you will see the information displayed in the browser screen. If Debug::$log is TRUE, it will be logged into the database.
 
 Using this plugin can allow you to track down unpleasant bugs, or to observe where other users are getting stuck by logging the results.
 
 To send debugging information to a file, you can use Debug::file($value), which will save it to the application's base directory.
 
 
------------------------------
------- Debugging Modes ------
------------------------------
-
-There are multiple debugging modes that can affect how you receive debugging information. These are often set per environment, such as in the config.php file of the application you're debugging. For production sites, debugging should only include silent logging - never verbose debugging, which displays directly to the user's browser.
-
-To set the debug mode, call the ::setMode() method, with the arguments including whichever modes you want to set:
-
-	Debug::setMode(Debug::MODE_VERBOSE, Debug::CLEARANCE_STAFF);
-
-The list of modes include:
-	
-	Debug::MODE_OFF			// Suppresses everything unless you output it manually [default mode]
-	Debug::MODE_VERBOSE		// Shows debug information directly in the browser
-	Debug::MODE_LOG			// Logs debugging data in your application; auto-prunes old logs
-	
-	Debug::CLEARANCE_ADMIN	// Only processes debugging information for admins [default setting]
-	Debug::CLEARANCE_STAFF	// Only processes debugging information for staff
-	Debug::CLEARANCE_ALL	// Processes debugging information for everyone
-
-It is important to know that you can run VERBOSE and LOG simultaneously, such as:
-
-	Debug::setMode(Debug::MODE_VERBOSE, Debug::MODE_LOG, Debug::CLEARANCE_ADMIN);
-
 -------------------------------
 ------ Methods Available ------
 -------------------------------
 
-// Set the debugging mode
-Debug::setMode(...);
-
 // Dump a debug value
 Debug::dump($debugValue);
-
-// Log a debug value
-$valueLogged = Debug::log($valueToDebug);
 
 // Run the debugger (automatically runs in VERBOSE mode)
 Debug::run();								// Display the debugging information in the browser.
@@ -71,61 +41,7 @@ abstract class Debug {
 	public static $adminDisplay = false;
 	public static $verbose = false;
 	public static $log = false;
-	public static $minClearance = 8;
-	
-	const MODE_OFF = 0;			// Suppresses everything unless you output it manually [default mode]
-	const MODE_VERBOSE = 1;		// Shows debug information in the browser
-	const MODE_LOG = 2;			// Logs debugging data in your application; auto-prunes old logs
-	
-	const CLEARANCE_ADMIN = 3;	// Only processes debugging information for admins [default setting]
-	const CLEARANCE_STAFF = 4;	// Only processes debugging information for staff
-	const CLEARANCE_ALL = 5;	// Processes debugging information for everyone
-	
-	
-/****** Returns the last error generated ******/
-	public static function setMode
-	(
-		// <args>		// (integers) The mode level to set (e.g. Debug::MODE_OFF, Debug::MODE_LOG_DATA, etc.)
-	): void					// RETURNS <void>
-	
-	// Debug::setMode(Debug::MODE_VERBOSE, Debug::MODE_LOG, Debug::CLEARANCE_ALL);
-	{
-		$args = func_get_args();
-		
-		foreach($args as $arg)
-		{
-			switch($arg)
-			{
-				case self::MODE_OFF:
-					self::$verbose = false;
-					self::$log = false;
-					break;
-				
-				case self::MODE_VERBOSE;
-					self::$verbose = true;
-					break;
-				
-				case self::MODE_LOG;
-					self::$log = true;
-					break;
-				
-				case self::CLEARANCE_ADMIN;
-					self::$minClearance = 8;
-					break;
-				
-				case self::CLEARANCE_STAFF;
-					self::$minClearance = 5;
-					break;
-				
-				case self::CLEARANCE_ALL;
-					self::$minClearance = -10;
-					break;
-			}
-		}
-		
-		// Reject verbose debugging you're on a production environment with low clearance levels
-		if(ENVIRONMENT == "production" and self::$minClearance < 5) { self::$verbose = false; }
-	}
+	public static $minClearance = 6;
 	
 	
 /****** Dump a value for debugging purposes ******/

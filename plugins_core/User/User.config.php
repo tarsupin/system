@@ -38,9 +38,6 @@ class User_config {
 			`date_joined`			int(10)			unsigned	NOT NULL	DEFAULT '0',
 			`date_lastLogin`		int(10)			unsigned	NOT NULL	DEFAULT '0',
 			
-			`has_instructions`		tinyint(1)					NOT NULL	DEFAULT '0',
-			`has_notifications`		tinyint(1)		unsigned	NOT NULL	DEFAULT '0',
-			
 			`auth_token`			varchar(22)					NOT NULL	DEFAULT '',
 			
 			UNIQUE (`uni_id`)

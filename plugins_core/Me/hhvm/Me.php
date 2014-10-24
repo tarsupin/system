@@ -19,6 +19,7 @@ The Me:: plugin is called on the index.php file in every site using the Me::init
 	Me::$device			// Value of the device (1 = mobile, 2 = tablet, 3 = desktop).
 	Me::$vals[]			// Contains an array of the user's data.
 	Me::$loggedIn		// TRUE if the user is logged in, FALSE if not. (Could alternatively use Me::$id)
+	Me::$slg			// Set to "" or "?slg=X" if logged in. Added to links to allow soft logins.
 	
 	
 ---------------------------------------
@@ -108,23 +109,8 @@ abstract class Me {
 	
 	// if(Me::initialize()) { Me::runBehavior($url); }
 	{
-		// Handle Banned Accounts
-		if(Me::$clearance <= -3)
-		{
-			if($url[0] != "user-panel" or $url[1] != "banned")
-			{
-				header("Location: /banned"); exit;
-			}
-		}
-		
-		// Set the user's soft login variable
-		Me::$slg = "?slg=" . Me::$id;
-		
-		// Check if there are any further instructions to follow
-		if(Me::$vals['has_instructions'] != 1) { return; }
-		
-		// Run User Instructions
-		UserInstruct::runInstructions(Me::$id);
+		echo "Empty shell - remove Me::runBehavior()<br />";
+		return;
 	}
 	
 	
@@ -245,17 +231,29 @@ abstract class Me {
 		}
 		else
 		{
-			self::$vals = Database::selectOne("SELECT uni_id, role, clearance, handle, display_name, has_instructions, has_notifications FROM users WHERE uni_id=? LIMIT 1", array($uniID));
+			self::$vals = Database::selectOne("SELECT uni_id, role, clearance, handle, display_name FROM users WHERE uni_id=? LIMIT 1", array($uniID));
 		}
 		
 		// Set your device value (1 = mobile, 2 = tablet, 3 = device)
 		if(!isset($_SESSION[SITE_HANDLE]['device']))
 		{
-			$device = new Device();
+			$device = new DetectDevice();
 			
-			$_SESSION[SITE_HANDLE]['device'] = (int) ($device->isMobilePhone ? 1 : self::$device);
+			if($device->isMobile())
+			{
+				$_SESSION[SITE_HANDLE]['device'] = 1;
+			}
+			else if($device->isTablet())
+			{
+				$_SESSION[SITE_HANDLE]['device'] = 2;
+			}
+			else
+			{
+				$_SESSION[SITE_HANDLE]['device'] = 3;
+			}
 		}
 		
+		// Prepare the Device
 		self::$device = (int) $_SESSION[SITE_HANDLE]['device'];
 		
 		// Make sure the user exists
@@ -264,13 +262,16 @@ abstract class Me {
 			// Set your session ID, which corresponds to your database user ID
 			self::$id = (int) self::$vals['uni_id'];
 			
+			// Set the user's soft login variable
+			self::$slg = "?slg=" . self::$id;
+			
 			// Save your Clearance Level
 			self::$clearance = (int) self::$vals['clearance'];
 			
-			// Recognize Integers
-			if(isset(self::$vals['auth_id']))
+			// Handle Banned Accounts
+			if(self::$clearance <= -3)
 			{
-				self::$vals['auth_id'] = (int) self::$vals['auth_id'];
+				header("Location: /banned"); exit;
 			}
 			
 			return true;

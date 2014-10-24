@@ -27,14 +27,30 @@ echo '
 <!-- Standard Footer -->
 <div class="spacer-giant"></div>
 <div id="footer">
-	<div style="padding-top:8px;">
-		<a href="' . $uniCom . '/contact' . Me::$slg . '">Contact</a> | <a href="' . $uniCom . '/faqs' . Me::$slg . '">FAQs</a> | <a href="' . $uniCom . '/privacy' . Me::$slg . '">Privacy</a> | <a href="' . $uniCom . '/user-panel/reports' . Me::$slg . '">Report</a> | <a href="' . $uniCom . '/acknowledgements' . Me::$slg . '">Thanks</a> | <a href="' . $uniCom . '/tos' . Me::$slg . '">TOS</a>
+	<a href="' . $uniCom . '/contact' . Me::$slg . '">Contact</a> | <a href="' . $uniCom . '/faqs' . Me::$slg . '">FAQs</a> | <a href="' . $uniCom . '/privacy' . Me::$slg . '">Privacy</a> | <a href="' . $uniCom . '/user-panel/reports' . Me::$slg . '">Report</a> | <a href="' . $uniCom . '/acknowledgements' . Me::$slg . '">Thanks</a> | <a href="' . $uniCom . '/tos' . Me::$slg . '">TOS</a>
+	<div id="footer-side-bar">
+		<div class="ftbutton">
+			<a id="notif-button" href="javascript:toggleNotifications();" style="color:#c0c0c0;"><span id="notif-count"></span> <span class="icon-circle-exclaim" style="font-size:22px; vertical-align:-10%;"></span></a>
+		</div>
 	</div>
 </div>
 
-</div> <!-- End "container" -->
+<div id="footer-panel">
+	<div id="notif-box" class="footer-display"></div>
+</div>
 
-' . Metadata::footer() . '
+</div> <!-- End "container" -->';
+
+// Prepare JSEncrypt value
+if(Me::$loggedIn)
+{
+	$jsEncrypt = Security::jsEncrypt(Me::$vals['handle']);
+	
+	echo '
+	<script>var JSUser = "' . Me::$vals['handle'] . '"; var JSEncrypt = "' . $jsEncrypt . '";</script>';
+}
+
+echo Metadata::footer() . '
 <script src="' . CDN . '/scripts/ajax.js" async></script>
 <script src="' . CDN . '/scripts/unifaction.js" async></script>
 

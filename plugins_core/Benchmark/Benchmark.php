@@ -46,7 +46,7 @@ If you require more advanced benchmarking options, there are other features you 
 
 The Benchmark::get() method has a return value equal to the duration since the last Benchmark::get(). This would allow you to have custom benchmarking tracking if you like.
 
-If the Benchmark table is installed (generally is during installation), the benchmarks you run can automatically be added to the database (if MODE_LOG is set). This will allow you to track many more results across more pages and in different scenarios.
+If the Benchmark table is installed (generally is during installation), the benchmarks you run can automatically be added to the database (if Benchmark::$log is TRUE). This will allow you to track many more results across more pages and in different scenarios.
 
 The Benchmark::get() method accepts additional parameters for naming the benchmark and tracking modifiers that apply to it. This is very useful when combined with the benchmark database, since it allows you to identify categories of benchmarks, or indicate what values were passed.
 
@@ -55,25 +55,6 @@ For example, if you're running benchmarks on a profile page on a live server, yo
 	Benchmark::get("profile-page", "page-visited: " . $userProfile, "visitor: " . $userVisiting);
 	
 This would allow you to sort the results of your benchmarking tests, even filtering them by which user profiles were being visited.
-
-
------------------------------
------- Benchmark Modes ------
------------------------------
-
-You can set the Benchmark Modes with the ::setMode() method. For example:
-
-	Benchmark::setMode(Benchmark::MODE_VERBOSE, Benchmark::CLEARANCE_ADMIN);
-
-Modes available:
-
-	MODE_OFF			// Don't show or log benchmarks [default mode]
-	MODE_VERBOSE		// Show benchmark results in the browser.
-	MODE_LOG			// Logs benchmarks into the database.
-	
-	CLEARANCE_ADMIN		// Only processes debugging information for admins [default setting]
-	CLEARANCE_STAFF		// Only processes debugging information for staff
-	CLEARANCE_ALL		// Allows debugging information to be tracked on everyone
 
 
 -------------------------------
@@ -110,58 +91,6 @@ abstract class Benchmark {
 	private static $verbose = false;
 	private static $log = false;
 	private static $clearance = 8;
-	
-	const MODE_OFF = 0;			// Don't show or log benchmarks [default mode]
-	const MODE_VERBOSE = 1;		// Show benchmark results in the browser.
-	const MODE_LOG = 2;			// Logs benchmarks into the database.
-	
-	const CLEARANCE_ADMIN = 3;	// Only processes debugging information for admins [default setting]
-	const CLEARANCE_STAFF = 4;	// Only processes debugging information for staff
-	const CLEARANCE_ALL = 5;	// Allows debugging information to be tracked on everyone
-	
-	
-/****** Set the Benchmark Mode ******/
-	public static function setMode
-	(
-		// (args)		// (integers) The modes to set (e.g. Benchmark::MODE_VERBOSE, Benchmark::MODE_LOG, etc.)
-	)					// RETURNS <void>
-	
-	// Benchmark::setMode(Benchmark::MODE_VERBOSE, Benchmark::CLEARANCE_ADMIN);
-	// Benchmark::setMode(Benchmark::MODE_LOG, Benchmark::CLEARANCE_ALL);
-	{
-		$args = func_get_args();
-		
-		foreach($args as $arg)
-		{
-			switch($arg)
-			{
-				case self::MODE_OFF:
-					self::$verbose = false;
-					self::$log = false;
-					break;
-				
-				case self::MODE_VERBOSE;
-					self::$verbose = 1;
-					break;
-				
-				case self::MODE_LOG;
-					self::$log = 1;
-					break;
-				
-				case self::CLEARANCE_ADMIN;
-					self::$clearance = 8;
-					break;
-				
-				case self::CLEARANCE_STAFF;
-					self::$clearance = 5;
-					break;
-				
-				case self::CLEARANCE_ALL;
-					self::$clearance = -10;
-					break;
-			}
-		}
-	}
 	
 	
 /****** Retrieve Duration Since Last Benchmark ******/

@@ -278,6 +278,19 @@ abstract class Security {
 	}
 	
 	
+/****** Prepare a JSEncrypt Value ******/
+	public static function jsEncrypt
+	(
+		string $key		// <str> The key for this encryption.
+	,	string $salt = ""	// <str> The salt for this encryption.
+	): string				// RETURNS <str> The resulting encrypted data.
+	
+	// $jsEncrypt = Encrypt::jsEncrypt($key, [$salt]);
+	{
+		return Security::hash(md5($key . $salt. date("yz")) . ":myJSEncryption:cross_site_functionality", 20, 62);
+	}
+	
+	
 /****** Secure Random Integer ******/
 	public static function randInt
 	(

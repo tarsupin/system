@@ -158,7 +158,7 @@ abstract class Comment {
 				
 				if($recipientID and $recipientID != $uniID)
 				{
-					Notifications::create($recipientID, "User Notified Me", $comment, $sourceURL, $uniID, true);
+					Notifications::create($recipientID, $sourceURL, $comment);
 				}
 			}
 		}

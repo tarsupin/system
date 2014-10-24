@@ -192,7 +192,7 @@ class DetectDevice {
      *
      * @var array
      */
-    protected static $tabletDevices = array(
+    protected static array <str, str> $tabletDevices = array(			// <str:str>
         'iPad'              => 'iPad|iPad.*Mobile', // @todo: check for mobile friendly emails topic.
         'NexusTablet'       => 'Android.*Nexus[\s]+(7|10)|^.*Android.*Nexus(?:(?!Mobile).)*$',
         'SamsungTablet'     => 'SAMSUNG.*Tablet|Galaxy.*Tab|SC-01C|GT-P1000|GT-P1003|GT-P1010|GT-P3105|GT-P6210|GT-P6800|GT-P6810|GT-P7100|GT-P7300|GT-P7310|GT-P7500|GT-P7510|SCH-I800|SCH-I815|SCH-I905|SGH-I957|SGH-I987|SGH-T849|SGH-T859|SGH-T869|SPH-P100|GT-P3100|GT-P3108|GT-P3110|GT-P5100|GT-P5110|GT-P6200|GT-P7320|GT-P7511|GT-N8000|GT-P8510|SGH-I497|SPH-P500|SGH-T779|SCH-I705|SCH-I915|GT-N8013|GT-P3113|GT-P5113|GT-P8110|GT-N8010|GT-N8005|GT-N8020|GT-P1013|GT-P6201|GT-P7501|GT-N5100|GT-N5105|GT-N5110|SHV-E140K|SHV-E140L|SHV-E140S|SHV-E150S|SHV-E230K|SHV-E230L|SHV-E230S|SHW-M180K|SHW-M180L|SHW-M180S|SHW-M180W|SHW-M300W|SHW-M305W|SHW-M380K|SHW-M380S|SHW-M380W|SHW-M430W|SHW-M480K|SHW-M480S|SHW-M480W|SHW-M485W|SHW-M486W|SHW-M500W|GT-I9228|SCH-P739|SCH-I925|GT-I9200|GT-I9205|GT-P5200|GT-P5210|GT-P5210X|SM-T311|SM-T310|SM-T310X|SM-T210|SM-T210R|SM-T211|SM-P600|SM-P601|SM-P605|SM-P900|SM-P901|SM-T217|SM-T217A|SM-T217S|SM-P6000|SM-T3100|SGH-I467|XE500|SM-T110|GT-P5220|GT-I9200X|GT-N5110X|GT-N5120|SM-P905|SM-T111|SM-T2105|SM-T315|SM-T320|SM-T320X|SM-T321|SM-T520|SM-T525|SM-T530NU|SM-T230NU|SM-T330NU|SM-T900|XE500T1C|SM-P605V|SM-P905V|SM-P600X|SM-P900X|SM-T210X|SM-T230|SM-T230X|SM-T325|GT-P7503|SM-T531|SM-T330|SM-T530|SM-T705C|SM-T535|SM-T331|SM-T800|SM-T700', // SCH-P709|SCH-P729|SM-T2558 - Samsung Mega - treat them like a regular phone.
@@ -414,7 +414,7 @@ class DetectDevice {
      *
      * @var array
      */
-    protected static $operatingSystems = array(
+    protected static array <str, str> $operatingSystems = array(		// <str:str>
         'AndroidOS'         => 'Android',
         'BlackBerryOS'      => 'blackberry|\bBB10\b|rim tablet os',
         'PalmOS'            => 'PalmOS|avantgo|blazer|elaine|hiptop|palm|plucker|xiino',
@@ -444,7 +444,7 @@ class DetectDevice {
      *
      * @var array
      */
-    protected static $browsers = array(
+    protected static array <str, str> $browsers = array(			// <str:str>
         // @reference: https://developers.google.com/chrome/mobile/docs/user-agent
         'Chrome'          => '\bCrMo\b|CriOS|Android.*Chrome/[.0-9]* (Mobile)?',
         'Dolfin'          => '\bDolfin\b',
@@ -483,7 +483,7 @@ class DetectDevice {
      *
      * @var array
      */
-    protected static $utilities = array(
+    protected static array <str, str> $utilities = array(		// <str:str>
         // Experimental. When a mobile device wants to switch to 'Desktop Mode'.
         // @ref: http://scottcate.com/technology/windows-phone-8-ie10-desktop-or-mobile/
         // @ref: https://github.com/serbanghita/Mobile-Detect/issues/57#issuecomment-15024011
@@ -523,7 +523,7 @@ class DetectDevice {
      *
      * @var array
      */
-    protected static $properties = array(
+    protected static array <str, mixed> $properties = array(		// <str:mixed>
 
         // Build
         'Mobile'        => 'Mobile/[VER]',

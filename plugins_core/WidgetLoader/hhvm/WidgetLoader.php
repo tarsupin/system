@@ -115,6 +115,33 @@ abstract class WidgetLoader {
 	public static array <str, array<int, array>> $slots = array();		// <str:[int:array]> Stores widget data in a designated container.
 	
 	
+/****** Install the widget loader table ******/
+	public function installLoader (
+	)			// <bool> RETURNS TRUE on success, FALSE on failure.
+	
+	// WidgetLoader::installLoader();
+	{
+		/*
+			This table does not get edited primarily by this loader, but rather by the other widgets that make use of
+			it. Widgets will provide instructions (and editing) with their own configurations.
+		*/
+		Database::exec("
+		CREATE TABLE IF NOT EXISTS `widget_loader`
+		(
+			`container`				varchar(22)					NOT NULL	DEFAULT '',
+			`widget`				varchar(22)					NOT NULL	DEFAULT '',
+			`sort_order`			tinyint(2)		unsigned	NOT NULL	DEFAULT '99',
+			
+			`instructions`			text						NOT NULL	DEFAULT '',
+			
+			UNIQUE (`container`, `widget`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		");
+		
+		return true;
+	}
+	
+	
 /****** Load widgets from the database ******/
 	public static function loadWidgetsFromDatabase
 	(
