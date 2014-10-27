@@ -30,13 +30,15 @@ echo '
 	<a href="' . $uniCom . '/contact' . Me::$slg . '">Contact</a> | <a href="' . $uniCom . '/faqs' . Me::$slg . '">FAQs</a> | <a href="' . $uniCom . '/privacy' . Me::$slg . '">Privacy</a> | <a href="' . $uniCom . '/user-panel/reports' . Me::$slg . '">Report</a> | <a href="' . $uniCom . '/acknowledgements' . Me::$slg . '">Thanks</a> | <a href="' . $uniCom . '/tos' . Me::$slg . '">TOS</a>
 	<div id="footer-side-bar">
 		<div class="ftbutton">
-			<a id="notif-button" href="javascript:toggleNotifications();" style="color:#c0c0c0;"><span id="notif-count"></span> <span class="icon-circle-exclaim" style="font-size:22px; vertical-align:-10%;"></span></a>
+			<a id="friend-button" href="javascript:toggleFriends();" style="color:#c0c0c0;"><span id="friend-count">0</span> <span class="icon-group" style="font-size:22px; vertical-align:-10%;"></span></a>
+			<a id="notif-button" href="javascript:toggleNotifications();" style="color:#c0c0c0;"><span id="notif-count">0</span> <span class="icon-circle-exclaim" style="font-size:22px; vertical-align:-10%;"></span></a>
 		</div>
 	</div>
 </div>
 
 <div id="footer-panel">
 	<div id="notif-box" class="footer-display"></div>
+	<div id="friend-box" class="footer-display"></div>
 </div>
 
 </div> <!-- End "container" -->';
@@ -45,9 +47,10 @@ echo '
 if(Me::$loggedIn)
 {
 	$jsEncrypt = Security::jsEncrypt(Me::$vals['handle']);
+	$jsUser = Me::$vals['handle'];
 	
 	echo '
-	<script>var JSUser = "' . Me::$vals['handle'] . '"; var JSEncrypt = "' . $jsEncrypt . '";</script>';
+	<script>var JSUser = "' . $jsUser . '"; var JSEncrypt = "' . $jsEncrypt . '"; var JSChatTime = ' . microtime(true) . '; var JSProfilePic = "' . ProfilePic::image(Me::$id, "small") . '";</script>';
 }
 
 echo Metadata::footer() . '

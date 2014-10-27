@@ -34,7 +34,7 @@ abstract class Notifications {
 	// $notifications = Notifications::get($uniID, [$page], [$returnNum]);
 	{
 		// Prepare the Packet
-		$packet = array("uni_id" => 1);
+		$packet = array("uni_id" => $uniID);
 		
 		if($page != 1) { $packet['page'] = $page; }
 		if($returnNum != 5) { $packet['return_num'] = $returnNum; }
@@ -44,7 +44,7 @@ abstract class Notifications {
 	}
 	
 	
-/****** Create a Standard Notification ******/
+/****** Create a standard notification ******/
 	public static function create
 	(
 		int $uniID				// <int> The UniID to create a notification for.
@@ -54,8 +54,26 @@ abstract class Notifications {
 	
 	// Notifications::create($uniID, $url, $message);
 	{
-		// Prepare the Packet with list of notifications
+		// Prepare the Packet details on the notification
 		$packet = array("uni_id" => $uniID, "url" => $url, "message" => $message);
+		
+		// Run the API
+		return Connect::to("sync_notifications", "AddNotificationAPI", $packet);
+	}
+	
+	
+/****** Create multiple notifications ******/
+	public static function createMultiple
+	(
+		array <int, int> $uniIDList			// <int:int> The list of UniID's to create the notification for.
+	,	string $url = ""			// <str> The url that you can follow (if you click the notification).
+	,	string $message			// <str> The message (what the notification says); 150 characters.
+	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
+	
+	// Notifications::createMultiple($uniIDList, $url, $message);
+	{
+		// Prepare the Packet with list of notifications
+		$packet = array("uni_id_list" => $uniIDList, "url" => $url, "message" => $message);
 		
 		// Run the API
 		return Connect::to("sync_notifications", "AddNotificationAPI", $packet);
