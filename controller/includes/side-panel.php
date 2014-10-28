@@ -1,15 +1,20 @@
 <?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); }
 
-// Draw the Side Panel
+// Load the widgets contained in the "UniFactionMenu" container, if applicable
+$widgetList = WidgetLoader::get("UniFactionMenu");
+
+foreach($widgetList as $widgetContent)
+{
+	echo $widgetContent;
+}
+
+// Draw the Left Panel
 echo '
 <!-- Side Panel -->
 <div id="panel">';
 
-// Load the Core Navigation Panel
-require(SYS_PATH . "/controller/includes/core_panel_" . ENVIRONMENT . ".php");
-
 echo '
-<div id="panel-nav">';
+<div id="panel-left">';
 
 // Load the widgets contained in the "SidePanel" container
 $widgetList = WidgetLoader::get("SidePanel");

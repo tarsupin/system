@@ -9,7 +9,7 @@ echo '
 require(SYS_PATH . "/controller/includes/core_panel_" . ENVIRONMENT . ".php");
 
 echo '
-<div id="panel-nav">';
+<div id="panel-left">';
 
 // Load the widgets contained in the "SidePanel" container
 $widgetList = WidgetLoader::get("SidePanel");

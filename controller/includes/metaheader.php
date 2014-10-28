@@ -13,7 +13,7 @@ echo '
 	<link rel="canonical" href="' . (isset($config['canonical']) ? $config['canonical'] : '/' . $url_relative) . '" />
 	
 	<!-- Primary Stylesheet -->
-	<link rel="stylesheet" href="' . CDN . '/css/unifaction-3col.css" />
+	<link rel="stylesheet" href="' . CDN . '/css/unifaction-base.css" />
 	<link rel="stylesheet" href="/assets/css/style.css" />
 	<link rel="stylesheet" href="/assets/css/icomoon.css" />
 	

@@ -38,6 +38,9 @@ echo '
 				echo '
 				<li id="nav-user"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(Me::$id, "small") . '" /></a>
 					<ul style="line-height:22px; min-width:150px;">
+						<li><a href="' . URL::unifaction_com() . '/multi-accounts' . Me::$slg . '">Change User</a></li>
+						<li><a href="' . URL::profilepic_unifaction_com() . '/' . Me::$slg . '">Update Image</a></li>
+						<li><a href="' . URL::unifaction_com() . '/user-panel' . Me::$slg . '">Settings</a></li>
 						<li><a href="/logout">Log Out</a></li>
 					</ul>
 				</li>';
@@ -50,6 +53,7 @@ echo '
 				<li id="nav-user"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(0, "small") . '" /></a>
 					<ul style="line-height:22px; min-width:150px;">
 						<li><a href="/login">Log In</a></li>
+						<li><a href="' . URL::unifaction_com() . '/register">Sign Up</a></li>
 					</ul>
 				</li>';
 			}
@@ -59,6 +63,10 @@ echo '
 		</nav>
 	</div>
 </div>
-<div class="spacer-giant"></div>
+<div class="spacer-giant"></div>';
 
+// Load the Core Navigation Panel
+require(SYS_PATH . "/controller/includes/core_panel_" . ENVIRONMENT . ".php");
+
+echo '
 <div id="content-wrap"><div id="viewport-wrap">';

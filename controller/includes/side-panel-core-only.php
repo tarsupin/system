@@ -9,7 +9,7 @@ echo '
 require(SYS_PATH . "/controller/includes/core_panel_" . ENVIRONMENT . ".php");
 
 echo '
-<div id="panel-nav" style="display:none;"></div>
+<div id="panel-left" style="display:none;"></div>
 </div>';
 
 // Allow the content to stretch over where the side navigation bar would be
