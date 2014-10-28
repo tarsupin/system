@@ -13,7 +13,7 @@ if(Form::submitted("install-connect-handle"))
 	if(FormValidate::pass())
 	{
 		// Make sure the handle is registered
-		if($response = Connect::call(URL::auth_unifaction_com() . "/api/UserRegistered", $_POST['handle']))
+		if($response = Connect::call(URL::unifaction_com() . "/api/UserRegistered", $_POST['handle']))
 		{
 			Cookie::set("admin-handle", $_POST['handle'], "", 3);
 			

@@ -13,9 +13,9 @@ if(!$ownerHandle = Cookie::get("admin-handle", ""))
 $_POST['unifaction-api-key'] = (isset($_POST['unifaction-api-key']) ? Sanitize::text($_POST['unifaction-api-key']) : "");
 
 // If we are connected to UniFaction, we can go to the next page
-if($siteData = Network::get("auth"))
+if($siteData = Network::get("unifaction"))
 {
-	if($response = Connect::to("auth", "IsSiteConnected"))
+	if($response = Connect::to("unifaction", "IsSiteConnected"))
 	{
 		Alert::saveSuccess("Connected", "You are connected to UniFaction!");
 		header("Location: /install/app-custom"); exit;
@@ -26,13 +26,13 @@ if($siteData = Network::get("auth"))
 if(Form::submitted("install-connect-auth"))
 {
 	// Create the necessary network_data value
-	$key = Network::setData("auth", "Auth", URL::auth_unifaction_com(), $_POST['unifaction-api-key'], true);
+	$key = Network::setData("unifaction", "UniFaction", URL::unifaction_com(), $_POST['unifaction-api-key'], true);
 	
 	// Set the appropriate clearance level for the auth server
-	Network::setClearance("auth", 9);
+	Network::setClearance("unifaction", 9);
 	
 	// Check if we are now connected to Auth
-	$response = Connect::to("auth", "IsSiteConnected");
+	$response = Connect::to("unifaction", "IsSiteConnected");
 	
 	// "/api/private", array("run" => "validate-site"), $siteData['site_key']);
 	

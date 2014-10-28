@@ -65,7 +65,7 @@ if(Form::submitted("install-app-config"))
 		
 		// Call UniFaction's API to register a site with the system
 		// If the site fails to register, it will provide an alert explaining why
-		$response = Connect::call(URL::auth_unifaction_com() . "/api/RegisterSiteHandle", $packet);
+		$response = Connect::call(URL::unifaction_com() . "/api/RegisterSiteHandle", $packet);
 		
 		if($response)
 		{

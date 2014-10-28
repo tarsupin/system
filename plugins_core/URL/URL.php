@@ -33,7 +33,7 @@ Here's a list of examples how the URL plugin will interpret the dynamic values:
 		Live:	sports.microfaction.com
 	
 	// URL's that end in "unifaction.com"
-	URL::auth_unifaction_com()
+	URL::unifaction_com()
 	
 		Local:	auth.test
 		Dev:	auth.phptesla.com
@@ -74,7 +74,7 @@ abstract class URL {
 		if(ENVIRONMENT == "production")
 		{
 			// Temporary Measure
-			$name = str_replace("auth_unifaction_com", "auth_unifaction_cool", $name);
+			$name = str_replace("unifaction_com", "unifaction_cool", $name);
 			if($name == "unifaction_com") { $name = "unifaction_cool"; }
 			
 			return "http://" . str_replace("_", ".", $name);

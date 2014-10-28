@@ -51,7 +51,7 @@ class AuthCommand extends API {
 /****** API Variables ******/
 	public bool $isPrivate = true;			// <bool> TRUE if this API is private (requires an API Key), FALSE if not.
 	public string $encryptType = "";			// <str> The encryption algorithm to use for response, or "" for no encryption.
-	public array <int, str> $allowedSites = array("auth", "unifaction");		// <int:str> the sites to allow the API to connect with. Default is all sites.
+	public array <int, str> $allowedSites = array("unifaction");		// <int:str> the sites to allow the API to connect with. Default is all sites.
 	public int $microCredits = 50000;		// <int> The cost in microcredits (1/10000 of a credit) to access this API.
 	public int $minClearance = 8;			// <int> The minimum clearance level required to use this API.
 	

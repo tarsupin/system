@@ -18,7 +18,7 @@ if(Me::$clearance < 9)
 // Run Header
 require(SYS_PATH . "/controller/includes/admin_header.php");
 
-if(SITE_HANDLE == "auth")
+if(SITE_HANDLE == "unifaction")
 {
 	echo '
 	<a href="/admin/scripts/run-universe">Run Universal Script</a> (activates all sites on the entire universe system)<br />';

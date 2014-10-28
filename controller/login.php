@@ -4,7 +4,7 @@
 ------ About the UniFaction Login Script ------
 -----------------------------------------------
 
-If the user is already logged into UniFaction Auth's server, then this page will automatically log them in to the current site.
+If the user is already logged into UniFaction Auth server, then this page will automatically log them in to the current site.
 
 Otherwise, the user will be redirected to UniFaction's "Auth" login page and instructed to log in. When they log in, they will be sent back to your site and logged in automatically.
 

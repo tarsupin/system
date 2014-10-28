@@ -101,19 +101,6 @@ abstract class Me {
 	}
 	
 	
-/****** Run Behaviors on Active User ******/
-	public static function runBehavior
-	(
-		array <int, str> $url	// <int:str> The URL data that was recorded by the page.
-	): void			// RETURNS <void> REDIRECT when instruction requires redirect.
-	
-	// if(Me::initialize()) { Me::runBehavior($url); }
-	{
-		echo "Empty shell - remove Me::runBehavior()<br />";
-		return;
-	}
-	
-	
 /****** Run a soft login (try to login without disrupting the user) ******/
 	public static function softLog
 	(
@@ -231,7 +218,7 @@ abstract class Me {
 		}
 		else
 		{
-			self::$vals = Database::selectOne("SELECT uni_id, role, clearance, handle, display_name FROM users WHERE uni_id=? LIMIT 1", array($uniID));
+			self::$vals = Database::selectOne("SELECT uni_id, role, clearance, handle, display_name, date_joined FROM users WHERE uni_id=? LIMIT 1", array($uniID));
 		}
 		
 		// Set your device value (1 = mobile, 2 = tablet, 3 = device)

@@ -66,8 +66,8 @@ This will essentially add a list of drop-down options to a search bar.
 ----------------------------------------------------
 
 	// Create some search entries
-	$results = Search::addSearchEntry("update my password", "", URL::auth_unifaction_com() . "/user-panel");
-	$results = Search::addSearchEntry("password security tips", "passwords optimize secure improve strong", URL::auth_unifaction_com() . "/user-panel");
+	$results = Search::addSearchEntry("update my password", "", URL::unifaction_com() . "/user-panel");
+	$results = Search::addSearchEntry("password security tips", "passwords optimize secure improve strong", URL::unifaction_com() . "/user-panel");
 	
 	$test = new Search("How do I create a good password");
 	var_dump($test);

@@ -33,7 +33,7 @@ abstract class UniFaction {
 	// $loginResponse = UniFaction::login(SITE_URL . "/login", [$logMode], [$logAct], [$chosenID]);
 	{
 		// Get the site data
-		if(!$siteData = Network::get("auth"))
+		if(!$siteData = Network::get("unifaction"))
 		{
 			return array();
 		}

@@ -38,9 +38,9 @@ For example, here is a simple working example of the "PingPong" API Plugin:
 	
 And to call the "PingPong" API Plugin:
 	
-	// Call the "PingPong" API plugin on "auth"
+	// Call the "PingPong" API plugin on "unifaction"
 	Connect::$isPrivate = false; // because this is a public API
-	$response = Connect::to("auth", "PingPong", "ping");
+	$response = Connect::to("unifaction", "PingPong", "ping");
 	
 	
 The PingPong API will wait for you to send it data. If you respond "pong!" if you send it "ping" - otherwise, it will respond "You didn't ping.".

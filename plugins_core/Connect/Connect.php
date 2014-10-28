@@ -20,13 +20,13 @@ There are two ways to call APIs: a private API, and a public API. If you connect
 	
 For example, your API may look like this:
 	
-	// Check if you have a connection established with "auth" (the Authentication site)
-	$response = Connect::to("auth", "IsSiteConnected", "hello!");
+	// Check if you have a connection established with "unifaction" (the Authentication site)
+	$response = Connect::to("unifaction", "IsSiteConnected", "hello!");
 	
 	
 The parameters do the following:
 
-	$siteHandle		// The handle of the site you're trying to call (such as "auth", "social", "fastchat", etc.)
+	$siteHandle		// The handle of the site you're trying to call (such as "unifaction", "social", "fastchat", etc.)
 	$apiName		// The name of the API that you're connecting to
 	$dataToSend		// The variable (array, string, integer, etc) that you're passing to the API
 	
@@ -42,7 +42,7 @@ The API will provide a response, such as to indicate true or return the values y
 Calling public APIs requires the use of the Connect::call() method. You must enter the full URL path to the public API. For example:
 	
 	$packet = "ping";
-	$response = Connect::call(URL::auth_unifaction_com() . "/api/PingPong", $packet);
+	$response = Connect::call(URL::unifaction_com() . "/api/PingPong", $packet);
 	
 You will have to know the URL public API, but the standard convention is to use the /api segment followed by the name of the API you are attempting to call.
 	

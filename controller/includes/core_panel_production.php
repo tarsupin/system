@@ -4,7 +4,6 @@ echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 <div id="panel-core">
 	<div id="core-nav">
 		<ul id="core-list">
-			<li class="core-link is-auth"><a href="http://auth.unifaction.cool"><span class="icon-home core-icon"></span><span class="core-txt">Dashboard</span></a></li>
 			
 			<!-- My Uni -->
 			
@@ -23,7 +22,6 @@ echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 </div>');
 
 /*
-	//<li class="core-link is-feed"><a href="http://feed.unifaction.me/' . Me::$slg . '"><span class="icon-document core-icon"></span><span class="core-txt">My Feed</span></a></li>
 	//<li class="core-link is-my_uni"><a href="http://unifaction.me/' . Me::$slg . '"><span class="icon-star core-icon"></span><span class="core-txt">My Uni</span></a></li>
 	//<li class="core-link is-avatar"><a href="http://avatar.unifaction.com/' . Me::$slg . '"><span class="icon-user core-icon"></span><span class="core-txt">Avatar</span></a></li>
 	//<li class="core-link"><a href="http://unifaction.com/games' . Me::$slg . '"><span class="icon-gamepad core-icon"></span><span class="core-txt">Games</span></a></li>

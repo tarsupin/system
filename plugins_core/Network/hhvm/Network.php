@@ -58,7 +58,7 @@ abstract class Network {
 		
 		// If the site wasn't found locally, connect to Auth so that we can retrieve the public information
 		// If we don't have a connection to Auth setup, this step will fail
-		if(!$siteData = Connect::to("auth", "GetSiteInfo", $siteHandle))
+		if(!$siteData = Connect::to("unifaction", "GetSiteInfo", $siteHandle))
 		{
 			return array();
 		}
@@ -112,7 +112,11 @@ abstract class Network {
 		);
 		
 		// Call the API
-		$siteData = self::get("auth");
+		if(!$siteData = self::get("unifaction"))
+		{
+			return false;
+		}
+		
 		$response = Connect::call($siteData['site_url'] . "/api/NetworkSync", $packet, $siteData['site_key']);
 		
 		return $response ? true : false;
@@ -130,7 +134,7 @@ abstract class Network {
 	): string						// RETURNS <str> the site key, or "" on failure.
 	
 	// $key = Network::setData($siteHandle, $siteName, $siteURL, [$siteKey], [$overwrite]);
-	// $key = Network::setData("auth", "Auth", URL::auth_unifaction_com(), [$siteKey], [$overwrite]);
+	// $key = Network::setData("unifaction", "UniFaction", URL::unifaction_com(), [$siteKey], [$overwrite]);
 	{
 		// If we're not overwriting the data, check if it already exists.
 		$siteData = $overwrite ? array() : Network::get($siteHandle);

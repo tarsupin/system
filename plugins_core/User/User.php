@@ -164,7 +164,7 @@ abstract class User {
 		// Get User Data from Auth
 		$packet = array("user" => $user, "columns" => "uni_id, handle, display_name");
 		
-		if($response = Connect::to("auth", "UserData", $packet))
+		if($response = Connect::to("unifaction", "UserData", $packet))
 		{
 			return self::register((int) $response['uni_id'], $response['handle'], $response['display_name'], "");
 		}
