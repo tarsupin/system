@@ -1,5 +1,8 @@
 <?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); }
 
+// For installations, we need to make sure that we're using the 3col CSS system
+Metadata::$headerData = array('<link rel="stylesheet" href="' . CDN . '/css/unifaction-3col.css" />');
+
 // Get the Site Variable, if SiteVarable plugin has been installed
 $installComplete = false;
 
