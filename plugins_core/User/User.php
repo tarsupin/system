@@ -159,7 +159,7 @@ abstract class User {
 		$user		// <mixed> UniID or Handle that you want to silently register.
 	)				// RETURNS <bool> TRUE on success, FALSE on failure.
 	
-	// $userData = User::silentRegister($user);
+	// User::silentRegister($user);
 	{
 		// Get User Data from Auth
 		$packet = array("user" => $user, "columns" => "uni_id, handle, display_name");

@@ -332,15 +332,21 @@ class Search {
 	public static function searchBarUserHandle
 	(
 		string $name = "userHandle"		// <str> The name of the search bar.
+	,	string $siteURL = ""				// <str> The URL of the site to connect to.
 	,	string $funcOnKeyUp = ""			// <str> An extra JS function to run on key-up.
 	,	string $defaultValue = ""			// <str> The default value for the search bar.
 	,	string $classPrefix = "search"		// <str> The class to style the box with.
 	,	string $placeholder = "User . . ."	// <str> The placeholder for the search bar.
 	): string								// RETURNS <str> HTML to insert a search bar (for looking up users).
 	
-	// Search::searchBarUserHandle([$name], [$funcOnKeyUp], [$defaultValue], [$classPrefix], [$placeholder]);
+	// Search::searchBarUserHandle([$name], [$siteURL], [$funcOnKeyUp], [$defaultValue], [$classPrefix], [$placeholder]);
 	{
-		return self::searchBar($name, "", "search-user-handle", $placeholder, $funcOnKeyUp, $defaultValue);
+		if($siteURL == "")
+		{
+			$siteURL = URL::unifaction_com();
+		}
+		
+		return self::searchBar($name, $siteURL, "search-user-handle", $placeholder, $funcOnKeyUp, $defaultValue, $classPrefix);
 	}
 	
 	

@@ -4,27 +4,7 @@ echo '
 </div> <!-- End "viewport-wrap" -->
 </div> <!-- End "content-wrap" -->';
 
-/*
-echo '
-<!-- Mobile Footer -->
-<div id="mobile-footer">
-	<ul id="mn-list">
-		<li class="mn-link">
-			<a href="javascript:toggleMenu();">Menu</a>
-		</li>
-		<li class="mn-link mobile-strict" style="padding-left:20px; padding-right:20px;">
-			<a href="' . URL::unifaction_com() . '/mobile-menu' . Me::$slg . '">All Sites</a>
-		</li>
-		<li class="mn-link mobile-strict">
-			<a href="' . URL::unifaction_social() . Me::$slg . '">UniFaction</a>
-		</li>
-	</ul>
-</div>';
-*/
-
 $uniCom = URL::unifaction_com();
-
-// <a href="' . URL::promote_unifaction_com() . '">Advertise</a>
 
 echo '
 <!-- Standard Footer -->

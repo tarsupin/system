@@ -64,7 +64,7 @@ if($uniID = User::authLogin($loginResponse))
 // Update the display name, if applicable
 if(Me::$loggedIn and $loginResponse['display_name'] != Me::$vals['display_name'])
 {
-	Database::query("UPDATE users SET display_name=? WHERE uni_id=? LIMIT 1", array(Me::$vals['display_name'], Me::$id));
+	Database::query("UPDATE users SET display_name=? WHERE uni_id=? LIMIT 1", array($loginResponse['display_name'], Me::$id));
 }
 
 // Check for custom login handling

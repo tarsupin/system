@@ -89,7 +89,7 @@ abstract class Feed {
 		);
 		
 		// Submit the packet
-		$success = Connect::to("feed", "FollowHashtagAPI", $packet);
+		$success = Connect::to("sync_feed", "FollowHashtagAPI", $packet);
 		
 		// Add the item being followed to the user's tracker list
 		if($success)
@@ -151,7 +151,7 @@ abstract class Feed {
 		);
 		
 		// Submit the packet
-		if($success = Connect::to("feed", "PushFeed", $packet))
+		if($success = Connect::to("sync_feed", "PushFeed", $packet))
 		{
 			if(isset(Connect::$meta['feed_id']))
 			{
@@ -190,7 +190,7 @@ abstract class Feed {
 		);
 		
 		// Submit the packet
-		return Connect::to("feed", "PushFeedUpdate", $packet);
+		return Connect::to("sync_feed", "PushFeedUpdate", $packet);
 	}
 	
 }

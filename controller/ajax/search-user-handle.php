@@ -18,6 +18,9 @@ The function UserHandle will then inject the user handle into the designated ele
 
 */
 
+// Prepare a response
+header('Access-Control-Allow-Origin: *');
+
 $search = new Search($_POST['search'], "users");
 
 echo '<ul>';

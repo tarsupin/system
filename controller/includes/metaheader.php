@@ -8,7 +8,8 @@ echo '
 	<title>' . (isset($config['pageTitle']) ? $config['pageTitle'] : $config['site-name']) . '</title>
 	
 	<!-- Meta Data -->
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />' .
+	(isset($config['active-hashtag']) ? '<meta id="activeHashtag" name="activeHashtag" content="' . $config['active-hashtag'] . '" />' : '') . '
 	<link rel="icon" type="image/gif" href="/favicon.gif">
 	<link rel="canonical" href="' . (isset($config['canonical']) ? $config['canonical'] : '/' . $url_relative) . '" />
 	

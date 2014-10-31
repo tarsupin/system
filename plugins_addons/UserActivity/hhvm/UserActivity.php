@@ -34,7 +34,7 @@ abstract class UserActivity {
 		// User Activity
 		if(Me::$id != 0)
 		{
-			return Database::query("REPLACE INTO activity_guests (guest_ip, date_lastVisit) VALUES (?, ?)", array(Me::$id, time()));
+			return Database::query("REPLACE INTO activity_users (uni_id, date_lastVisit) VALUES (?, ?)", array(Me::$id, time()));
 		}
 		
 		// Guest Activity
@@ -52,7 +52,7 @@ abstract class UserActivity {
 	,	int $limit = 100		// <int> The maximum number of users to show online at once
 	): array						// RETURNS <array> list of all online users
 	
-	// $activeUsers = UserActivity::getUserActivity([$duration], [$resync], [$limit]);
+	// $activeUsers = UserActivity::getUsersOnline([$duration], [$resync], [$limit]);
 	{
 		// Check if data is already cached
 		$usersOnline = Cache::get("usersOnline");
@@ -60,11 +60,18 @@ abstract class UserActivity {
 		if($usersOnline === false)		// If the result is set to false, the data is not cached
 		{
 			$usersOnline = array();
-			$userList = Database::selectMultiple("SELECT u.uni_id, u.handle FROM activity_users a INNER JOIN users u ON a.uni_id=u.uni_id WHERE a.date_lastVisit <= ? ORDER BY date_lastVisit DESC LIMIT 0, " . ($limit + 0), array(time() - $duration));
+			$userList = Database::selectMultiple("SELECT u.uni_id, u.handle, u.role FROM activity_users a INNER JOIN users u ON a.uni_id=u.uni_id WHERE a.date_lastVisit >= ? ORDER BY date_lastVisit DESC LIMIT 0, " . ($limit + 1), array(time() - $duration));
 			
+			// If there are more users online than can be displayed
+			if(count($userList) > $limit)
+			{
+				array_pop($userList);
+			}
+			
+			// Loop through each user
 			foreach($userList as $user)
 			{
-				$usersOnline[$user['handle']] = (int) $user['uni_id'];
+				$usersOnline[$user['handle']] = $user;
 			}
 			
 			ksort($usersOnline);
@@ -104,7 +111,7 @@ abstract class UserActivity {
 		
 		if($userCount === false)		// If the result is set to false, the data is not cached
 		{
-			$userCount = (int) Database::selectValue("SELECT COUNT(*) as totalNum FROM activity_users WHERE date_lastVisit <= ? LIMIT 1", array(time() - $duration));
+			$userCount = (int) Database::selectValue("SELECT COUNT(*) as totalNum FROM activity_users WHERE date_lastVisit >= ? LIMIT 1", array(time() - $duration));
 			
 			// Handle the resync value
 			if($resync == 0)
@@ -119,7 +126,7 @@ abstract class UserActivity {
 			Cache::set("onlineCount-users", $userCount, $resync);
 		}
 		
-		return $userCount;
+		return (int) $userCount;
 	}
 	
 	
@@ -128,7 +135,7 @@ abstract class UserActivity {
 	(
 		int $duration = 300		// <int> Number of seconds to check user activity over (default: last 5 minutes)
 	,	int $resync = 0			// <int> Number of seconds before resyncing the count (default: 1/2 the duration)
-	): array						// RETURNS <array> list of all online users
+	): int						// RETURNS <int> the number of users online
 	
 	// $guestCount = UserActivity::getGuestsOnlineCount([$duration], [$resync]);
 	{
@@ -137,7 +144,7 @@ abstract class UserActivity {
 		
 		if($guestCount === false)		// If the result is set to false, the data is not cached
 		{
-			$guestCount = (int) Database::selectValue("SELECT COUNT(*) as totalNum FROM activity_guests WHERE date_lastVisit <= ? LIMIT 1", array(time() - $duration));
+			$guestCount = (int) Database::selectValue("SELECT COUNT(*) as totalNum FROM activity_guests WHERE date_lastVisit >= ? LIMIT 1", array(time() - $duration));
 			
 			// Handle the resync value
 			if($resync == 0)
@@ -152,7 +159,7 @@ abstract class UserActivity {
 			Cache::set("onlineCount-guests", $guestCount, $resync);
 		}
 		
-		return $guestCount;
+		return (int) $guestCount;
 	}
 	
 	

@@ -41,7 +41,7 @@ echo '
 						<li><a href="' . URL::unifaction_com() . '/multi-accounts' . Me::$slg . '">Change User</a></li>
 						<li><a href="' . URL::profilepic_unifaction_com() . '/' . Me::$slg . '">Update Image</a></li>
 						<li><a href="' . URL::unifaction_com() . '/user-panel' . Me::$slg . '">Settings</a></li>
-						<li><a href="/logout">Log Out</a></li>
+						<li><a href="' . URL::unifaction_com() . '/logout">Log Out</a></li>
 					</ul>
 				</li>';
 			}
