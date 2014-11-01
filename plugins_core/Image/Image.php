@@ -306,7 +306,7 @@ class Image {
 	{
 		if (!in_array($mode, array("darken", "lighten", "multiply", "screen", "overlay", "difference")))
 			return;
-	
+		
 		// Load the new layer
 		$draw = new Image($layerPath);
 		if(!isset($draw->resource)) { return; }

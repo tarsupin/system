@@ -2,7 +2,6 @@
 
 echo '
 </div>
-<script src="http://cdn.test/scripts/ajax.js" async></script>
 <script src="http://cdn.test/scripts/unifaction.js" async></script>
 
 </body>

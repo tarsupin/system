@@ -4,21 +4,15 @@
 ------ About the UniqueID Plugin ------
 ---------------------------------------
 
-This class creates unique IDs (integers in sequential order). This effect is similar to an auto_increment key an SQL
-table. It is used to map objects to uniquely identified numeric "address" to reference them later.
+This plugins creates unique IDs (integers in sequential order). This effect is similar to an auto_increment key an SQL table. It is used to map objects to uniquely identified numeric "address" to reference them later.
 
-This functionality was built to allow certain database tables to increment values without needing to have an
-auto-incremented field. This allows certain tables to have good partitioning structures, while retaining certain
-advantages of having unique IDs.
+This functionality was built to allow certain database tables to increment values without needing to have an auto-incremented field. This allows certain tables to have good partitioning structures, while retaining certain advantages of having unique IDs.
 
-UniqueID ID's created with this class are maintained as unique across the entire site, so they could be shared across
-multiple object types. Once an ID is assigned, the address counter will increment and the next ID will be 1 higher.
+UniqueID ID's created with this class are maintained as unique across the entire site, so they could be shared across multiple object types. Once an ID is assigned, the address counter will increment and the next ID will be 1 higher.
 
-It is also possible to track any number of tables (or objects) with a shared UniqueID counter, and always be able to
-identify each object based on its unique ID.
+It is also possible to track any number of tables (or objects) with a shared UniqueID counter, and always be able to identify each object based on its unique ID.
 
-Note: you can create multiple ID counters if you need different sets of unique IDs. For example, threads may need to
-have unique ID's from the UniqueID counter "thread", while posts could use the UniqueID counter "post".
+Note: you can create multiple ID counters if you need different sets of unique IDs. For example, threads may need to have unique ID's from the UniqueID counter "thread", while posts could use the UniqueID counter "post".
 
 
 -----------------------------------------

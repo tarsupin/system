@@ -44,7 +44,6 @@ if(Me::$loggedIn)
 }
 
 echo Metadata::footer() . '
-<script src="' . CDN . '/scripts/ajax.js" async></script>
 <script src="' . CDN . '/scripts/unifaction.js" async></script>
 
 </body>
