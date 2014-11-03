@@ -64,6 +64,10 @@ class ChatWidget extends Widget {
 				<input id="chat_username" type="text" name="chat_username" value="' . Me::$vals['handle'] . '" style="display:none;" />
 				</form>';
 			}
+			else
+			{
+				$this->content .= '<form id="chat-form" class="uniform" action="javascript:void(0);" method="post"><input id="chat_message" type="text" name="chat_message" value="" placeholder="Log in to chat . . ." style="width:100%; box-sizing:border-box;" readonly /></form>';
+			}
 			
 			$this->content .= '
 				<input id="chat_channel" type="hidden" name="chat_channel" value="' . $channel . '" />

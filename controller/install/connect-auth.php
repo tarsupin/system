@@ -64,11 +64,11 @@ echo '
 
 <h3>Step #1 - Log into @' . $ownerHandle . ' and retrieve your Site\'s API Key</h3>
 <p>Now that you\'ve set up the database on your site, you will need to connect to UniFaction with your site\'s API key. To get the key, follow these steps:</p>
-<p>&nbsp; &nbsp; &bull; <a href="http://unifaction.com/login">Log into your UniFaction account</a></p>
+<p>&nbsp; &nbsp; &bull; <a href="' . URL::unifaction_com() . '/login">Log into your UniFaction account</a></p>
 <p>&nbsp; &nbsp; &bull; Switch to @' . $ownerHandle . '\'s profile</p>
-<p>&nbsp; &nbsp; &bull; Go to your <a href="http://unifaction.com/user-panel">User Panel</a></p>
-<p>&nbsp; &nbsp; &bull; Click on <a href="http://unifaction.com/user-panel/my-sites">"My Sites"</a></p>
-<p>&nbsp; &nbsp; &bull; Click on the <a href="http://unifaction.com/user-panel/my-sites?confirm=' . SITE_HANDLE . '">Confirm ' . SITE_HANDLE . '</a> button.</p>
+<p>&nbsp; &nbsp; &bull; Go to your <a href="' . URL::unifaction_com() . '/user-pane">Settings</a></p>
+<p>&nbsp; &nbsp; &bull; Click on <a href="' . URL::unifaction_com() . '/user-panel/my-sites">"My Sites"</a></p>
+<p>&nbsp; &nbsp; &bull; Click on the <a href="' . URL::unifaction_com() . '/user-panel/my-sites?confirm=' . SITE_HANDLE . '">Confirm ' . SITE_HANDLE . '</a> button.</p>
 <p>&nbsp; &nbsp; &bull; Copy the API Key.</p>
 
 <h3>Step #2 - Enter your Site\'s API Key</h3>

@@ -57,17 +57,23 @@ class FeaturedWidget extends Widget {
 /****** Process the widget's behavior ******/
 	public function processWidget
 	(
-		$hashtag			// <str> The hashtag that this widget uses to filter the appropriate content.
+		$hashtags			// <mixed> The hashtag (or hashtags) this widget uses to filter the appropriate content.
 	,	$categories			// <int:str> The categories that this featured content widget will call from.
-	,	$slots = 2			// <int> The number of slots to show in featured content.
-	,	$totalViews = 100	// <int> The total number of views that this widget should show before refreshing.
+	,	$slots = 3			// <int> The number of slots to show in featured content.
+	,	$totalViews = 200	// <int> The total number of views that this widget should show before refreshing.
 	)						// RETURNS <void>
 	
-	// FeaturedWidget::processWidget($hashtag, $categories, [$slots], [$totalViews]);
+	// FeaturedWidget::processWidget($hashtags, $categories, [$slots], [$totalViews]);
 	{
 		// Prepare Values
 		$featPull = "widgets-featured-" . mt_rand(1, 3);
 		$scanWidget = false;
+		
+		// Make sure the hashtag is an array
+		if(!is_array($hashtags))
+		{
+			$hashtags = array($hashtags);
+		}
 		
 		// Attempt to load the site's featured content data
 		if($wfData = SiteVariable::load($featPull))
@@ -95,7 +101,7 @@ class FeaturedWidget extends Widget {
 			
 			// Prepare the API Packet
 			$packet = array(
-				"hashtag"			=> $hashtag			// The top-tier hashtag to use for filtering purposes
+				"hashtags"			=> $hashtags		// The top-tier hashtags to use for filtering purposes
 			,	"categories"		=> $categories		// The categories that your widget will show
 			,	"view_count"		=> $totalViews		// An optional setting; number of times it will be shown
 			,	"number_slots"		=> $slots			// The number of entries to return (generally 2 or 3)
@@ -111,14 +117,7 @@ class FeaturedWidget extends Widget {
 				
 				foreach($apiData['widgetData'] as $widget)
 				{
-					$html .= '
-					<div class="widget-featured">
-						<div class="widget-featured-left"><a href="#"><img src="' . $widgetSync . '/assets/featured/' . $widget['id'] . '.jpg"></a></div>
-						<div class="widget-featured-right">
-							<strong>' . $widget['title'] . '</strong><br />
-							' . $widget['description'] . '
-						</div>
-					</div>';
+					$html .= '<div class="widget-featured"><div class="widget-featured-left"><a href="' . $widget['url'] . '"><img src="' . $widgetSync . '/assets/featured/' . $widget['id'] . '.jpg"></a></div><div class="widget-featured-right"><strong>' . $widget['title'] . '</strong><br />' . $widget['description'] . '</div></div>';
 				}
 				
 				$html .= '</div></div>';
