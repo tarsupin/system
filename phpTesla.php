@@ -175,10 +175,15 @@ switch($url[0])
 	case "api":
 	case "logout":
 		require(SYS_PATH . "/controller/" . $url[0] . ".php"); exit;
-}
-
-/****** Attempt a soft login ******/
-if(isset($_GET['slg']))
-{
-	Me::softLog((int) $_GET['slg']);
+	
+	case "ajax":
+		break;
+	
+	default:
+		
+		/****** Attempt a soft login ******/
+		if(isset($_GET['slg']))
+		{
+			Me::softLog((int) $_GET['slg']);
+		}
 }

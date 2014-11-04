@@ -14,7 +14,7 @@ Once a user is logged into the site, they can access many of UniFaction's featur
 -------------------------------
 
 // Get the login response from UniFaction
-$loginResponse = UniFaction::login(SITE_URL . "/login", [$logMode], [$logAct]);
+$loginResponse = UniFaction::login();
 
 */
 
@@ -24,13 +24,10 @@ abstract class UniFaction {
 /****** Universal Login with UniFaction User ******/
 	public static function login
 	(
-		string $linkback		// <str> The URL link back to the page (used to return after logging in).
-	,	string $logMode = ""	// <str> The mode to use for logging in.
-	,	string $logAct = ""	// <str> The action to use for logging in.
-	,	int $chosenID = 0	// <int> The chosen UniID to log in with.
+		int $chosenID = 0	// <int> The chosen UniID to log in with.
 	): array <str, mixed>					// RETURNS <str:mixed> response from UniFaction, or array() if not available.
 	
-	// $loginResponse = UniFaction::login(SITE_URL . "/login", [$logMode], [$logAct], [$chosenID]);
+	// $loginResponse = UniFaction::login([$chosenID]);
 	{
 		// Get the site data
 		if(!$siteData = Network::get("unifaction"))
@@ -63,7 +60,7 @@ abstract class UniFaction {
 		else
 		{
 			// Redirect to the Universal Login Page - get credentials and return
-			header("Location: " . $siteData['site_url'] . "/login?site=" . SITE_HANDLE . "&shk=" . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . "&conf=" . Security::hash(SITE_HANDLE . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . $siteData['site_key'], 20, 62) . "&ret=" . rawurlencode($linkback) . ($logMode != "" ? '&logMode=' . Sanitize::variable($logMode) : '') . '&logAct=' . ($logAct != "" ? Sanitize::variable($logAct) : "") . ($chosenID != 0 ? "&chooseID=" . $chosenID : "")); exit;
+			header("Location: " . $siteData['site_url'] . "/login?site=" . SITE_HANDLE . "&shk=" . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . "&conf=" . Security::hash(SITE_HANDLE . $_SESSION[SITE_HANDLE]['unilogin_handshake'] . $siteData['site_key'], 20, 62) . ($chosenID != 0 ? "&chooseID=" . $chosenID : "")); exit;
 		}
 		
 		return array();

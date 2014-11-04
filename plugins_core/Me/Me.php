@@ -105,9 +105,10 @@ abstract class Me {
 	public static function softLog
 	(
 		$chooseID = 0	// <int> The UniID that is being set as active (0 if whatever Auth is logged as)
+	,	$returnTo = "/"	// <str> The URL to return to after logging in.
 	)					// RETURNS <void>
 	
-	// Me::softLog([$chooseID]);
+	// Me::softLog([$chooseID], [$returnTo]);
 	{
 		// If a Chosen ID is set and is already active, ignore this process
 		if($chooseID and isset($_SESSION[SITE_HANDLE]['id']))
@@ -121,11 +122,8 @@ abstract class Me {
 		Cookie::delete('userID_' . SITE_HANDLE);
 		unset($_SESSION[SITE_HANDLE]);
 		
-		// Prepare the return value
-		$_SESSION[SITE_HANDLE]['site_login']['return_to'] = '/' . ($url_relative != "" ? $url_relative : "");
-		
 		// Login with Auth
-		UniFaction::login(SITE_URL . "/login", "", "", $chooseID); exit;
+		UniFaction::login($chooseID); exit;
 	}
 	
 	
@@ -148,13 +146,14 @@ abstract class Me {
 		if(isset($_SESSION[SITE_HANDLE]['site_login']))
 		{
 			// This retains the site login redirection for UniFaction (Auth)
-			$_SESSION[SITE_HANDLE] = array("site_login" => array("site" => $_SESSION[SITE_HANDLE]['site_login']['site'], "return-to-url" => $_SESSION[SITE_HANDLE]['site_login']['return-to-url']));
+			$_SESSION[SITE_HANDLE] = array("site_login" => $_SESSION[SITE_HANDLE]['site_login']);
 		}
-		else if(isset($_SESSION[SITE_HANDLE]['return_to']))
+		else if(isset($_SESSION[SITE_HANDLE]['return_url']))
 		{
-			// This section prevents the "return_to" variable from being lost during login
+			// This section prevents the "return_url" variable from being lost during login
 			// This allows us to return back to the URL that the user actually wants to load up
 			// NOTE: This works for all sites EXCEPT for UniFaction (Auth)
+			$_SESSION[SITE_HANDLE] = array("return_url" => $_SESSION[SITE_HANDLE]['return_url']);
 		}
 		else
 		{
@@ -185,7 +184,7 @@ abstract class Me {
 		Cookie::delete('userID_' . SITE_HANDLE);
 		Cookie::deleteAll();
 		
-		$returnTo = (isset($_SESSION[SITE_HANDLE]['return_to']) ? $_SESSION[SITE_HANDLE]['return_to'] : false);
+		$returnTo = (isset($_SESSION[SITE_HANDLE]['return_url']) ? $_SESSION[SITE_HANDLE]['return_url'] : false);
 		
 		// Unset All Session Values
 		foreach($_SESSION[SITE_HANDLE] as $key => $val)
@@ -337,14 +336,14 @@ abstract class Me {
 	
 	// Me::redirectLogin("/page-to-return-to?extraVal=yep");
 	{
-		if(isset($_SESSION[SITE_HANDLE]['return_to']))
+		if(isset($_SESSION[SITE_HANDLE]['return_url']))
 		{
-			unset($_SESSION[SITE_HANDLE]['return_to']);
+			unset($_SESSION[SITE_HANDLE]['return_url']);
 			
 			header("Location: " . Sanitize::url($fallback)); exit;
 		}
 		
-		$_SESSION[SITE_HANDLE]['return_to'] = $returnTo;
+		$_SESSION[SITE_HANDLE]['return_url'] = $returnTo;
 		
 		header("Location: /login"); exit;
 	}
