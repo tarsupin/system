@@ -59,11 +59,30 @@ require(CONF_PATH . "/config.php");					// Loads the Application Configuration F
 /****** Session Preparation ******/
 session_start();
 
+// Make sure the base session value used is available
 if(!isset($_SESSION[SITE_HANDLE]))
 {
 	$_SESSION[SITE_HANDLE] = array();
 }
 
+// Check if the user is logged in
+// If the user isn't logged in, try to handle automatic logins as effectively as possible
+if(!isset($_SESSION[SITE_HANDLE]['id']))
+{
+	if($cookieData = Cookie::get("last_slg", SITE_HANDLE))
+	{
+		if((int) $cookieData < time() - 900)
+		{
+			$_GET['slg'] = 1;
+			
+			Cookie::set('last_slg', time(), SITE_HANDLE, 365);
+		}
+	}
+	else
+	{
+		Cookie::set('last_slg', time() - 36000, SITE_HANDLE, 365);
+	}
+}
 
 /****** Process Security Functions ******/
 Security::fingerprint();

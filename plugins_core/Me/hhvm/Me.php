@@ -122,7 +122,7 @@ abstract class Me {
 		unset($_SESSION[SITE_HANDLE]);
 		
 		// Prepare the return value
-		$_SESSION[SITE_HANDLE]['return_to'] = '/' . ($url_relative != "" ? $url_relative : "");
+		$_SESSION[SITE_HANDLE]['site_login']['return_to'] = '/' . ($url_relative != "" ? $url_relative : "");
 		
 		// Login with Auth
 		UniFaction::login(SITE_URL . "/login", "", "", $chooseID); exit;
@@ -145,11 +145,16 @@ abstract class Me {
 		if(self::$id == 0) { return false; }
 		
 		// Prepare User Session
-		if(isset($_SESSION[SITE_HANDLE]['return_to']))
+		if(isset($_SESSION[SITE_HANDLE]['site_login']))
+		{
+			// This retains the site login redirection for UniFaction (Auth)
+			$_SESSION[SITE_HANDLE] = array("site_login" => array("site" => $_SESSION[SITE_HANDLE]['site_login']['site'], "return-to-url" => $_SESSION[SITE_HANDLE]['site_login']['return-to-url']));
+		}
+		else if(isset($_SESSION[SITE_HANDLE]['return_to']))
 		{
 			// This section prevents the "return_to" variable from being lost during login
 			// This allows us to return back to the URL that the user actually wants to load up
-			$_SESSION[SITE_HANDLE] = array("return_to" => $_SESSION[SITE_HANDLE]['return_to']);
+			// NOTE: This works for all sites EXCEPT for UniFaction (Auth)
 		}
 		else
 		{
