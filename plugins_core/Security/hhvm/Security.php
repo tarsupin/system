@@ -287,7 +287,7 @@ abstract class Security {
 	
 	// $jsEncrypt = Encrypt::jsEncrypt($key, [$salt]);
 	{
-		return Security::hash(md5($key . $salt. date("yz")) . ":myJSEncryption:cross_site_functionality", 20, 62);
+		return Security::hash($key . date("yz") . $salt . ":myJSEncryption:cross_site_functionality", 20, 62);
 	}
 	
 	

@@ -69,18 +69,18 @@ if(!isset($_SESSION[SITE_HANDLE]))
 // If the user isn't logged in, try to handle automatic logins as effectively as possible
 if(!isset($_SESSION[SITE_HANDLE]['id']))
 {
-	if($cookieData = Cookie::get("last_slg", SITE_HANDLE))
+	if($cookieData = Cookie::get("last_slg_" . SITE_HANDLE, SITE_HANDLE))
 	{
 		if((int) $cookieData < time() - 900)
 		{
 			$_GET['slg'] = 1;
 			
-			Cookie::set('last_slg', time(), SITE_HANDLE, 365);
+			Cookie::set('last_slg_' . SITE_HANDLE, time(), SITE_HANDLE, 365);
 		}
 	}
 	else
 	{
-		Cookie::set('last_slg', time() - 36000, SITE_HANDLE, 365);
+		Cookie::set('last_slg_' . SITE_HANDLE, time() - 36000, SITE_HANDLE, 365);
 	}
 }
 
@@ -177,6 +177,7 @@ switch($url[0])
 		require(SYS_PATH . "/controller/" . $url[0] . ".php"); exit;
 	
 	case "ajax":
+	case "login":
 		break;
 	
 	default:

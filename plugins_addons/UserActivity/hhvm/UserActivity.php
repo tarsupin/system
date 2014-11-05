@@ -13,6 +13,8 @@ This plugin will allow you to keep track of the number of users and guests onlin
 
 UserActivity::update();
 
+$lastActivity = UserActivity::getUsersLastVisit($uniID);
+
 $activeUsers = UserActivity::getUserActivity([$duration], [$resync], [$limit]);
 
 $userCount = UserActivity::getUsersOnlineCount([$duration], [$resync]);
@@ -44,6 +46,18 @@ abstract class UserActivity {
 	}
 	
 	
+/****** Get the last visit time of a specific user ******/
+	public static function getUsersLastVisit
+	(
+		int $uniID		// <int> The UniID of the last visit.
+	): int				// RETURNS <int> The timestamp of the last visit, or 0 on failure.
+	
+	// $lastActivity = UserActivity::getUsersLastVisit($uniID);
+	{
+		return (int) Database::selectValue("SELECT date_lastVisit FROM activity_users WHERE uni_id=? LIMIT 1", array($uniID));
+	}
+	
+	
 /****** Get User Activity ******/
 	public static function getUsersOnline
 	(
@@ -60,7 +74,7 @@ abstract class UserActivity {
 		if($usersOnline === false)		// If the result is set to false, the data is not cached
 		{
 			$usersOnline = array();
-			$userList = Database::selectMultiple("SELECT u.uni_id, u.handle, u.role FROM activity_users a INNER JOIN users u ON a.uni_id=u.uni_id WHERE a.date_lastVisit >= ? ORDER BY date_lastVisit DESC LIMIT 0, " . ($limit + 1), array(time() - $duration));
+			$userList = Database::selectMultiple("SELECT u.uni_id, u.handle, u.role FROM activity_users a INNER JOIN users u ON a.uni_id=u.uni_id WHERE a.date_lastVisit >= ? ORDER BY a.date_lastVisit DESC LIMIT 0, " . ($limit + 1), array(time() - $duration));
 			
 			// If there are more users online than can be displayed
 			if(count($userList) > $limit)

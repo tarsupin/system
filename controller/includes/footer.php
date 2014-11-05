@@ -33,17 +33,7 @@ echo '
 
 </div> <!-- End "container" -->';
 
-// Prepare JSEncrypt value
-if(Me::$loggedIn)
-{
-	$jsEncrypt = Security::jsEncrypt(Me::$vals['handle']);
-	$jsUser = Me::$vals['handle'];
-	
-	echo '
-	<script>var JSUser = "' . $jsUser . '"; var JSEncrypt = "' . $jsEncrypt . '"; var JSChatTime = ' . microtime(true) . '; var JSProfilePic = "' . ProfilePic::image(Me::$id, "small") . '";</script>';
-}
-
-echo Metadata::footer() . '
+echo Metadata::JSChat() . Metadata::footer() . '
 <script src="' . CDN . '/scripts/unifaction.js" async></script>
 
 </body>

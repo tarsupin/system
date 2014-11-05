@@ -48,6 +48,10 @@ abstract class Metadata {
 	public static $follow = false;			// <bool> TRUE if you want search engines to follow this page.
 	public static $index = false;			// <bool> TRUE if you want search engines to index this page.
 	
+	public static $jsData = array(			// <str:mixed> Special javascript data to save.
+		"key"		=> ""
+	);
+	
 	
 /****** Add Metadata Line to the Header ******/
 	public static function addHeader
@@ -168,6 +172,25 @@ abstract class Metadata {
 		}
 		
 		return $html;
+	}
+	
+	
+/****** Handle special javascript chatting functionality ******/
+	public static function JSChat (
+	)				// RETURNS <str> the text to use for special javascript functionality.
+	
+	// Metadata::JSChat()
+	{
+		if(Me::$loggedIn)
+		{
+			// Prepare Values
+			$jsEncrypt = Security::jsEncrypt(Me::$vals['handle'], self::$jsData['key']);
+			$jsUser = Me::$vals['handle'];
+			
+			return '<script>var JSUser = "' . $jsUser . '"; var JSEncrypt = "' . $jsEncrypt . '"; var JSChatTime = ' . microtime(true) . '; var JSProfilePic = "' . ProfilePic::image(Me::$id, "small") . '";</script>';
+		}
+		
+		return '';
 	}
 	
 }

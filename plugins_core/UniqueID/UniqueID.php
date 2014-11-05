@@ -74,18 +74,19 @@ abstract class UniqueID {
 	
 	// $uniqueID = UniqueID::get([$name]);
 	{
-		$pass = true;
-		
-		Database::startTransaction();
-		
-		if($current = Database::selectValue("SELECT value FROM site_variables WHERE key_group=? AND key_name=? LIMIT 1", array("uniqueIDs", $name)))
+		// Get the current value set
+		if(!$current = (int) Database::selectValue("SELECT value FROM site_variables WHERE key_group=? AND key_name=? LIMIT 1", array("uniqueIDs", $name)))
 		{
-			$current = ((int) json_decode($current)) + 1;
-			
-			$pass = Database::query("UPDATE site_variables SET value=? WHERE key_group=? AND key_name=? LIMIT 1", array($current, "uniqueIDs", $name));
+			return 0;
 		}
 		
-		return (Database::endTransaction($pass) ? (int) $current : 0);
+		// Update the counter for next time
+		if(!Database::query("UPDATE site_variables SET value=? WHERE key_group=? AND key_name=? LIMIT 1", array(($current + 1), "uniqueIDs", $name)))
+		{
+			return 0;
+		}
+		
+		return $current;
 	}
 	
 	
