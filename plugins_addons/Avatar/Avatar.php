@@ -47,7 +47,7 @@ abstract class Avatar {
 	public static function image
 	(
 		$uniID			// <int> The UniID whose avatar you'd like to show.
-	,	$aviID = 0		// <int> The ID of the specific avatar. 0 is the default one.			
+	,	$aviID = 1		// <int> The ID of the specific avatar. 1 is the default one.			
 	)					// RETURNS <str> URL of the avatar to show off.
 	
 	// $aviImage = Avatar:image($uniID)
@@ -62,12 +62,12 @@ abstract class Avatar {
 	public static function imageData
 	(
 		$uniID			// <int> The UniID whose avatar you'd like to get data of.
-	,	$aviID = 0		// <int> The ID of the specific avatar. 0 is the default one.			
+	,	$aviID = 1		// <int> The ID of the specific avatar. 1 is the default one.			
 	)					// RETURNS <str:str> data pertaining to the avatar's image.
 	
 	// $aviData = Avatar:imageData($uniID);
 	{
-		$fileAdd = substr(str_replace(array('+', '=', '/'), array('', '', ''), base64_encode(md5("avatar:" . $uniID . ($aviID != 0 ? "_" . $aviID : "")))), 0, 10);
+		$fileAdd = substr(str_replace(array('+', '=', '/'), array('', '', ''), base64_encode(md5("avatar:" . $uniID . ($aviID != 1 ? "_" . $aviID : "")))), 0, 10);
 		
 		$avatar = array(
 			"site"				=> URL::avatar_unifaction_com()
