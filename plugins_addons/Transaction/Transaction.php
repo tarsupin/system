@@ -48,7 +48,7 @@ abstract class AppTrade {
 	,	$itemID			// <int> The ID of the item that the sender is exchanging.
 	)					// RETURNS <bool> TRUE if the item was sent, FALSE if it failed.
 	
-	// AppTrade::sendItem_doTransaction($senderID, $recipientID, $goldAmount);
+	// AppTrade::sendItem_doTransaction($senderID, $recipientID, $itemID);
 	{
 		// Do the item transaction here
 	}
@@ -160,7 +160,7 @@ abstract class Transaction {
 		if($pass = Database::query("DELETE FROM transactions_entries WHERE transaction_id=?", array($transactionID)))
 		{
 			// Delete all of the users
-			if($pass = Database::query("DELETE FROM `transactions_users` WHERE transaction_id=? VALUES (?)", array($transactionID)))
+			if($pass = Database::query("DELETE FROM `transactions_users` WHERE transaction_id=?", array($transactionID)))
 			{
 				// Delete the transaction
 				$pass = Database::query("DELETE FROM transactions WHERE id=?", array($transactionID));
@@ -287,23 +287,39 @@ abstract class Transaction {
 	)					// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// Transaction::process($transactionID);
-	{
-		return true;
-		
-		// Prepare Values
-		$method = str_replace("_doTransaction", "", $method) . "_doTransaction";
-		
-		// Make sure the function can process
-		if(!method_exists($class, $method))
+	{		
+		// Get Actions
+		Database::startTransaction();
+		$actions = Database::selectMultiple("SELECT class, process_method, process_parameters, display FROM transactions_entries WHERE transaction_id=?", array($transactionID));
+		foreach($actions as $action)
 		{
-			return false;
+			// Prepare Values
+			$method = str_replace("_doTransaction", "", $action['process_method']) . "_doTransaction";
+			$class = $action['class'];
+			
+			// Make sure the function can process
+			if(!method_exists($class, $method))
+			{
+				// Undo process
+				Database::endTransaction(false);
+				return false;
+			}
+
+			// Serialize Data
+			$parameters = json_decode($action['process_parameters']);
+			$display = json_decode($action['display']);
+			
+			// Execute Method
+			if(!call_user_func_array(array($class, $method), $parameters))
+			{
+				// Undo process if something went wrong
+				Database::endTransaction(false);
+				return false;
+			}
 		}
+		Database::endTransaction();
 		
-		// Serialize Data
-		$parameters = json_encode($parameters);
-		$display = json_encode($display);
-		
-		
+		return true;
 	}
 	
 	

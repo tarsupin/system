@@ -264,6 +264,7 @@ abstract class Currency {
 		
 		if($uniIDOther !== 0)
 		{
+			$balance = self::check($uniIDOther);
 			$pass2 = Database::query("INSERT INTO `currency_records` (`description`, `uni_id`, `other_id`, `amount`, `running_total`, `date_exchange`) VALUES (?, ?, ?, ?, ?, ?)", array(Sanitize::safeword($desc), $uniIDOther, $uniID, 0 - $amount, $balance, $timestamp));
 		}
 		
