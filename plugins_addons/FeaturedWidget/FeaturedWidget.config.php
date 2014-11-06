@@ -44,7 +44,7 @@ class FeaturedWidget_config {
 	// $plugin->isInstalled();
 	{
 		// Make sure the newly installed tables exist
-		return DatabaseAdmin::columnsExist("featured_widget", array("channel", "widget_html"));
+		return DatabaseAdmin::columnsExist("featured_widget", array("hashtag", "widget_html"));
 	}
 	
 }
