@@ -246,8 +246,8 @@ abstract class Currency {
 	(
 		int $uniID		// <int> The Uni-Account to send currency.
 	,	int $uniIDOther	// <int> The Uni-Account to receive currency (0 for the server).
-	,	int $amount		// <int> or <float> How much currency was added to the recipient.
-	,	int $balance	// <int> or <float> The balance the sender currently has after this transaction occurs.
+	,	float $amount		// <float> How much currency was added to the recipient.
+	,	float $balance	// <float> The balance the sender currently has after this transaction occurs.
 	,	string $desc = ""	// <str> A brief description about the transaction's purpose.
 	): bool				// RETURNS <bool> TRUE on success, or FALSE on error.
 	
