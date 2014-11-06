@@ -300,7 +300,7 @@ abstract class Me {
 			return false;
 		}
 		
-		$authData = User::get($_COOKIE[$varName], "auth_token");
+		$authData = User::getDataByHandle($_COOKIE[$varName], "auth_token");
 		
 		// Check the cookie authentication
 		if(!$userID = Cookie::get('userID_' . SITE_HANDLE, $authData['auth_token']))
