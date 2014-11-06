@@ -57,54 +57,44 @@ class FeaturedWidget extends Widget {
 /****** Process the widget's behavior ******/
 	public function processWidget
 	(
-		$hashtags			// <mixed> The hashtag (or hashtags) this widget uses to filter the appropriate content.
-	,	$categories			// <int:str> The categories that this featured content widget will call from.
-	,	$slots = 3			// <int> The number of slots to show in featured content.
-	,	$totalViews = 200	// <int> The total number of views that this widget should show before refreshing.
-	)						// RETURNS <void>
+		$hashtag				// <str> The hashtag that this widget uses to filter the appropriate content.
+	,	$categories = array()	// <int:str> The categories that this featured content widget will call from.
+	,	$slots = 3				// <int> The number of slots to show in featured content.
+	,	$totalViews = 200		// <int> The total number of views that this widget should show before refreshing.
+	)							// RETURNS <void>
 	
-	// FeaturedWidget::processWidget($hashtags, $categories, [$slots], [$totalViews]);
+	// FeaturedWidget::processWidget($hashtag, $categories, [$slots], [$totalViews]);
 	{
 		// Prepare Values
-		$featPull = "widgets-featured-" . mt_rand(1, 3);
-		$scanWidget = false;
+		$html = "";
+		$scan = false;
 		
-		// Make sure the hashtag is an array
-		if(!is_array($hashtags))
+		// Attempt to use an existing widget
+		if($widgetData = Database::selectOne("SELECT widget_html, views_remaining FROM featured_widget WHERE hashtag=? LIMIT 1", array($hashtag)))
 		{
-			$hashtags = array($hashtags);
-		}
-		
-		// Attempt to load the site's featured content data
-		if($wfData = SiteVariable::load($featPull))
-		{
-			if(!isset($wfData['remaining-views']) or !$wfData['remaining-views'])
+			if($widgetData['views_remaining'] <= 0)
 			{
-				$scanWidget = true;
+				$scan = true;
 			}
 			else
 			{
-				SiteVariable::save($featPull, "remaining-views", ($wfData['remaining-views'] - 1));
-				
-				$this->content = isset($wfData['html-content']) ? $wfData['html-content'] : '';
+				$html = $widgetData['widget_html'];
 			}
 		}
-		else
+		else 
 		{
-			$scanWidget = true;
+			$scan = true;
 		}
 		
-		if($scanWidget)
+		// Run the scan for new widget data if applicable
+		if($scan)
 		{
-			// There is no saved data, so we need to pull it from the widget sync
-			$html = "";
-			
 			// Prepare the API Packet
 			$packet = array(
-				"hashtags"			=> $hashtags		// The top-tier hashtags to use for filtering purposes
+				"hashtag"			=> $hashtag			// The hashtag to use for filtering purposes
 			,	"categories"		=> $categories		// The categories that your widget will show
 			,	"view_count"		=> $totalViews		// An optional setting; number of times it will be shown
-			,	"number_slots"		=> $slots			// The number of entries to return (generally 2 or 3)
+			,	"number_slots"		=> $slots			// The number of content slots to return (generally 2 or 3)
 			);
 			
 			// Connect to the API and pull the response
@@ -123,15 +113,17 @@ class FeaturedWidget extends Widget {
 				$html .= '</div></div>';
 			}
 			
-			// Set the widget data's HTML content
-			SiteVariable::save($featPull, "html-content", $html);
+			// Save this entry
+			Database::query("REPLACE INTO featured_widget (hashtag, widget_html, views_remaining) VALUES (?, ?, ?)", array($hashtag, $html, $totalViews));
 			
-			// Set the widget data's count value (even if the pull failed)
-			SiteVariable::save($featPull, "remaining-views", $totalViews);
-			
-			$this->content = $html;
+			// Prepare the next cycle
+			$widgetData = array('widget_html' => $html, 'views_remaining' => $totalViews);
 		}
+		
+		// Update the views remaining
+		Database::query("UPDATE featured_widget SET views_remaining=views_remaining-1 WHERE hashtag=? LIMIT 1", array($hashtag));
+		
+		$this->content = $html;
 	}
-	
 	
 }

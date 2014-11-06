@@ -119,7 +119,6 @@ abstract class Me {
 		global $url_relative;
 		
 		// Create a soft logout
-		Cookie::delete('userID_' . SITE_HANDLE);
 		unset($_SESSION[SITE_HANDLE]);
 		
 		// Login with Auth

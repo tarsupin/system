@@ -22,6 +22,7 @@ This is an exmample of the plugin that you'll need to create in your site's plug
 	
 You must have the methods end in "_doTransaction" or they will not work (this is for security reasons).
 
+
 abstract class AppTrade {
 	
 	
@@ -50,32 +51,6 @@ abstract class AppTrade {
 	// AppTrade::sendItem_doTransaction($senderID, $recipientID, $itemID);
 	{
 		// Do the item transaction here
-	}
-	
-/****** Undo Exchange gold between two users ******
-	public static function sendGold_undoTransaction
-	(
-		int $senderID		// <int> The UniID sending the gold.
-	,	int $recipientID	// <int> The UniID receiving the gold.
-	,	int $goldAmount		// <int> The amount of gold being sent.
-	): bool					// RETURNS <bool> TRUE if the gold was sent, FALSE if it failed.
-	
-	// AppTrade::sendGold_undoTransaction($senderID, $recipientID, $goldAmount);
-	{
-		return self::sendItem_doTransaction($recipientID, $senderID, $goldAmount);
-	}
-	
-/****** Undo Exchange an item between two users ******
-	public static function sendItem_undoTransaction
-	(
-		int $senderID		// <int> The UniID sending the gold.
-	,	int $recipientID	// <int> The UniID receiving the gold.
-	,	int $itemID			// <int> The ID of the item that the sender is exchanging.
-	): bool					// RETURNS <bool> TRUE if the item was sent, FALSE if it failed.
-	
-	// AppTrade::sendItem_undoTransaction($senderID, $recipientID, $goldAmount);
-	{
-		return self::sendItem_doTransaction($recipientID, $senderID, $itemID);
 	}
 	
 }

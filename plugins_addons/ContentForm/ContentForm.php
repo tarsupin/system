@@ -262,6 +262,7 @@ class ContentForm {
 			}
 			
 			// Prepare Final Update
+			$this->authorUpdate = 0;
 			$this->settingUpdate = false;
 			$this->statusUpdate = false;
 			
@@ -322,7 +323,23 @@ class ContentForm {
 			// Process the Settings
 			if($this->settingUpdate)
 			{
-				Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, comments=?, voting=? WHERE id=? LIMIT 1", array($this->contentData['title'], $this->contentData['primary_hashtag'], $this->contentData['comments'], $this->contentData['voting'], $this->contentID));
+				Database::query("UPDATE IGNORE content_entries SET title=?, primary_hashtag=?, description=?, comments=?, voting=?, date_posted=? WHERE id=? LIMIT 1", array($this->contentData['title'], $this->contentData['primary_hashtag'], $this->contentData['description'], $this->contentData['comments'], $this->contentData['voting'], $this->contentData['date_posted'], $this->contentID));
+			}
+			
+			// Process the Author
+			if($this->authorUpdate > 0)
+			{
+				Database::startTransaction();
+				
+				if($pass = Database::query("UPDATE IGNORE content_entries SET uni_id=? WHERE id=? LIMIT 1", array($this->contentData['uni_id'], $this->contentID)))
+				{
+					if($pass = Database::query("DELETE FROM content_by_user WHERE uni_id=? AND content_id=? LIMIT 1", array($this->authorUpdate, $this->contentID)))
+					{
+						$pass = Database::query("REPLACE INTO content_by_user (uni_id, content_id) VALUES (?, ?)", array($this->contentData['uni_id'], $this->contentID));
+					}
+				}
+				
+				Database::endTransaction($pass);
 			}
 			
 			// Process the Status
@@ -363,6 +380,40 @@ class ContentForm {
 		{
 			$this->contentData['primary_hashtag'] = $_POST['primary_hashtag'];
 			$this->settingUpdate = true;
+		}
+		
+		// Description
+		if(isset($_POST['description']) and $_POST['description'] != $this->contentData['description'])
+		{
+			$this->contentData['description'] = $_POST['description'];
+			$this->settingUpdate = true;
+		}
+		
+		if(Me::$clearance >= 6)
+		{
+			// Author
+			if(isset($_POST['author']) and $_POST['author'])
+			{
+				if($authorID = User::getIDByHandle(Sanitize::variable($_POST['author'])))
+				{
+					if($authorID != $this->contentData['uni_id'])
+					{
+						$this->authorUpdate = $this->contentData['uni_id'];
+						$this->contentData['uni_id'] = $authorID;
+					}
+				}
+				else
+				{
+					Alert::warning("Author Failure", "That author was not located on the site.");
+				}
+			}
+			
+			// Date Posted
+			if(isset($_POST['date_posted']) and $_POST['date_posted'] != $this->contentData['date_posted'])
+			{
+				$this->contentData['date_posted'] = $_POST['date_posted'];
+				$this->settingUpdate = true;
+			}
 		}
 		
 		// Post Status
@@ -693,13 +744,40 @@ class ContentForm {
 			</div>
 		</div>';
 		
+		// Update the Description
+		echo '
+		<div>
+			<strong>Description:</strong><br />
+			<textarea name="description" style="width:95%;" maxlength="255">' . $this->contentData['description'] . '</textarea>
+		</div>';
+		
+		// Update the Author
+		if(Me::$clearance >= 6)
+		{
+			$authorData = User::get($this->contentData['uni_id'], "handle");
+			
+			echo '
+			<div style="margin-top:12px;">
+				<strong>Author:</strong><br />
+				<input type="text" name="author" maxlength="22" value="' . $authorData['handle'] . '" />
+			</div>';
+			
+			// Update the Timestamp
+			echo '
+			<div style="margin-top:12px;">
+				<strong>Date Posted:</strong><br />
+				<input type="text" name="date_posted" value="' . $this->contentData['date_posted'] . '" />
+			</div>';
+		}
+		
 		// Display the hashtag dropdown
 		if(Me::$clearance >= 6 or $this->openPost)
 		{
 			if($dropHTML = ContentHashtags::hashtagFormDropdown($this->contentData['id'], $this->contentData['primary_hashtag']))
 			{
 				echo '
-				<div>
+				<div style="margin-top:12px;">
+				<strong>Primary Hashtag:</strong><br />
 				<select name="primary_hashtag">
 					<option value="">-- Select Primary Hashtag --</option>
 					' . $dropHTML . '
@@ -711,33 +789,34 @@ class ContentForm {
 		// Show several options that only editors are allowed to use
 		if(Me::$clearance >= 6)
 		{
-			echo '<p>';
-			
 			// Show the comment dropdown, if allowed
 			if($this->comments > 0)
 			{
 				echo '
-				<select name="comments">' . str_replace('value="' . $this->contentData['comments'] . '"', 'value="' . $this->contentData['comments'] . '" selected', '
-					<option value="' . Content::COMMENTS_STANDARD . '">Standard Comments</option>
-					<option value="' . Content::COMMENTS_MODERATE . '">Comments Need Approval</option>
-					<option value="' . Content::COMMENTS_NO_POSTING . '">Freeze Comments</option>
-					<option value="' . Content::COMMENTS_DISABLED . '">Don\'t Show Comments</option>
-				</select>');
+				<div style="margin-top:12px;">
+					<strong>Comments:</strong><br />
+					<select name="comments">' . str_replace('value="' . $this->contentData['comments'] . '"', 'value="' . $this->contentData['comments'] . '" selected', '
+						<option value="' . Content::COMMENTS_STANDARD . '">Standard Comments</option>
+						<option value="' . Content::COMMENTS_MODERATE . '">Comments Need Approval</option>
+						<option value="' . Content::COMMENTS_NO_POSTING . '">Freeze Comments</option>
+						<option value="' . Content::COMMENTS_DISABLED . '">Don\'t Show Comments</option>
+					</select>') . '
+				</div>';
 			}
 			
 			// Show the voting dropdown, if allowed
 			if($this->voting > 0)
 			{
 				echo '
-				<select name="voting">' . str_replace('value="' . $this->contentData['voting'] . '"', 'value="' . $this->contentData['voting'] . '" selected', '
-					<option value="' . Content::VOTING_STANDARD . '">Standard Voting</option>
-					<option value="' . Content::VOTING_FREEZE . '">Freeze Voting</option>
-					<option value="' . Content::VOTING_DISABLED . '">No Voting</option>
-				</select>');
+				<div style="margin-top:12px;">
+					<strong>Voting:</strong><br />
+					<select name="voting">' . str_replace('value="' . $this->contentData['voting'] . '"', 'value="' . $this->contentData['voting'] . '" selected', '
+						<option value="' . Content::VOTING_STANDARD . '">Standard Voting</option>
+						<option value="' . Content::VOTING_FREEZE . '">Freeze Voting</option>
+						<option value="' . Content::VOTING_DISABLED . '">No Voting</option>
+					</select>') . '
+				</div>';
 			}
-			
-			echo '
-			</p>';
 		}
 		
 		// Show the setting modules

@@ -74,7 +74,6 @@ abstract class URL {
 		if(ENVIRONMENT == "production")
 		{
 			// Temporary Measure
-			$name = str_replace("unifaction_com", "unifaction_cool", $name);
 			if($name == "unifaction_com") { $name = "unifaction_cool"; }
 			
 			return "http://" . str_replace("_", ".", $name);
