@@ -21,7 +21,7 @@ For example, it could be used in an HTML image tag like this:
 ------ Methods Available ------
 -------------------------------
 
-Avatar::hasAvatar($uniID)			// Checks if the user has an avatar or not
+Avatar::hasAvatar()				// Checks if the active user has an avatar or not
 
 Avatar::image($uniID)			// Returns an avatar
 Avatar::imageData($uniID)		// Returns the avatar image structure
@@ -35,11 +35,11 @@ abstract class Avatar {
 	public static function hasAvatar (
 	)					// RETURNS <bool> TRUE if user has an avatar, FALSE otherwise.
 	
-	// Avatar::hasAvatar
+	// Avatar::hasAvatar();
 	{
 		if(!Me::$loggedIn) { return false; }
 		
-		return ((isset(Me::$vals['has_avatar']) and Me::$vals['has_avatar']) ? true : false);
+		return ((isset(Me::$vals['avatar_opt']) and Me::$vals['avatar_opt']) ? true : false);
 	}
 	
 	

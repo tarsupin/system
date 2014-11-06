@@ -22,7 +22,7 @@ class Avatar_config {
 	
 	// $plugin->install();
 	{
-		DatabaseAdmin::addColumn("users", "has_avatar", "tinyint(1) unsigned NOT NULL", 0);
+		DatabaseAdmin::addColumn("users", "avatar_opt", "tinyint(1) unsigned NOT NULL", 0);
 		
 		return $this->isInstalled();
 	}
@@ -35,7 +35,7 @@ class Avatar_config {
 	// $plugin->isInstalled();
 	{
 		// Make sure the newly installed tables exist
-		return DatabaseAdmin::columnsExist("users", array("has_avatar"));
+		return DatabaseAdmin::columnsExist("users", array("avatar_opt"));
 	}
 	
 }
