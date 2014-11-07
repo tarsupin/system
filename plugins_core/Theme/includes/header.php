@@ -32,7 +32,7 @@ echo '
 			if(Me::$loggedIn)
 			{
 				echo '
-				<li id="nav-user"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(Me::$id, "small") . '" /></a>
+				<li id="login-menu"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(Me::$id, "small") . '" /></a>
 					<ul style="line-height:22px;">
 						<li><a href="/login?logAct=switch">Switch User</a></li>
 						<li><a href="/logout">Log Out</a></li>
@@ -44,7 +44,7 @@ echo '
 			else
 			{
 				echo '
-				<li id="nav-user"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(0, "small") . '" /></a>
+				<li id="login-menu"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(0, "small") . '" /></a>
 					<ul style="line-height:22px;">
 						<li><a href="/login">Log In</a></li>
 					</ul>

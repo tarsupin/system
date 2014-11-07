@@ -2,6 +2,7 @@
 
 echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 <div id="panel-core">
+	<div id="core-uni" class="hide-600"></div>
 	<div id="core-nav">
 		<ul id="core-list">
 			<li class="core-link is-my_uni"><a href="http://unifaction.me.test/' . Me::$slg . '"><span class="icon-globe core-icon"></span><span class="core-txt">My Uni</span></a></li>
