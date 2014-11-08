@@ -116,7 +116,7 @@ abstract class UserActivity {
 	(
 		$duration = 300		// <int> Number of seconds to check user activity over (default: last 5 minutes)
 	,	$resync = 0			// <int> Number of seconds before resyncing the count (default: 1/2 the duration)
-	)						// RETURNS <array> list of all online users
+	)						// RETURNS <int> the number of users online.
 	
 	// $userCount = UserActivity::getUsersOnlineCount([$duration], [$resync]);
 	{
