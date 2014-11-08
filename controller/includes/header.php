@@ -53,7 +53,7 @@ require(SYS_PATH . "/controller/includes/core_panel_" . ENVIRONMENT . ".php");
 
 echo '
 <div id="content-wrap">
-	<div style="padding-top:60px;">';
+	<div style="padding-top:60px;"></div>';
 
 // Load the widgets contained in the "UniFactionMenu" container, if applicable
 $widgetList = WidgetLoader::get("UniFactionMenu");

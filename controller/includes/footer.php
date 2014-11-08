@@ -2,13 +2,13 @@
 
 echo '
 </div> <!-- End "viewport-wrap" -->
+<div style="padding-top:60px;"></div>
 </div> <!-- End "content-wrap" -->';
 
 $uniCom = URL::unifaction_com();
 
 echo '
 <!-- Standard Footer -->
-<div class="spacer-giant"></div>
 <div id="footer">
 	<ul id="footer-left">
 		<li class="mobile-link"><a href="javascript:toggleMenu();">Menu</a></li>
@@ -30,8 +30,7 @@ echo '
 	<div id="notif-box" class="footer-display"></div>
 	<div id="friend-box" class="footer-display"></div>
 </div>
-</div> <!-- End "container" -->
-<div style="padding-top:60px;"></div>';
+</div> <!-- End "container" -->';
 
 echo Metadata::JSChat() . Metadata::footer() . '
 <script src="' . CDN . '/scripts/unifaction.js" async></script>
