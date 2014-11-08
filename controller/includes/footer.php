@@ -30,8 +30,8 @@ echo '
 	<div id="notif-box" class="footer-display"></div>
 	<div id="friend-box" class="footer-display"></div>
 </div>
-
-</div> <!-- End "container" -->';
+</div> <!-- End "container" -->
+<div style="padding-top:60px;"></div>';
 
 echo Metadata::JSChat() . Metadata::footer() . '
 <script src="' . CDN . '/scripts/unifaction.js" async></script>
