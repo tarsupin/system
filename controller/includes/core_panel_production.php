@@ -2,8 +2,8 @@
 
 echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 <div id="panel-core">
-	<div id="core-uni" class="hide-600"></div>
 	<div id="core-nav">
+	<div id="core-uni" class="hide-600"></div>
 		<ul id="core-list">
 			
 			<!-- My Uni -->
