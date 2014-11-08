@@ -272,7 +272,7 @@ abstract class Transaction {
 		if($uniID == 0)
 		{
 			// Set everyone's transaction approval to "disapprove"
-			return Database::query("UPDATE `transactions_users` SET has_agreed=? WHERE transaction_id=? LIMIT 1", array(0, $transactionID));
+			return Database::query("UPDATE `transactions_users` SET has_agreed=? WHERE transaction_id=?", array(0, $transactionID));
 		}
 		
 		// Set the user's transaction approval to "disapprove"
