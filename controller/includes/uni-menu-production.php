@@ -4,9 +4,9 @@
 WidgetLoader::add("UniFactionMenu", 10, '
 <div class="menu-wrap hide-600">
 	<ul class="menu">
-		<li class="menu-slot"><a href="' . URL::unifaction_com() . Me::$slg  . '">Uni</a><ul><li class="dropdown-slot"><a href="' . URL::unifaction_com() . '/discover' . Me::$slg . '">Discover Uni</a></li><li class="dropdown-slot"><a href="' . URL::unifaction_social() . '/friends' . Me::$slg . '">Friends</a></li><li class="dropdown-slot"><a href="' . URL::unifaction_com() . '/feed' . Me::$slg . '">My Feed</a></li></ul>
+		<li class="menu-slot"><a href="' . URL::unifaction_com() . Me::$slg  . '">Uni</a><ul><li class="dropdown-slot"><a href="' . URL::unifaction_com() . '/discover' . Me::$slg . '">Discover Uni</a></li><li class="dropdown-slot"><a href="' . URL::unifaction_social() . '/friends' . Me::$slg . '">Friends</a></li><li class="dropdown-slot"><a href="' . URL::chat_unifaction_com() . Me::$slg . '">Chat System</a></li></ul>
 		
-		<li class="menu-slot"><a href="' . URL::unifaction_community() . Me::$slg  . '">Communities</a><ul><li class="dropdown-slot"><a href="' . URL::avatar_unifaction_com() . Me::$slg  . '">Avatar</a></li><li class="dropdown-slot"><a href="' . URL::chat_unifaction_com() . Me::$slg  . '">Chat System</a></li></ul>
+		<li class="menu-slot"><a href="/discover">Communities</a><ul><li class="dropdown-slot"><a href="' . URL::avatar_unifaction_com() . Me::$slg  . '">Avatar</a></li><li class="dropdown-slot"><a href="' . URL::books_unifaction_com() . Me::$slg  . '">Books</a></li><li class="dropdown-slot"><a href="' . URL::gaming_unifaction_com() . Me::$slg  . '">Gaming</a></li><li class="dropdown-slot"><a href="' . URL::movies_unifaction_com() . Me::$slg  . '">Movies</a></li><li class="dropdown-slot"><a href="' . URL::music_unifaction_com() . Me::$slg  . '">Music</a></li><li class="dropdown-slot"><a href="' . URL::pets_unifaction_com() . Me::$slg  . '">Pets</a></li><li class="dropdown-slot"><a href="' . URL::shows_unifaction_com() . Me::$slg  . '">Shows</a></li><li class="dropdown-slot"><a href="' . URL::tech_unifaction_com() . Me::$slg  . '">Tech</a></li></ul>
 		
 		<li class="menu-slot show-tablet"><a href="' . URL::unn_today() . Me::$slg  . '">News</a><ul><li class="dropdown-slot"><a href="' . URL::unn_today() . Me::$slg  . '">World News</a></li><li class="dropdown-slot"><a href="' . URL::unn_today() . '/USA' . Me::$slg . '">US News</a></li></ul>
 		
@@ -25,10 +25,3 @@ WidgetLoader::add("UniFactionMenu", 10, '
 		
 	</ul>
 </div>');
-
-/*
-Sports: Sports News, Sports Forums, Sports Galleries, More...
-Tech: Tech Articles, Tech Forums, Gadgets, Programming, More...
-Science: Health
-Communities: Art Universe, Avatar, Chat System, Pet Competition, "Cool Stuff", Roleplaying, More...
-*/
