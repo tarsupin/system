@@ -367,7 +367,7 @@ abstract class Content {
 		if($status < Content::STATUS_GUEST)
 		{
 			// If it's not your page, clearance is disallowed
-			if($ownerID != Me::$id)
+			if($ownerID != Me::$id and Me::$clearance < 6)
 			{
 				Alert::saveError("Invalid Clearance", "You do not have clearance to view that article.");
 			

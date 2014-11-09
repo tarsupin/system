@@ -1,8 +1,8 @@
 <?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); }
 
 echo '
-</div> <!-- End "viewport-wrap" -->
 <div style="padding-top:60px;"></div>
+</div> <!-- End "viewport-wrap" -->
 </div> <!-- End "content-wrap" -->';
 
 $uniCom = URL::unifaction_com();

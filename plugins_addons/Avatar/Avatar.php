@@ -50,7 +50,7 @@ abstract class Avatar {
 	,	$aviID = 1		// <int> The ID of the specific avatar. 1 is the default one.			
 	)					// RETURNS <str> URL of the avatar to show off.
 	
-	// $aviImage = Avatar:image($uniID)
+	// $aviImage = Avatar:image($uniID, [$aviID]);
 	{
 		$aviData = self::imageData($uniID, $aviID);
 		
@@ -65,7 +65,7 @@ abstract class Avatar {
 	,	$aviID = 1		// <int> The ID of the specific avatar. 1 is the default one.			
 	)					// RETURNS <str:str> data pertaining to the avatar's image.
 	
-	// $aviData = Avatar:imageData($uniID);
+	// $aviData = Avatar:imageData($uniID, [$aviID]);
 	{
 		$fileAdd = substr(str_replace(array('+', '=', '/'), array('', '', ''), base64_encode(md5("avatar:" . $uniID . ($aviID != 1 ? "_" . $aviID : "")))), 0, 10);
 		
