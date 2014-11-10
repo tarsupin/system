@@ -176,8 +176,8 @@ switch($url[0])
 	case "logout":
 		require(SYS_PATH . "/controller/" . $url[0] . ".php"); exit;
 	
-	case "ajax":
 	case "login":
+	case "ajax":
 		break;
 	
 	default:
