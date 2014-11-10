@@ -107,7 +107,7 @@ class FeaturedWidget extends Widget {
 				
 				foreach($apiData['widgetData'] as $widget)
 				{
-					$html .= '<div class="widget-featured"><div class="widget-featured-left"><a href="' . $widget['url'] . '"><img src="' . $widgetSync . '/assets/featured/' . ceil($widget['id'] / 1000) . '/' . $widget['id'] . '.jpg"></a></div><div class="widget-featured-right"><strong>' . $widget['title'] . '</strong><br />' . $widget['description'] . '</div></div>';
+					$html .= '<div class="widget-featured"><div class="widget-featured-left"><a href="' . $widget['url'] . '"><img src="' . $widgetSync . '/assets/featured/' . ceil($widget['id'] / 1000) . '/' . $widget['id'] . '.jpg"></a></div><div class="widget-featured-right"><strong><a href="' . $widget['url'] . '">' . $widget['title'] . '</a></strong><br />' . $widget['description'] . '</div></div>';
 				}
 				
 				$html .= '</div></div>';
