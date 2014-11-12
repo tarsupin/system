@@ -69,7 +69,7 @@ abstract class UserActivity {
 	// $activeUsers = UserActivity::getUsersOnline([$duration], [$resync], [$limit]);
 	{
 		// Check if data is already cached
-		$usersOnline = Cache::get("usersOnline");
+		$usersOnline = Cache::get("usersOnline-" . SITE_HANDLE);
 		
 		if($usersOnline === false)		// If the result is set to false, the data is not cached
 		{
@@ -100,7 +100,7 @@ abstract class UserActivity {
 			if(mt_rand(0, 5 == 1)) { self::pruneActivity($duration * 2); }
 			
 			// Cache the list of users online
-			Cache::set("usersOnline", Serialize::encode($usersOnline), $resync);
+			Cache::set("usersOnline-" . SITE_HANDLE, Serialize::encode($usersOnline), $resync);
 		}
 		else
 		{
@@ -121,7 +121,7 @@ abstract class UserActivity {
 	// $userCount = UserActivity::getUsersOnlineCount([$duration], [$resync]);
 	{
 		// Check if data is already cached
-		$userCount = Cache::get("onlineCount-users");
+		$userCount = Cache::get("onlineCount-" . SITE_HANDLE);
 		
 		if($userCount === false)		// If the result is set to false, the data is not cached
 		{
@@ -137,7 +137,7 @@ abstract class UserActivity {
 			if(mt_rand(0, 5 == 1)) { self::pruneActivity($duration * 2); }
 			
 			// Cache the user online count
-			Cache::set("onlineCount-users", $userCount, $resync);
+			Cache::set("onlineCount-" . SITE_HANDLE, $userCount, $resync);
 		}
 		
 		return (int) $userCount;
@@ -154,7 +154,7 @@ abstract class UserActivity {
 	// $guestCount = UserActivity::getGuestsOnlineCount([$duration], [$resync]);
 	{
 		// Check if data is already cached
-		$guestCount = Cache::get("onlineCount-guests");
+		$guestCount = Cache::get("guestCount-" . SITE_HANDLE);
 		
 		if($guestCount === false)		// If the result is set to false, the data is not cached
 		{
@@ -170,7 +170,7 @@ abstract class UserActivity {
 			if(mt_rand(0, 5 == 1)) { self::pruneActivity($duration * 2); }
 			
 			// Cache the user online count
-			Cache::set("onlineCount-guests", $guestCount, $resync);
+			Cache::set("guestCount-" . SITE_HANDLE, $guestCount, $resync);
 		}
 		
 		return (int) $guestCount;

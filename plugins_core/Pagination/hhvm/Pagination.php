@@ -206,6 +206,6 @@ class Pagination {
 		}
 		
 		// Sort the Pagination Array
-		ksort($this->pages);
+		sort($this->pages);
 	}
 }

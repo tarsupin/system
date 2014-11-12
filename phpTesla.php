@@ -174,6 +174,7 @@ switch($url[0])
 {
 	case "api":
 	case "logout":
+	case "script":
 		require(SYS_PATH . "/controller/" . $url[0] . ".php"); exit;
 	
 	case "login":

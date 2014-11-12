@@ -51,7 +51,7 @@ class ChatWidget extends Widget {
 	{
 		$this->content = '
 		<div id="chat-wrap" class="chat-wrap">
-			<div class="chat-header" class="chat-header">#' . $channel . ' Chat</div>
+			<div class="chat-header" class="chat-header"><a href="http://chat.unifaction.com/' . $channel . '">#' . $channel . ' Chat</a></div>
 			<div id="chat-inner" class="chat-inner"></div>
 			<div id="chat-form-wrap">';
 			
