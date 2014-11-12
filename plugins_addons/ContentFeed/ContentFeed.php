@@ -68,7 +68,7 @@ abstract class ContentFeed {
 		$contentIDs = array();
 		
 		// Retrieve the list of content entries
-		$getList = Database::selectMultiple("SELECT id FROM content_entries WHERE status >= ? ORDER BY id DESC LIMIT 0, 20", array($status));
+		$getList = Database::selectMultiple("SELECT id FROM content_entries WHERE status >= ? ORDER BY date_posted DESC LIMIT 0, 20", array($status));
 		
 		foreach($getList as $getID)
 		{

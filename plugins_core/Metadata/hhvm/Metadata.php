@@ -186,8 +186,9 @@ abstract class Metadata {
 			// Prepare Values
 			$jsEncrypt = Security::jsEncrypt(Me::$vals['handle'], self::$jsData['key']);
 			$jsUser = Me::$vals['handle'];
+			$jsTime = microtime(true) - 90;
 			
-			return '<script>var JSUser = "' . $jsUser . '"; var JSEncrypt = "' . $jsEncrypt . '"; var JSChatTime = ' . microtime(true) . '; var JSProfilePic = "' . ProfilePic::image(Me::$id, "small") . '";</script>';
+			return '<script>var JSUser = "' . $jsUser . '"; var JSEncrypt = "' . $jsEncrypt . '"; var JSChatTime = ' . $jsTime . '; var JSProfilePic = "' . ProfilePic::image(Me::$id, "small") . '";</script>';
 		}
 		
 		return '';

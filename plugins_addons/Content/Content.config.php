@@ -50,8 +50,9 @@ class Content_config {
 			
 			`date_posted`			int(10)			unsigned	NOT NULL	DEFAULT '0',
 			
-			PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8 PARTITION BY KEY(id) PARTITIONS 5;
+			PRIMARY KEY (`id`),
+			INDEX (`date_posted`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		");
 		
 		/*
