@@ -202,7 +202,7 @@ abstract class Transaction {
 	{
 		// Invalidate the transaction approvals (since circumstances changed)
 		// In other words, nobody can agree to the transaction without knowledge of a new user joining
-		Transaction::disapprove($transactionID);
+		self::disapprove($transactionID);
 		
 		// Add the user to the transaction
 		return Database::query("INSERT INTO `transactions_users` (`uni_id`, `transaction_id`) VALUES (?, ?)", array($uniID, $transactionID));
@@ -220,7 +220,7 @@ abstract class Transaction {
 	{
 		// Invalidate the transaction approvals (since circumstances changed)
 		// In other words, nobody can agree to the transaction without knowledge that one of the users dropped out
-		Transaction::disapprove($transactionID);
+		self::disapprove($transactionID);
 		
 		// Remove the User
 		return Database::query("DELETE FROM `transactions_users` WHERE transaction_id=? AND uni_id=? VALUES (?, ?)", array($transactionID, $uniID));
@@ -364,7 +364,7 @@ abstract class Transaction {
 		
 		// Invalidate the transaction approvals (since circumstances changed)
 		// In other words, something was added to the transaction, so everyone needs to re-agree.
-		Transaction::disapprove($transactionID);
+		self::disapprove($transactionID);
 		
 		// Insert the new transaction entry
 		return Database::query("INSERT INTO `transactions_entries` (`transaction_id`, `uni_id`, `class`, `process_method`, `process_parameters`, `display`) VALUES (?, ?, ?, ?, ?, ?)", array($transactionID, $uniID, $class, $method, $parameters, $display));
@@ -386,7 +386,7 @@ abstract class Transaction {
 		}
 		
 		// Invalidate the transaction approvals (since circumstances changed)
-		Transaction::disapprove($entry['transaction_id']);
+		self::disapprove((int) $entry['transaction_id']);
 		
 		// Remove the Entry
 		return Database::query("DELETE FROM transactions_entries WHERE id=? LIMIT 1", array($entryID));
