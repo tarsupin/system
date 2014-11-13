@@ -25,6 +25,7 @@ There are two important UniMarkup methods to use.
 [center]	// Centers the text (on a new line).
 [note]		// Note: Provides a side-note with smaller text.
 [code]		// Code: Provides a block of text that maintains spacing rules by code.
+[url]		// Link: Creates a URL link to another page.
 [link]		// Link: Creates a URL link to another page.
 [size]		// Sets the size of text.
 [color]		// Color: Assigns an HTML color or word color to the section.

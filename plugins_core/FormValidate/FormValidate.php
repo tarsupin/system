@@ -514,11 +514,17 @@ abstract class FormValidate {
 		$announce = "";
 		$maxShow = 6;
 		
+		$replacements = array(" " => "(spaces)", "	" => "(tabs)", chr(13) => "(newline)", "
+" => "(newlines)");
+		
 		// Quick replacements
-		if(isset($illegalChars[' ']))
+		foreach($replacements as $orig => $rep)
 		{
-			$illegalChars['(space)'] = $illegalChars[' '];
-			unset($illegalChars[' ']);
+			if(isset($illegalChars[$orig]))
+			{
+				$illegalChars[$rep] = $illegalChars[$orig];
+				unset($illegalChars[$orig]);
+			}
 		}
 		
 		foreach($illegalChars as $key => $count)

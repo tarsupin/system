@@ -28,6 +28,7 @@ class User_config {
 			`uni_id`				int(10)			unsigned	NOT NULL	DEFAULT '0',
 			
 			`role`					varchar(12)					NOT NULL	DEFAULT '',
+			`flair`					varchar(22)					NOT NULL	DEFAULT '',
 			`clearance`				tinyint(1)					NOT NULL	DEFAULT '0',
 			
 			`handle`				varchar(22)					NOT NULL	DEFAULT '',

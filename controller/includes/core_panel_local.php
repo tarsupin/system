@@ -10,6 +10,7 @@ echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 			<li class="core-link is-fastchat"><a href="http://fastchat.social.test/' . Me::$slg . '"><span class="icon-comments core-icon"></span><span class="core-txt">FastChat</span></a></li>
 			<li class="core-link is-hashtag"><a href="http://hashtag.test/' . Me::$slg . '"><span class="icon-tag core-icon"></span><span class="core-txt">Hashtags</span></a></li>
 			<li class="core-link is-microfaction"><a href="http://community.microfaction.test/' . Me::$slg . '"><span class="icon-newspaper core-icon"></span><span class="core-txt">MicroFactions</span></a></li>
+			<li class="core-link is-my_uni"><a href="http://chat.test/' . Me::$slg . '"><span class="icon-quote core-icon"></span><span class="core-txt">Chat Rooms</span></a></li>
 			<li class="core-link is-blogfrog"><a href="http://blogfrog.social.test/' . Me::$slg . '"><span class="icon-pen core-icon"></span><span class="core-txt">BlogFrog</span></a></li>
 			<li class="core-link is-credits"><a href="http://unijoule.test/' . Me::$slg . '"><span class="icon-coin core-icon"></span><span class="core-txt">UniJoule</span></a></li>
 			<li class="core-link is-avatar"><a href="http://avatar.test/' . Me::$slg . '"><span class="icon-user core-icon"></span><span class="core-txt">Avatar</span></a></li>
