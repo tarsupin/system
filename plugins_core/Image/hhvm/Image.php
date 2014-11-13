@@ -1265,7 +1265,7 @@ class Image {
 	public function save
 	(
 		string $file				// <str> The file where you'd like to save the image.
-	,	int $quality = 85		// <int> The level of quality (only affects jpg)
+	,	int $quality = 90		// <int> The level of quality (only affects jpg)
 	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
 	
 	// $image->save($file, [$quality]);
