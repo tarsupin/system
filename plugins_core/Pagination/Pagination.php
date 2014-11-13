@@ -169,6 +169,7 @@ class Pagination {
 				$this->pages[$a] = $a;
 			}
 			
+			sort($this->pages);
 			return;
 		}
 		
@@ -183,7 +184,7 @@ class Pagination {
 		}
 		
 		// For Divisional Pages
-		if($mode == "division")
+		else if($mode == "division")
 		{
 			// Set the Major Divisions
 			$min = (int) max(1, floor($this->highestPage / $pageRange));

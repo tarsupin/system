@@ -63,6 +63,8 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '<div style="text-align:center;">$1</div>', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '<span style="font-size:0.8em;">$1</span>', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '<pre class="code">$1</pre>', $text);
+		$text = preg_replace('#\[url\](.+)\[\/url\]#iUs', '<a href="$1" rel="nofollow">$1</a>', $text);
+		$text = preg_replace('#\[url\=(.+)\](.+)\[\/url\]#iUs', '<a href="$1" rel="nofollow">$2</a>', $text);
 		$text = preg_replace('#\[link\](.+)\[\/link\]#iUs', '<a href="$1" rel="nofollow">$1</a>', $text);
 		$text = preg_replace('#\[link\=(.+)\](.+)\[\/link\]#iUs', '<a href="$1" rel="nofollow">$2</a>', $text);
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '<span style="font-size:$1px">$2</span>', $text);
@@ -94,6 +96,8 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '$1', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '$1', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '$1', $text);
+		$text = preg_replace('#\[url\](.+)\[\/url\]#iUs', '$1', $text);
+		$text = preg_replace('#\[url\=(.+)\](.+)\[\/url\]#iUs', '$2', $text);
 		$text = preg_replace('#\[link\](.+)\[\/link\]#iUs', '$1', $text);
 		$text = preg_replace('#\[link\=(.+)\](.+)\[\/link\]#iUs', '$2', $text);
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '$2', $text);
@@ -161,9 +165,9 @@ abstract class UniMarkup {
 		<a onclick=\'UniMarkup("' . $elementID . '", "center")\'><span class="icon-paragraph-center"></span></a>
 		&nbsp;';
 		
-		// Draw Link
+		// Draw URL
 		$html .= '
-		<a onclick=\'UniMarkupAdvanced("' . $elementID . '", "link")\'><span class="icon-link"></span></a>
+		<a onclick=\'UniMarkupAdvanced("' . $elementID . '", "url")\'><span class="icon-link"></span></a>
 		&nbsp;';
 		
 		// Draw Code
