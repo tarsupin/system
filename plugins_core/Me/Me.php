@@ -105,7 +105,7 @@ abstract class Me {
 	public static function softLog
 	(
 		$chooseID = 0	// <int> The UniID that is being set as active (0 if whatever Auth is logged as)
-	,	$returnTo = "/"	// <str> The URL to return to after logging in.
+	,	$returnTo = ""	// <str> The URL to return to after logging in.
 	)					// RETURNS <void>
 	
 	// Me::softLog([$chooseID], [$returnTo]);
@@ -120,6 +120,12 @@ abstract class Me {
 		
 		// Create a soft logout
 		unset($_SESSION[SITE_HANDLE]);
+		
+		// Rebuild a return URL
+		if(!$returnTo)
+		{
+			$_SESSION[SITE_HANDLE]['return_url'] = $url_relative;
+		}
 		
 		// Login with Auth
 		UniFaction::login($chooseID); exit;
@@ -264,10 +270,27 @@ abstract class Me {
 				header("Location: /banned"); exit;
 			}
 			
+			// Occasionally log activity (handles auro allotment)
+			if(mt_rand(0, 25) == 22)
+			{
+				self::logActivity();
+			}
+			
 			return true;
 		}
 		
 		return false;
+	}
+	
+	
+/****** Run the karma, auro, and general activity log ******/
+	public static function logActivity (
+	)					// RETURNS <void>
+	
+	// Me::logActivity();
+	{
+		// Not ready yet
+		// Connect::to("karma", "KarmaActivityAPI", array("uni_id" => Me::$id, "site_handle" => SITE_HANDLE, "action" => "view"));
 	}
 	
 	

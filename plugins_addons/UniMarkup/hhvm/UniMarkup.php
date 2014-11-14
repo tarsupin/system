@@ -124,9 +124,9 @@ abstract class UniMarkup {
 		
 		// Draw Text Formatting Options
 		$html .= '
-		<a onclick=\'UniMarkup("' . $elementID . '", "b")\'><span class="icon-bold"></span></a>
-		<a onclick=\'UniMarkup("' . $elementID . '", "u")\'><span class="icon-underline"></span></a>
-		<a onclick=\'UniMarkup("' . $elementID . '", "i")\'><span class="icon-italic"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "b")\'><span class="icon-bold"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "u")\'><span class="icon-underline"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "i")\'><span class="icon-italic"></span></a>
 		&nbsp;';
 		
 		// Draw Color Options
@@ -163,27 +163,27 @@ abstract class UniMarkup {
 		
 		// Draw Center Paragraph 
 		$html .= '
-		<a onclick=\'UniMarkup("' . $elementID . '", "center")\'><span class="icon-paragraph-center"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "center")\'><span class="icon-paragraph-center"></span></a>
 		&nbsp;';
 		
 		// Draw URL
 		$html .= '
-		<a onclick=\'UniMarkupAdvanced("' . $elementID . '", "url")\'><span class="icon-link"></span></a>
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "url")\'><span class="icon-link"></span></a>
 		&nbsp;';
 		
 		// Draw Code
 		$html .= '
-		<a onclick=\'UniMarkup("' . $elementID . '", "code")\'><span class="icon-console"></span></a>';
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "code")\'><span class="icon-console"></span></a>';
 		
 		// Draw Quote
 		$html .= '
-		<a onclick=\'UniMarkupAdvanced("' . $elementID . '", "quote")\'><span class="icon-quote"></span></a>';
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "quote")\'><span class="icon-quote"></span></a>';
 		
 		// Draw User and Hashtags
 		$html .= '
 		&nbsp;
-		<a onclick=\'UniMarkupAdvanced("' . $elementID . '", "user")\'><span class="icon-user"></span></a>
-		<a onclick=\'UniMarkupAdvanced("' . $elementID . '", "tag")\'><span class="icon-tag"></span></a>';
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "user")\'><span class="icon-user"></span></a>
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "tag")\'><span class="icon-tag"></span></a>';
 		
 		$html .= '
 		</div>';
