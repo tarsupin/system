@@ -6,12 +6,13 @@ abstract class Auro {
 /****** Grant auro to a user ******/
 	public static function grant
 	(
-		int $uniID		// <int> The UniID to grant the auro to.
-	,	int $auro		// <int> The amount of auro to send to the user.
-	,	string $desc = ""	// <str> A description for the transaction, if desired.
-	): bool				// RETURNS <bool> TRUE if the user recieved it, FALSE on failure.
+		int $uniID			// <int> The UniID to grant the auro to.
+	,	int $auro			// <int> The amount of auro to send to the user.
+	,	string $desc = ""		// <str> A description for the transaction, if desired.
+	,	string $siteName = ""	// <str> The name of the site, if you're recording a transaction.
+	): bool					// RETURNS <bool> TRUE if the user recieved it, FALSE on failure.
 	
-	// $success = Auro::grant($uniID, $auro, [$desc]);
+	// $success = Auro::grant($uniID, $auro, [$desc], [$siteName]);
 	{
 		// Prepare the Packet
 		$packet = array(
@@ -19,7 +20,11 @@ abstract class Auro {
 		,	"auro"		=> $auro
 		);
 		
-		if($desc) { $packet['desc'] = $desc; }
+		if($desc)
+		{
+			$packet['desc'] = $desc;
+			$packet['site_name'] = $siteName;
+		}
 		
 		return Connect::to("karma", "GrantAuroAPI", $packet);
 	}
@@ -28,12 +33,13 @@ abstract class Auro {
 /****** Spend or subtract auro from the user ******/
 	public static function spend
 	(
-		int $uniID		// <int> The UniID to spend auro from.
-	,	int $auro		// <int> The amount of auro to spend from the user.
-	,	string $desc = ""	// <str> A description for the transaction, if desired.
-	): bool				// RETURNS <bool> TRUE on successful purchase, FALSE if the user didn't have enough auro.
+		int $uniID			// <int> The UniID to spend auro from.
+	,	int $auro			// <int> The amount of auro to spend from the user.
+	,	string $desc = ""		// <str> A description for the transaction, if desired.
+	,	string $siteName = ""	// <str> The name of the site, if you're recording a transaction.
+	): bool					// RETURNS <bool> TRUE on successful purchase, FALSE if the user didn't have enough auro.
 	
-	// $success = Auro::spend($uniID, $auro, [$desc]);
+	// $success = Auro::spend($uniID, $auro, [$desc], [$siteName]);
 	{
 		// Prepare the Packet
 		$packet = array(
@@ -41,7 +47,11 @@ abstract class Auro {
 		,	"auro"		=> $auro
 		);
 		
-		if($desc) { $packet['desc'] = $desc; }
+		if($desc)
+		{
+			$packet['desc'] = $desc;
+			$packet['site_name'] = $siteName;
+		}
 		
 		return Connect::to("karma", "SpendAuroAPI", $packet);
 	}
@@ -54,9 +64,10 @@ abstract class Auro {
 	,	int $uniIDTo		// <int> The UniID receiving the auro.
 	,	int $auro			// <int> The amount of auro being exchanged.
 	,	string $desc = ""		// <str> A description for the transaction, if desired.
+	,	string $siteName = ""	// <str> The name of the site, if you're recording a transaction.
 	): bool					// RETURNS <bool> TRUE on successful exchange, FALSE on failure.
 	
-	// $success = Auro::exchange($uniIDFrom, $uniIDTo, $auro, [$desc]);
+	// $success = Auro::exchange($uniIDFrom, $uniIDTo, $auro, [$desc], [$siteName]);
 	{
 		// Prepare the Packet
 		$packet = array(
@@ -65,7 +76,11 @@ abstract class Auro {
 		,	"auro"			=> $auro
 		);
 		
-		if($desc) { $packet['desc'] = $desc; }
+		if($desc)
+		{
+			$packet['desc'] = $desc;
+			$packet['site_name'] = $siteName;
+		}
 		
 		return Connect::to("karma", "ExchangeAuroAPI", $packet);
 	}
