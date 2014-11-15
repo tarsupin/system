@@ -8,11 +8,20 @@ abstract class Auro {
 	(
 		$uniID		// <int> The UniID to grant the auro to.
 	,	$auro		// <int> The amount of auro to send to the user.
+	,	$desc = ""	// <str> A description for the transaction, if desired.
 	)				// RETURNS <bool> TRUE if the user recieved it, FALSE on failure.
 	
-	// $success = Auro::grant($uniID, $auro);
+	// $success = Auro::grant($uniID, $auro, [$desc]);
 	{
-		return Connect::to("karma", "GrantAuroAPI", array("uni_id" => $uniID, "auro" => $auro));
+		// Prepare the Packet
+		$packet = array(
+			"uni_id"	=> $uniID
+		,	"auro"		=> $auro
+		);
+		
+		if($desc) { $packet['desc'] = $desc; }
+		
+		return Connect::to("karma", "GrantAuroAPI", $packet);
 	}
 	
 	
@@ -21,11 +30,20 @@ abstract class Auro {
 	(
 		$uniID		// <int> The UniID to spend auro from.
 	,	$auro		// <int> The amount of auro to spend from the user.
+	,	$desc = ""	// <str> A description for the transaction, if desired.
 	)				// RETURNS <bool> TRUE on successful purchase, FALSE if the user didn't have enough auro.
 	
-	// $success = Auro::spend($uniID, $auro);
+	// $success = Auro::spend($uniID, $auro, [$desc]);
 	{
-		return Connect::to("karma", "SpendAuroAPI", array("uni_id" => $uniID, "auro" => $auro));
+		// Prepare the Packet
+		$packet = array(
+			"uni_id"	=> $uniID
+		,	"auro"		=> $auro
+		);
+		
+		if($desc) { $packet['desc'] = $desc; }
+		
+		return Connect::to("karma", "SpendAuroAPI", $packet);
 	}
 	
 	
@@ -35,10 +53,20 @@ abstract class Auro {
 		$uniIDFrom		// <int> The UniID spending the auro.
 	,	$uniIDTo		// <int> The UniID receiving the auro.
 	,	$auro			// <int> The amount of auro being exchanged.
+	,	$desc = ""		// <str> A description for the transaction, if desired.
 	)					// RETURNS <bool> TRUE on successful exchange, FALSE on failure.
 	
-	// $success = Auro::exchange($uniIDFrom, $uniIDTo, $auro);
+	// $success = Auro::exchange($uniIDFrom, $uniIDTo, $auro, [$desc]);
 	{
-		return Connect::to("karma", "ExchangeAuroAPI", array("uni_id_from" => $uniIDFrom, "uni_id_to" => $uniIDTo, "auro" => $auro));
+		// Prepare the Packet
+		$packet = array(
+			"uni_id_from"	=> $uniIDFrom
+		,	"uni_id_to"		=> $uniIDTo
+		,	"auro"			=> $auro
+		);
+		
+		if($desc) { $packet['desc'] = $desc; }
+		
+		return Connect::to("karma", "ExchangeAuroAPI", $packet);
 	}
 }
