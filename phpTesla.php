@@ -65,25 +65,6 @@ if(!isset($_SESSION[SITE_HANDLE]))
 	$_SESSION[SITE_HANDLE] = array();
 }
 
-// Check if the user is logged in
-// If the user isn't logged in, try to handle automatic logins as effectively as possible
-if(!isset($_SESSION[SITE_HANDLE]['id']))
-{
-	if($cookieData = Cookie::get("last_slg_" . SITE_HANDLE, SITE_HANDLE))
-	{
-		if((int) $cookieData < time() - 900)
-		{
-			$_GET['slg'] = 1;
-			
-			Cookie::set('last_slg_' . SITE_HANDLE, time(), SITE_HANDLE, 365);
-		}
-	}
-	else
-	{
-		Cookie::set('last_slg_' . SITE_HANDLE, time() - 36000, SITE_HANDLE, 365);
-	}
-}
-
 /****** Process Security Functions ******/
 Security::fingerprint();
 
@@ -186,6 +167,25 @@ switch($url[0])
 		/****** Attempt a soft login ******/
 		if(isset($_GET['slg']))
 		{
-			Me::softLog((int) $_GET['slg']);
+			Me::softLog((int) $_GET['slg'], $url_relative);
+		}
+		
+		// Check if the user is logged in
+		// If the user isn't logged in, try to handle automatic logins as effectively as possible
+		else if(!isset($_SESSION[SITE_HANDLE]['id']))
+		{
+			if($cookieData = Cookie::get("last_slg_" . SITE_HANDLE, SITE_HANDLE))
+			{
+				if((int) $cookieData < time() - 900)
+				{
+					$_GET['slg'] = 1;
+					
+					Cookie::set('last_slg_' . SITE_HANDLE, time(), SITE_HANDLE, 365);
+				}
+			}
+			else
+			{
+				Cookie::set('last_slg_' . SITE_HANDLE, time() - 36000, SITE_HANDLE, 365);
+			}
 		}
 }

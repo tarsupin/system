@@ -116,15 +116,13 @@ abstract class Me {
 			if($_SESSION[SITE_HANDLE]['id'] == $chooseID) { return; }
 		}
 		
-		global $url_relative;
-		
 		// Create a soft logout
 		unset($_SESSION[SITE_HANDLE]);
 		
-		// Rebuild a return URL
-		if(!$returnTo)
+		// Assign the return URL
+		if($returnTo)
 		{
-			$_SESSION[SITE_HANDLE]['return_url'] = $url_relative;
+			$_SESSION[SITE_HANDLE]['return_url'] = $returnTo;
 		}
 		
 		// Login with Auth
@@ -152,13 +150,6 @@ abstract class Me {
 		{
 			// This retains the site login redirection for UniFaction (Auth)
 			$_SESSION[SITE_HANDLE] = array("site_login" => $_SESSION[SITE_HANDLE]['site_login']);
-		}
-		else if(isset($_SESSION[SITE_HANDLE]['return_url']))
-		{
-			// This section prevents the "return_url" variable from being lost during login
-			// This allows us to return back to the URL that the user actually wants to load up
-			// NOTE: This works for all sites EXCEPT for UniFaction (Auth)
-			$_SESSION[SITE_HANDLE] = array("return_url" => $_SESSION[SITE_HANDLE]['return_url']);
 		}
 		else
 		{

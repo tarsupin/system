@@ -19,9 +19,10 @@ echo '
 		<a href="' . $uniCom . '/contact' . Me::$slg . '">Contact</a> | <a href="' . $uniCom . '/faqs' . Me::$slg . '">FAQs</a> | <a href="' . $uniCom . '/privacy' . Me::$slg . '">Privacy</a> | <a href="' . $uniCom . '/user-panel/reports' . Me::$slg . '">Report</a> | <a href="' . $uniCom . '/acknowledgements' . Me::$slg . '">Thanks</a> | <a href="' . $uniCom . '/tos' . Me::$slg . '">TOS</a>
 	</div>
 	<div id="footer-right">
-		<div class="ftbutton">
+		<div id="ftbutton">
 			<a id="friend-button" href="javascript:toggleFriends();"><span id="friend-count">0</span> <span class="icon-group foot-icon"></span></a>
 			<a id="notif-button" href="javascript:toggleNotifications();"><span id="notif-count">0</span> <span class="icon-circle-exclaim foot-icon"></span></a>
+			<a id="notif-button" href="javascript:toggleMyDisplay();"><span class="icon-settings foot-icon"></span></a>
 		</div>
 	</div>
 </div>
@@ -29,6 +30,7 @@ echo '
 <div id="footer-panel">
 	<div id="notif-box" class="footer-display"></div>
 	<div id="friend-box" class="footer-display"></div>
+	<div id="myDisplay-box" class="footer-display"></div>
 </div>
 </div> <!-- End "container" -->';
 
