@@ -178,9 +178,9 @@ switch($url[0])
 			{
 				if((int) $cookieData < time() - 900)
 				{
-					$_GET['slg'] = 1;
-					
 					Cookie::set('last_slg_' . SITE_HANDLE, time(), SITE_HANDLE, 365);
+					
+					Me::softLog(1, $url_relative);
 				}
 			}
 			else
