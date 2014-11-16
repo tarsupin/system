@@ -281,7 +281,7 @@ abstract class Me {
 	// Me::logActivity();
 	{
 		// Not ready yet
-		// Connect::to("karma", "KarmaActivityAPI", array("uni_id" => Me::$id, "site_handle" => SITE_HANDLE, "action" => "view"));
+		Connect::to("karma", "KarmaActivityAPI", array("uni_id" => Me::$id, "site_handle" => SITE_HANDLE, "action" => "view"));
 	}
 	
 	
