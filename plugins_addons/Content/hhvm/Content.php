@@ -287,10 +287,9 @@ abstract class Content {
 			.but-share { padding:8px; background-color:#4bc7c7; color:white !important; border-radius:6px; }
 			.but-share:hover { background-color:#8fdad7; }
 		</style>
-
+		
 		<p style="margin-top:16px;">
-			<a class="but-share" href="' . Content::shareContent($contentID, "article") . '"><span class="icon-group"></span> Share</a>
-			<a class="but-share" href="' . Content::chatContent($contentID, "article") . '"><span class="icon-comments"></span> Chat</a>';
+			<a class="but-share" href="' . Content::shareContent($contentID, "article") . '"><span class="icon-group"></span> Share</a>';
 		
 		if(Me::$clearance >= 6 or self::$contentData['uni_id'] == Me::$id)
 		{
