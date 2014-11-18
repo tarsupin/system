@@ -105,7 +105,7 @@ abstract class Comment {
 				$title = (isset($hashData['title']) ? $hashData['title'] : "");
 				$desc = (isset($hashData['description']) ? $hashData['description'] : "");
 				
-				Hashtag::submitImage($uniID, $hashData['thumbnail'], $comment, $hashtags, $sourceURL, $title, $desc);
+				Hashtag::submitImage($uniID, $hashData['thumbnail'], $hashtags, $sourceURL, $title, $desc);
 			}
 			
 			// Upload the Video URL
@@ -116,7 +116,7 @@ abstract class Comment {
 				$title = (isset($hashData['title']) ? $hashData['title'] : "");
 				$desc = (isset($hashData['description']) ? $hashData['description'] : "");
 				
-				Hashtag::submitVideo($uniID, $hashData['video_url'], $comment, $hashtags, $sourceURL, $title, $desc);
+				Hashtag::submitVideo($uniID, $hashData['video_url'], $hashtags, $sourceURL, $title, $desc);
 			}
 			
 			// Upload Comments
