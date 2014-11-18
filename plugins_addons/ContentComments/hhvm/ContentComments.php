@@ -30,7 +30,6 @@ abstract class ContentComments {
 		
 		// Prepare Values
 		$socialURL = URL::unifaction_social();
-		$fastchatURL = URL::fastchat_social();
 		
 		// Display the Comments
 		foreach($comments as $comment)
@@ -40,7 +39,7 @@ abstract class ContentComments {
 				<div class="comment-left"><a href="' . $socialURL . '/' . $comment['handle'] . '"><img class="circimg" src="' . ProfilePic::image((int) $comment['uni_id'], "medium") . '" /></a></div>
 				<div class="comment-right">
 					<div class="comment-top">
-						<div class="comment-data"><a href="' . $socialURL . '/' . $comment['handle'] . '"><span>' . $comment['display_name'] . '</span></a> <a class="handle" href="' . $fastchatURL . '/' . $comment['handle'] . '">@' . $comment['handle'] . '</a></div>
+						<div class="comment-data"><a href="' . $socialURL . '/' . $comment['handle'] . '"><span>' . $comment['display_name'] . '</span></a> <a class="handle" href="' . $socialURL . '/' . $comment['handle'] . '">@' . $comment['handle'] . '</a></div>
 						<div class="comment-time-post">' . Time::fuzzy((int) $comment['date_posted']) . '</div>
 					</div>
 					<div class="comment-message">' . Comment::showSyntax($comment['comment']) . '</div>

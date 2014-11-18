@@ -26,7 +26,7 @@ For example, your API may look like this:
 	
 The parameters do the following:
 
-	$siteHandle		// The handle of the site you're trying to call (such as "unifaction", "social", "fastchat", etc.)
+	$siteHandle		// The handle of the site you're trying to call (such as "unifaction", "social", "avatar", etc.)
 	$apiName		// The name of the API that you're connecting to
 	$dataToSend		// The variable (array, string, integer, etc) that you're passing to the API
 	

@@ -117,7 +117,7 @@ abstract class ModuleAuthor {
 		<div class="panel-box">
 			<span class="panel-head">About the Author</span>
 			<div style="padding:0px 16px 16px 16px; overflow:hidden;">
-				<a href="' . URL::fastchat_social() . '/' . $authorData['handle'] . '" style="margin:0px; padding:0px;"><img src="' . ProfilePic::image($authorID, "medium") . '" style="float:left; margin-right: 8px; margin-bottom:2px;" /></a>
+				<a href="' . URL::unifaction_social() . '/' . $authorData['handle'] . '" style="margin:0px; padding:0px;"><img src="' . ProfilePic::image($authorID, "medium") . '" style="float:left; margin-right: 8px; margin-bottom:2px;" /></a>
 				<div style="text-align:justify;">' . $authorData['blurb'] . '</div>
 			</div>
 		</div>';

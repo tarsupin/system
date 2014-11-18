@@ -40,11 +40,11 @@ Here's a list of examples how the URL plugin will interpret the dynamic values:
 		Live:	auth.unifaction.com
 	
 	// URL's that end in something other than ".com"
-	URL::fastchat_social()
+	URL::unifaction_social()
 		
-		Local:	fastchat.social.test
-		Dev:	fastchat.social.phptesla.com
-		Live:	fastchat.social
+		Local:	unifaction.social.test
+		Dev:	unifaction.social.phptesla.com
+		Live:	unifaction.social
 
 -------------------------------
 ------ Methods Available ------
@@ -73,9 +73,6 @@ abstract class URL {
 		// Production URL
 		if(ENVIRONMENT == "production")
 		{
-			// Temporary Measure
-			if($name == "unifaction_com") { $name = "unifaction_cool"; }
-			
 			return "http://" . str_replace("_", ".", $name);
 		}
 		

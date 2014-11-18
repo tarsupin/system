@@ -182,7 +182,7 @@ abstract class Comment {
 		
 		if($baseHandleSite == "")
 		{
-			$baseHandleSite = URL::fastchat_social();
+			$baseHandleSite = URL::unifaction_social();
 		}
 		
 		// Loop through the syntax on the comment

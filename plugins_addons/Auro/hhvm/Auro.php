@@ -10,7 +10,7 @@ abstract class Auro {
 	,	int $auro			// <int> The amount of auro to send to the user.
 	,	string $desc = ""		// <str> A description for the transaction, if desired.
 	,	string $siteName = ""	// <str> The name of the site, if you're recording a transaction.
-	): bool					// RETURNS <bool> TRUE if the user recieved it, FALSE on failure.
+	): bool					// RETURNS <bool> TRUE if the user received it, FALSE on failure.
 	
 	// $success = Auro::grant($uniID, $auro, [$desc], [$siteName]);
 	{

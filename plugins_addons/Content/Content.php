@@ -59,7 +59,7 @@ echo '
 // Display the Page
 echo '
 <h1>' . $coreData['title'] . '</h1>
-<p style="margin-bottom:0px;">Published ' . date("F jS, Y", $coreData['date_posted']) . ' by <a href="' . URL::unifaction_social() . '/' . $coreData['handle'] . '">' . $coreData['display_name'] . '</a> (<a href="' . URL::fastchat_social() . '/' . $coreData['handle'] . '">@' . $coreData['handle'] . '</a>)</p>
+<p style="margin-bottom:0px;">Published ' . date("F jS, Y", $coreData['date_posted']) . ' by <a href="' . URL::unifaction_social() . '/' . $coreData['handle'] . '">' . $coreData['display_name'] . '</a> (<a href="' . URL::unifaction_social() . '/' . $coreData['handle'] . '">@' . $coreData['handle'] . '</a>)</p>
 <p><a href="#">Tip the Author</a> | <a href="' . Content::shareContent($contentID, "article") . '">Share this Article</a> | <a href="' . Content::chatContent($contentID, "article") . '">Chat this Article</a> | <a href="' . Content::setVote($contentID) . '">Like</a> | <a href="' . Content::flag($contentID) . '">Flag</a>';
 
 // Display the hashtag list
@@ -234,7 +234,7 @@ abstract class Content {
 		// Display the Header
 		echo '
 		<h1 style="line-height:120%; padding-bottom:4px;">' . self::$contentData['title'] . '</h1>
-		<p style="margin-top:0px; margin-bottom:8px;">' . date("F jS, Y", self::$contentData['date_posted']) . ' by <a href="' . URL::unifaction_social() . '/' . self::$contentData['handle'] . '">' . self::$contentData['display_name'] . '</a> (<a href="' . URL::fastchat_social() . '/' . self::$contentData['handle'] . '">@' . self::$contentData['handle'] . '</a>)</p>
+		<p style="margin-top:0px; margin-bottom:8px;">' . date("F jS, Y", self::$contentData['date_posted']) . ' by <a href="' . URL::unifaction_social() . '/' . self::$contentData['handle'] . '">' . self::$contentData['display_name'] . '</a> (<a href="' . URL::unifaction_social() . '/' . self::$contentData['handle'] . '">@' . self::$contentData['handle'] . '</a>)</p>
 		<hr class="c-hr-dotted" />';
 		
 		// Pull the tracking data for this entry
@@ -546,83 +546,6 @@ abstract class Content {
 		
 		// Return Core Data
 		return $scanData;
-	}
-	
-	
-/****** "Chat This Content" Button ******/
-	public static function chatContent
-	(
-		$contentID		// <int> The content ID of the content entry you're chatting.
-	,	$type = "blog"	// <str> The type of content being chatted.
-	)					// RETURNS <str> the URL of the share link.
-	
-	// $href = Content::chatContent($contentID, $type);
-	{
-		// Prepare the Chat Data
-		$contentInfo = Serialize::encode(array($contentID, Me::$id, $type));
-		$contentInfo = urlencode(Encrypt::run("cCData", $contentInfo, "fast"));
-		
-		return '/action/Content/chatContent?param[0]=' . $contentInfo . (self::$returnURL ? '&return=' . self::$returnURL : '');
-	}
-	
-	
-/****** "Chat This Content" Action ******/
-	public static function chatContent_TeslaAction
-	(
-		$contentInfo	// <int:mixed> The data for the content that we're chatting.
-	)					// RETURNS <bool> TRUE on success, FALSE on failure.
-	
-	// URL: /action/Content/chatContent?param[0]={$contentInfo}
-	{
-		// Prepare Values
-		$contentInfo = Decrypt::run("cCData", $contentInfo[0]);
-		
-		list($contentID, $uniID, $type) = Serialize::decode($contentInfo);
-		
-		if(!$contentID or !$uniID)
-		{
-			return false;
-		}
-		
-		// Recognize Integers
-		$contentID = (int) $contentID;
-		$uniID = (int) $uniID;
-		
-		// Get the Article Data
-		$coreData = Content::scanForCoreData($contentID);
-		
-		// Prepare the Chat Image Array
-		$packet = array(
-			'uni_id'		=> $uniID					// The UniID of the page that you're posting to
-		,	'type'			=> $type					// The type of content being chatted (blog, article, etc)
-		,	'thumbnail'		=> $coreData['thumbnail']	// The thumbnail URL if you're posting an image
-		,	'title'			=> $coreData['title']		// If set, this is the title of the attachment
-		,	'description'	=> $coreData['body']		// If set, this is the description of the attachment
-		,	'source'		=> SITE_URL . "/" . $coreData['url_slug']		// The URL of the sourced content
-		,	'orig_handle'	=> $coreData['handle']		// The handle of the user that originally posted the content
-		);
-		
-		// Connect to Chat's Publishing API
-		$success = Connect::to("fastchat", "PublishAPI", $packet);
-		
-		if($success)
-		{
-			// Run the Content Tracker, if applicable
-			if(class_exists("ContentTrack"))
-			{
-				$contentTrack = new ContentTrack($contentID, $uniID);
-				
-				$contentTrack->share();
-			}
-			
-			Alert::saveSuccess("Chat Share", "You have successfully shared content to your Chat Page.");
-		}
-		else
-		{
-			Alert::saveError("Chat Failed", "This content encountered an error while attempting to post on your Chat Page.");
-		}
-		
-		return ($success === true);
 	}
 	
 	

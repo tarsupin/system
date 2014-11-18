@@ -243,7 +243,6 @@ abstract class ContentFeed {
 		}
 		
 		// Prepare Values
-		$fastchatURL = URL::fastchat_social();
 		$socialURL = URL::unifaction_social();
 		$hashtagURL = URL::hashtag_unifaction_com();
 		
@@ -288,7 +287,7 @@ abstract class ContentFeed {
 			if($coreData['handle'])
 			{
 				echo '
-					<div class="c-feed-author feed-desktop">Written by <a href="' . $socialURL . '/' . $coreData['handle'] . '">' . $coreData['display_name'] . '</a> (<a href="' . $fastchatURL . '/' . $coreData['handle'] . '">@' . $coreData['handle'] . '</a>)</div>';
+					<div class="c-feed-author feed-desktop">Written by <a href="' . $socialURL . '/' . $coreData['handle'] . '">' . $coreData['display_name'] . '</a> (<a href="' . $socialURL . '/' . $coreData['handle'] . '">@' . $coreData['handle'] . '</a>)</div>';
 			}
 			
 			echo '

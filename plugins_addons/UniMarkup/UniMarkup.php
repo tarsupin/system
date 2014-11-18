@@ -75,7 +75,7 @@ abstract class UniMarkup {
 		
 		// Comment Syntax
 		//$text = preg_replace('#(?<![:&])\#([\w]+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
-		//$text = preg_replace('#\@([\w]+?)#iUs', '<a href="' . URL::fastchat_social(). '/$1">@$1</a>', $text);
+		//$text = preg_replace('#\@([\w]+?)#iUs', '<a href="' . URL::unifaction_social(). '/$1">@$1</a>', $text);
 		
 		// Return Text
 		return $text;
