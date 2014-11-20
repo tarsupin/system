@@ -3,6 +3,10 @@
 // Display the Navigation Bar
 echo '
 <body>
+
+<!-- Content here gets displayed in the right panel, even with a dynamic AJAX loader -->
+<div id="move-content-wrapper" style="display:none;"><script type="text/javascript" src="http://ap.lijit.com/www/delivery/fpi.js?z=272446&u=unifaction&width=300&height=250" async></script></div>
+
 <div id="container">
 <div id="header-wrap">
 	<a href="' . URL::unifaction_com() . '"><img id="nav-logo" src="' . CDN . '/images/unifaction-logo.png" /></a>
