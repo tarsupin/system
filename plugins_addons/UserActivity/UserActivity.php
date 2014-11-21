@@ -88,7 +88,7 @@ abstract class UserActivity {
 				$usersOnline[$user['handle']] = $user;
 			}
 			
-			ksort($usersOnline);
+			ksort($usersOnline, SORT_NATURAL | SORT_FLAG_CASE);
 			
 			// Handle the resync value
 			if($resync == 0)
