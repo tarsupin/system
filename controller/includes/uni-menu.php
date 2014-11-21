@@ -1,11 +1,14 @@
 <?php if(!defined("CONF_PATH")) { die("No direct script access allowed."); } 
 
+/*
+
+		<li class="menu-slot"><a href="' . URL::unifaction_com() . '/communities">Communities</a><ul><li class="dropdown-slot"><a href="' . URL::avatar_unifaction_community() . Me::$slg  . '">Avatar</a></li><li class="dropdown-slot"><a href="' . URL::books_unifaction_community() . Me::$slg  . '">Books</a></li><li class="dropdown-slot"><a href="' . URL::gaming_unifaction_community() . Me::$slg  . '">Gaming</a></li><li class="dropdown-slot"><a href="' . URL::movies_unifaction_community() . Me::$slg  . '">Movies</a></li><li class="dropdown-slot"><a href="' . URL::music_unifaction_community() . Me::$slg  . '">Music</a></li><li class="dropdown-slot"><a href="' . URL::pets_unifaction_community() . Me::$slg  . '">Pets</a></li><li class="dropdown-slot"><a href="' . URL::shows_unifaction_community() . Me::$slg  . '">Shows</a></li><li class="dropdown-slot"><a href="' . URL::unifaction_com() . '/communities' . Me::$slg  . '#sports-communities">Pets</a></li><li class="dropdown-slot"><a href="' . URL::tech_unifaction_community() . Me::$slg  . '">Tech</a></li><li class="dropdown-slot"><a href="' . URL::unifaction_com() . '/communities">... more</a></li></ul>
+*/
+
 // UniFaction Dropdown Menu
 WidgetLoader::add("UniFactionMenu", 10, '
 <div class="menu-wrap hide-600">
 	<ul class="menu">' . (isset($uniMenu) ? $uniMenu : '') . '
-		
-		<li class="menu-slot"><a href="' . URL::unifaction_com() . '/communities">Communities</a><ul><li class="dropdown-slot"><a href="' . URL::avatar_unifaction_community() . Me::$slg  . '">Avatar</a></li><li class="dropdown-slot"><a href="' . URL::books_unifaction_community() . Me::$slg  . '">Books</a></li><li class="dropdown-slot"><a href="' . URL::gaming_unifaction_community() . Me::$slg  . '">Gaming</a></li><li class="dropdown-slot"><a href="' . URL::movies_unifaction_community() . Me::$slg  . '">Movies</a></li><li class="dropdown-slot"><a href="' . URL::music_unifaction_community() . Me::$slg  . '">Music</a></li><li class="dropdown-slot"><a href="' . URL::pets_unifaction_community() . Me::$slg  . '">Pets</a></li><li class="dropdown-slot"><a href="' . URL::shows_unifaction_community() . Me::$slg  . '">Shows</a></li><li class="dropdown-slot"><a href="' . URL::unifaction_com() . '/communities' . Me::$slg  . '#sports-communities">Pets</a></li><li class="dropdown-slot"><a href="' . URL::tech_unifaction_community() . Me::$slg  . '">Tech</a></li><li class="dropdown-slot"><a href="' . URL::unifaction_com() . '/communities">... more</a></li></ul>
 		
 		<li class="menu-slot show-tablet"><a href="' . URL::unn_today() . Me::$slg  . '">News</a><ul><li class="dropdown-slot"><a href="' . URL::unn_today() . Me::$slg  . '">World News</a></li><li class="dropdown-slot"><a href="' . URL::unn_today() . '/USA' . Me::$slg . '">US News</a></li></ul>
 		

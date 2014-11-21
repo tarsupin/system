@@ -5,8 +5,9 @@ echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 	<div id="core-nav">
 	<div id="core-uni" class="hide-600"></div>
 		<ul id="core-list">
-			<li class="core-link is-universe"><a href="http://unifaction.com/' . Me::$slg . '"><span class="icon-globe core-icon"></span><span class="core-txt">My Uni</span></a></li>
+			<li class="core-link is-universe"><a href="http://unifaction.com/' . Me::$slg . '"><span class="icon-globe core-icon"></span><span class="core-txt">Universe</span></a></li>
 			<li class="core-link is-social"><a href="http://unifaction.social/' . Me::$slg . '"><span class="icon-group core-icon"></span><span class="core-txt">Unity</span></a></li>
+			<li class="core-link is-community"><a href="http://unifaction.community/' . Me::$slg . '"><span class="icon-earth core-icon"></span><span class="core-txt">Communities</span></a></li>
 			
 			<!-- My Uni -->
 			
