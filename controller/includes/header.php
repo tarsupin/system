@@ -27,10 +27,13 @@ echo '
 	{
 		echo '
 		<li id="login-menu"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(Me::$id, "small") . '" /></a>
-			<ul style="line-height:22px; min-width:150px;">
-				<li><a href="' . URL::unifaction_com() . '/multi-accounts' . Me::$slg . '">Change User</a></li>
-				<li><a href="' . URL::profilepic_unifaction_com() . '/' . Me::$slg . '">Update Image</a></li>
-				<li><a href="' . URL::unifaction_com() . '/user-panel' . Me::$slg . '">Settings</a></li>
+			<ul style="line-height:22px; min-width:180px;">
+				<li><a href="' . URL::unifaction_social() . '/' . Me::$vals['handle'] . Me::$slg . '">My Unity Wall</a></li>
+				<li><a href="' . URL::blogfrog_social() . '/' . Me::$vals['handle'] . Me::$slg . '">My BlogFrog</a></li>
+				<li><a href="' . URL::unifaction_social() . '/friends' . Me::$slg . '">My Friends</a></li>
+				<li><a href="' . URL::unijoule_com() . Me::$slg . '">My UniJoule</a></li>
+				<li><a href="' . URL::profilepic_unifaction_com() . '/' . Me::$slg . '">Update Profile Pic</a></li>
+				<li><a href="' . URL::unifaction_com() . '/user-panel' . Me::$slg . '">My Settings</a></li>
 				<li><a href="' . URL::unifaction_com() . '/logout">Log Out</a></li>
 			</ul>
 		</li>';
