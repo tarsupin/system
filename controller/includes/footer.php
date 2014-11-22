@@ -5,15 +5,31 @@ echo '
 </div> <!-- End "viewport-wrap" -->
 </div> <!-- End "content-wrap" -->';
 
+
+// Display the Mobile Menu
+echo '
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="modal-bg" onclick="toggleMenu()" style="position:absolute; top:0px; left:0px; display:none; width:100%; z-index:500; height:100%;"><div style="padding:10px; z-index:600; margin-bottom:80px;">';
+
+$widgetList = WidgetLoader::get("MobilePanel");
+
+foreach($widgetList as $widgetContent)
+{
+	echo $widgetContent;
+}
+
+echo '
+</div></div>';
+
 $uniCom = URL::unifaction_com();
 
+// Footer
 echo '
 <!-- Standard Footer -->
 <div id="footer">
 	<ul id="footer-left">
 		<li class="mobile-link"><a href="javascript:toggleMenu();">Menu</a></li>
 		<li class="mobile-link"><a href="' . URL::unifaction_com() . '/mobile-menu' . Me::$slg . '">All Sites</a></li>
-		<li class="mobile-link"><a href="' . URL::unifaction_com() . Me::$slg . '">Home</a></li>
 	</ul>
 	<div id="footer-middle">
 		<a href="' . $uniCom . '/contact' . Me::$slg . '">Contact</a> | <a href="' . $uniCom . '/faqs' . Me::$slg . '">FAQs</a> | <a href="' . $uniCom . '/privacy' . Me::$slg . '">Privacy</a> | <a href="' . $uniCom . '/user-panel/reports' . Me::$slg . '">Report</a> | <a href="' . $uniCom . '/acknowledgements' . Me::$slg . '">Thanks</a> | <a href="' . $uniCom . '/tos' . Me::$slg . '">TOS</a>
