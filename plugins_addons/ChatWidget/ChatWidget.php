@@ -59,7 +59,7 @@ class ChatWidget extends Widget {
 			{
 				$this->content .= '
 				<form id="chat-form" class="uniform" action="javascript:void(0);" method="post" onsubmit="submitChatForm();">' . Form::prepare("chat-post") . '
-				<input id="chat_message" type="text" name="chat_message" value="" placeholder="Chat something . . ." style="width:100%; box-sizing:border-box;" maxlength="200" tabindex="10" autofocus autocomplete="off" />
+				<input id="chat_message" type="text" name="chat_message" value="" placeholder="Chat something . . ." style="width:100%; box-sizing:border-box;" maxlength="200" autocomplete="off" />
 				<input type="submit" name="submit" value="Post Chat" style="display:none;" />
 				<input id="chat_username" type="text" name="chat_username" value="' . Me::$vals['handle'] . '" style="display:none;" />
 				</form>';
