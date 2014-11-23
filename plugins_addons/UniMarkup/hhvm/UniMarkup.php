@@ -19,6 +19,7 @@ There are two important UniMarkup methods to use.
 ------ UniMarkup Available ------
 ---------------------------------
 
+[nocode]	// NoCode: Prevents the text from being parsed.
 [b]			// Bold: Bolds the text without indicating any SEO relevance.
 [u]			// Underlines the text.
 [i]			// Italicizes the text.
@@ -61,6 +62,16 @@ abstract class UniMarkup {
 	
 	// $text = UniMarkup::parse($text);
 	{
+		// NoCode
+		$text =  preg_replace_callback(
+			'/\[nocode\](.+?)\[\/nocode\]/is',
+			create_function(
+				'$matches',
+				'return str_replace(array("[","]"),array("&#91;","&#93;"),$matches[1]);'
+			),
+			$text
+		);
+	
 		// Parse the UniMarkup
 		$text = preg_replace('#\[b\](.+)\[\/b\]#iUs', '<span style="font-weight:bold;">$1</span>', $text);
 		$text = preg_replace('#\[u\](.+)\[\/u\]#iUs', '<span style="text-decoration:underline;">$1</span>', $text);
@@ -76,28 +87,23 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '<span style="font-size:$1px;">$2</span>', $text);
 		$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '<span style="color:$1;">$2</span>', $text);
 		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '<img src="$1" alt="Image" />', $text);
-		// Quotes, lists and spoilers are often nested
-		while(preg_match('#\[quote\](.+)\[\/quote]#iUs', $text))
+		
+		// Quotes are often nested
+		while(preg_match('#\[quote\](.+)\[\/quote\]#iUs', $text))
 		{
-			$text = preg_replace('#\[quote\](((?R)|.)+)\[\/quote]#iUs', '<div class="quote">$1</div><div class="quote-by">By: ?</div>', $text);
+			$text = preg_replace('#\[quote\](((?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$1</div><div class="quote-by">By: ?</div>', $text);
 		}
-		while(preg_match('#\[quote\=(.+)\](.+)\[\/quote]#iUs', $text))
+		while(preg_match('#\[quote\=(.+)\](.+)\[\/quote\]#iUs', $text))
 		{
-			$text = preg_replace('#\[quote\=(.+)\](((?R)|.)+)\[\/quote]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text);
+			$text = preg_replace('#\[quote\=(.+)\](((?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text);
 		}
-		while(preg_match('#\[list\](((?R)|.)+)\[\/list]#iUs', $text))
-		{
-			$text = preg_replace('#\[list\](((?R)|.)+)\[\/list]#iUs', '<ul>$1</ul>', $text);
-		}
-		$text = str_replace('[*]', '<li>', $text);
-		while(preg_match('#\[spoiler\](.+)\[\/spoiler]#iUs', $text))
-		{
-			$text = preg_replace('#\[spoiler\](((?R)|.)+)\[\/spoiler]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">Spoiler</div><div class="spoiler-content">$1</div>', $text);
-		}
-		while(preg_match('#\[spoiler\=(.+)\](.+)\[\/spoiler]#iUs', $text))
-		{
-			$text = preg_replace('#\[spoiler\=(.+)\](((?R)|.)+)\[\/spoiler]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">$1</div><div class="spoiler-content">$2</div>', $text);
-		}
+		$text = preg_replace('#\[list\]#iUs', '<ul>', $text);
+		$text = preg_replace('#\[\/list\]#iUs', '</ul>', $text);
+		$text = preg_replace('#\[\*\]#iUs', '<li>', $text);
+		
+		$text = preg_replace('#\[spoiler\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">Spoiler</div><div class="spoiler-content">', $text);
+		$text = preg_replace('#\[spoiler\=(.+)\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">$1</div><div class="spoiler-content">', $text);
+		$text = preg_replace('#\[\/spoiler\]#iUs', '</div>', $text);
 		
 		// Comment Syntax
 		//$text = preg_replace('#(?<![:&])\#([\w]+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
@@ -131,25 +137,25 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '$2', $text);
 		$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '$2', $text);
 		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '', $text); 
-		while(preg_match('#\[quote\](.+)\[\/quote]#iUs', $text))
+		while(preg_match('#\[quote\](.+)\[\/quote\]#iUs', $text))
 		{
-			$text = preg_replace('#\[quote\](((?R)|.)+)\[\/quote]#iUs', '', $text);
+			$text = preg_replace('#\[quote\](((?R)|.)+)\[\/quote\]#iUs', '', $text);
 		}
-		while(preg_match('#\[quote\=(.+)\](.+)\[\/quote]#iUs', $text))
+		while(preg_match('#\[quote\=(.+)\](.+)\[\/quote\]#iUs', $text))
 		{
-			$text = preg_replace('#\[quote\=(.+)\](((?R)|.)+)\[\/quote]#iUs', '', $text);
+			$text = preg_replace('#\[quote\=(.+)\](((?R)|.)+)\[\/quote\]#iUs', '', $text);
 		}
-		while(preg_match('#\[list\](.+)\[\/list]#iUs', $text))
+		while(preg_match('#\[list\](.+)\[\/list\]#iUs', $text))
 		{
-			$text = preg_replace('#\[list\](((?R)|.)+)\[\/list]#iUs', '', $text);
+			$text = preg_replace('#\[list\](((?R)|.)+)\[\/list\]#iUs', '', $text);
 		}
-		while(preg_match('#\[spoiler\](.+)\[\/spoiler]#iUs', $text))
+		while(preg_match('#\[spoiler\](.+)\[\/spoiler\]#iUs', $text))
 		{
-			$text = preg_replace('#\[spoiler\](.+)\[\/spoiler]#iUs', '', $text);
+			$text = preg_replace('#\[spoiler\](((?R)|.)+)\[\/spoiler\]#iUs', '', $text);
 		}
-		while(preg_match('#\[spoiler\=(.+)\](.+)\[\/spoiler]#iUs', $text))
+		while(preg_match('#\[spoiler\=(.+)\](.+)\[\/spoiler\]#iUs', $text))
 		{
-			$text = preg_replace('#\[spoiler\=(.+)\](.+)\[\/spoiler]#iUs', '', $text);
+			$text = preg_replace('#\[spoiler\=(.+)\](((?R)|.)+)\[\/spoiler\]#iUs', '', $text);
 		}
 		
 		// Return Text
