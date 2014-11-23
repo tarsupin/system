@@ -32,6 +32,7 @@ echo '
 				<li><a href="' . URL::blogfrog_social() . '/' . Me::$vals['handle'] . Me::$slg . '">My BlogFrog</a></li>
 				<li><a href="' . URL::unifaction_social() . '/friends' . Me::$slg . '">My Friends</a></li>
 				<li><a href="' . URL::unijoule_com() . Me::$slg . '">My UniJoule</a></li>
+				<li><a href="' . URL::inbox_unifaction_com() . Me::$slg . '">My Inbox</a></li>
 				<li><a href="' . URL::profilepic_unifaction_com() . '/' . Me::$slg . '">Update Profile Pic</a></li>
 				<li><a href="' . URL::unifaction_com() . '/user-panel">My Settings</a></li>
 				<li><a href="' . URL::unifaction_com() . '/multi-accounts">Switch User</a></li>

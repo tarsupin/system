@@ -161,6 +161,19 @@ abstract class User {
 	
 	// User::silentRegister($user);
 	{
+		// Make sure the user doesn't exist
+		if(is_numeric($user))
+		{
+			if($userData = User::get($user, "uni_id"))
+			{
+				return true;
+			}
+		}
+		else if($userData = User::getIDByHandle($user))
+		{
+			return true;
+		}
+		
 		// Get User Data from Auth
 		$packet = array("user" => $user, "columns" => "uni_id, handle, display_name");
 		
