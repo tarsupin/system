@@ -355,7 +355,7 @@ abstract class FormValidate {
 	public static function number
 	(
 		string $name			// <str> The name of the input field.
-	,	string &$value			// <str> The value to validate.
+	,	mixed &$value			// <mixed> The value to validate.
 	,	int $minValue = 0	// <int> The minimum value of the field.
 	,	int $maxValue = 0	// <int> The maximum value of the field.
 	): void					// RETURNS <void>
