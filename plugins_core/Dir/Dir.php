@@ -117,7 +117,7 @@ abstract class Dir {
 		}
 		
 		// Delete the source folder if the move was successful
-		return $success ? self::delete($sourcePath) : false;
+		return ($success ? self::delete($sourcePath) : false);
 	}
 	
 	
