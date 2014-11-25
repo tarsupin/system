@@ -172,8 +172,10 @@ abstract class Content {
 		
 		Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" /><script src="' . CDN . '/scripts/content-system.js"></script>');
 		
+		Metadata::addHeader('<meta property="og:image" content="' . self::$contentData['thumbnail'] . '"/>');
+		
 		// Add Facebook Method
-		Metadata::addHeader('
+		Metadata::addFooter('
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
