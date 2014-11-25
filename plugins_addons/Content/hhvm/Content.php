@@ -124,12 +124,15 @@ abstract class Content {
 	public static function prepare
 	(
 		int $contentID		// <int> The ID of the content to prepare.
-	): void					// RETURNS <void> runs the appropriate preparation methods.
+	): bool					// RETURNS <bool> TRUE on success, FALSE if no content is returned.
 	
 	// ContentFeed::prepare($contentID);
 	{
 		// Retrieve important content data
-		self::$contentData = self::load($contentID);
+		if(!self::$contentData = self::load($contentID))
+		{
+			return false;
+		}
 		
 		// Recognize Integers
 		self::$contentData['uni_id'] = (int) self::$contentData['uni_id'];
@@ -161,10 +164,15 @@ abstract class Content {
 		}
 		*/
 		
+		// Add a view to the system
+		$contentTrack = new ContentTrack($contentID, Me::$id);
+		
 		// Prepare Metaheader Scripts
 		Photo::prepareResponsivePage();
 		
 		Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" /><script src="' . CDN . '/scripts/content-system.js"></script>');
+		
+		return true;
 	}
 	
 	
@@ -188,7 +196,10 @@ abstract class Content {
 	
 	// $contentData = ContentLoad::load($contentID);
 	{
-		$contData = Database::selectOne("SELECT e.*, c.body, u.handle, u.display_name FROM content_entries e LEFT JOIN content_cache c ON e.id=c.content_id INNER JOIN users u ON e.uni_id=u.uni_id WHERE e.id=? LIMIT 1", array($contentID));
+		if(!$contData = Database::selectOne("SELECT e.*, c.body, u.handle, u.display_name FROM content_entries e LEFT JOIN content_cache c ON e.id=c.content_id INNER JOIN users u ON e.uni_id=u.uni_id WHERE e.id=? LIMIT 1", array($contentID)))
+		{
+			return array();
+		}
 		
 		// Recognize Integers
 		$contData['uni_id'] = (int) $contData['uni_id'];
@@ -445,7 +456,7 @@ abstract class Content {
 	// $coreData = Content::scanForCoreData($contentID, [$blocksToScan]);
 	{
 		// Get the Content Data
-		if(!$scanData = Database::selectOne("SELECT c.uni_id, c.url_slug, c.title, c.thumbnail, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id WHERE c.id=? LIMIT 1", array($contentID)))
+		if(!$scanData = Database::selectOne("SELECT c.uni_id, c.url_slug, c.title, c.thumbnail, c.description, c.date_posted, c.status, u.handle, c.primary_hashtag, u.display_name FROM content_entries c LEFT JOIN users u ON c.uni_id=u.uni_id WHERE c.id=? LIMIT 1", array($contentID)))
 		{
 			return array();
 		}
@@ -578,8 +589,14 @@ abstract class Content {
 		
 		list($contentID, $uniID, $type) = Serialize::decode($contentInfo);
 		
-		if(!$contentID or !$uniID)
+		if(!$contentID)
 		{
+			return false;
+		}
+		
+		if(!$uniID)
+		{
+			Alert::saveInfo("Share Failed", "Please log in to share this content to your Unity Wall.");
 			return false;
 		}
 		
@@ -589,17 +606,16 @@ abstract class Content {
 		// Prepare the Chat Image Array
 		$packet = array(
 			'uni_id'		=> $uniID					// The UniID of the page that you're posting to
-		,	'type'			=> $type					// The type of content being chatted (blog, article, etc)
 		,	'poster_id'		=> $uniID					// The person posting to the page (usually the same as UniID)
 		,	'thumbnail'		=> $coreData['thumbnail']	// Set this value (absolute url) if you're posting an image
 		,	'title'			=> $coreData['title']		// If set, this is the title of the attachment
-		,	'description'	=> $coreData['body']		// If set, this is the description of the attachment
+		,	'description'	=> $coreData['description']	// If set, this is the description of the attachment
 		,	'source'		=> SITE_URL . "/" . $coreData['url_slug']		// The URL of the sourced content
 		,	'orig_handle'	=> $coreData['handle']		// The handle of the user that originally posted the content
 		);
 		
 		// Connect to Chat's Publishing API
-		$success = Connect::to("social", "PublishAPI", $packet);
+		$success = Connect::to("social", "PublishArticleAPI", $packet);
 		
 		if($success)
 		{
@@ -611,11 +627,11 @@ abstract class Content {
 				$contentTrack->share();
 			}
 			
-			Alert::saveSuccess("Social Share", "You have successfully shared content to your Social Wall.");
+			Alert::saveSuccess("Social Share", "You have successfully shared content to your Unity Wall.");
 		}
 		else
 		{
-			Alert::saveError("Share Failed", "This content encountered an error while attempting to post on your Social Wall.");
+			Alert::saveError("Share Failed", "This content encountered an error while attempting to post on your Unity Wall.");
 		}
 		
 		return ($success === true);

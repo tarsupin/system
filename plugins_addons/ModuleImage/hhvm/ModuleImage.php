@@ -22,8 +22,12 @@ abstract class ModuleImage {
 		"content-img"				=> "Centered Image, 100% Width"
 	,	"content-img-mid"			=> "Centered Image, 70% Width"
 	,	"content-img-sm"			=> "Centered Image, 50% Width"
+	,	"content-img-left-60"		=> "Image on Left, 60% Width"
+	,	"content-img-left-50"		=> "Image on Left, 50% Width"
 	,	"content-img-left"			=> "Image on Left, 40% Width"
 	,	"content-img-left-sm"		=> "Image on Left, 25% Width"
+	,	"content-img-right-60"		=> "Image on Right, 60% Width"
+	,	"content-img-right-50"		=> "Image on Right, 50% Width"
 	,	"content-img-right"			=> "Image on Right, 40% Width"
 	,	"content-img-right-sm"		=> "Image on Right, 25% Width"
 	);

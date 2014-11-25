@@ -258,7 +258,16 @@ abstract class ContentFeed {
 			
 			// Prepare Values
 			$aggregate = $coreData['url'] == "" ? false : true;
-			$articleURL = $aggregate ? $coreData['url'] . "/" . $coreData['url_slug'] : "/" . $coreData['url_slug'];
+			
+			// Determine the Article URL
+			if($coreData['status'] == Content::STATUS_DRAFT)
+			{
+				$articleURL = "/draft?id=" . $contentID;
+			}
+			else
+			{
+				$articleURL = $aggregate ? $coreData['url'] . "/" . $coreData['url_slug'] : "/" . $coreData['url_slug'];
+			}
 			
 			// Display the Content
 			echo '

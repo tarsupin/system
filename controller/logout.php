@@ -3,4 +3,4 @@
 // This script logs the user out of the system and redirects them to your home page.
 Me::logout();
 
-header("Location: /"); exit;
+header("Location: " . URL::unifaction_com() . "/logout"); exit;

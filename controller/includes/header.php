@@ -36,7 +36,7 @@ echo '
 				<li><a href="' . URL::profilepic_unifaction_com() . '/' . Me::$slg . '">Update Profile Pic</a></li>
 				<li><a href="' . URL::unifaction_com() . '/user-panel">My Settings</a></li>
 				<li><a href="' . URL::unifaction_com() . '/multi-accounts">Switch User</a></li>
-				<li><a href="' . URL::unifaction_com() . '/logout">Log Out</a></li>
+				<li><a href="/logout">Log Out</a></li>
 			</ul>
 		</li>';
 	}
