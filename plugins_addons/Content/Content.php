@@ -172,6 +172,17 @@ abstract class Content {
 		
 		Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" /><script src="' . CDN . '/scripts/content-system.js"></script>');
 		
+		// Add Facebook Method
+		Metadata::addHeader('
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=67124493108&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, \'script\', \'facebook-jssdk\'));</script>');
+		
 		return true;
 	}
 	
@@ -299,7 +310,7 @@ abstract class Content {
 			.but-share:hover { background-color:#8fdad7; }
 		</style>
 		
-		<p style="margin-top:16px;">
+		<p style="margin-top:16px; display:inline-block;">
 			<a class="but-share" href="' . Content::shareContent($contentID, "article") . '"><span class="icon-group"></span> Share</a>';
 		
 		if(Me::$clearance >= 6 or self::$contentData['uni_id'] == Me::$id)
@@ -310,7 +321,9 @@ abstract class Content {
 		
 		echo '
 			<a class="but-share" href="' . Content::flag($contentID) . '"><span class="icon-flag"></span> Flag</a>
-		</p>';
+		</p>
+		
+		<div style="display:inline-block;"><div class="fb-share-button" data-href="' . SITE_URL . "/" . self::$contentData['url_slug'] . '" data-layout="button_count" style="display:inline-block;"></div></div>';
 		
 		echo '
 		<hr class="c-hr-dotted" />';
