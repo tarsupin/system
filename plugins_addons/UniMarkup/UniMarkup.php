@@ -52,6 +52,47 @@ $text = UniMarkup::strip($text);
 
 abstract class UniMarkup {
 	
+/****** Replace matching tags ******/
+	private static function replaceMatch
+	(
+		$text		// <str> The text with UniMarkup to parse through.
+	,	$tag		// <str> The tag to check for.
+	,	$replace1	// <str> Replacement for the start tag.
+	,	$replace2	// <str> Replacement for the end tag.
+	,	$unique = false	// <bool> Whether to call the method recursively.
+	)				// RETURNS <str> the positions of start and end tag.
+	
+	// $text = self::replaceMatch($text, 'b', '<span style="font-weight:bold;">', '</span>');
+	{
+		$startTag = "[" . $tag . "]";
+		$endTag = "[/" . $tag . "]";
+		$start = stripos($text, $startTag);
+		$pos = $start+2+strlen($tag);
+		$pass = true;
+		if($start !== false)
+		{
+			do
+			{
+				$end = stripos($text, $endTag, $pos);
+				$temp = substr(strtolower($text), $start+2+strlen($tag), $end-$start-2-strlen($tag));
+				$count1 = substr_count($temp, $startTag);
+				$count2 = substr_count($temp, $endTag);
+				$pos = $end+3+strlen($tag);
+				$pass = ($count1 == $count2 ? true : false);
+			}
+			while(!$pass && $pos < strlen($text));
+		}
+
+		if($pass && $start !== false && $end !== false)
+		{
+			$text = substr($text, 0, $start) . $replace1 . substr($text, $start+2+strlen($tag), $end-$start-2-strlen($tag)) . $replace2 . substr($text, $end+3+strlen($tag));
+			if(!$unique)
+			{
+				return self::replaceMatch($text, $tag, $replace1, $replace2);
+			}
+		}
+		return $text;
+	}
 	
 /****** Run UniMarkup on a block of text ******/
 # This code was modified from the original source at: http://thesinkfiles.hubpages.com/hub/Regex-for-BBCode-in-PHP
@@ -62,9 +103,11 @@ abstract class UniMarkup {
 	
 	// $text = UniMarkup::parse($text);
 	{
+		//Benchmark::get();
+	
 		// NoCode
 		$text =  preg_replace_callback(
-			'/\[nocode\](.+?)\[\/nocode\]/is',
+			'#\[nocode\](.+)\[\/nocode\]#iUs',
 			create_function(
 				'$matches',
 				'return str_replace(array("[","]"),array("&#91;","&#93;"),$matches[1]);'
@@ -80,36 +123,88 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '<div style="text-align:center;">$1</div>', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '<span style="font-size:0.8em;">$1</span>', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '<pre class="code">$1</pre>', $text);
-		$text = preg_replace('#\[url\](.+)\[\/url\]#iUs', '<a href="$1" rel="nofollow">$1</a>', $text);
 		$text = preg_replace('#\[url\=(.+)\](.+)\[\/url\]#iUs', '<a href="$1" rel="nofollow">$2</a>', $text);
-		$text = preg_replace('#\[link\](.+)\[\/link\]#iUs', '<a href="$1" rel="nofollow">$1</a>', $text);
 		$text = preg_replace('#\[link\=(.+)\](.+)\[\/link\]#iUs', '<a href="$1" rel="nofollow">$2</a>', $text);
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '<span style="font-size:$1px;">$2</span>', $text);
-		$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '<span style="color:$1;">$2</span>', $text);
 		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '<img src="$1" alt="Image" />', $text);
 		
-		// Quotes, lists and spoilers are often nested
+		// Quotes, lists, colors and spoilers are often nested. List and color parsing is not order sensitive, so the ?R pattern is not needed here.
 		$count = 0;
 		do {
-			$text = preg_replace('#\[quote\=(.+)\](((?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text, -1, $count);
-		} while($count > 0);
-		$count = 0;
-		do {
-			$text = preg_replace('#\[quote\=(.+)\](((?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text, -1, $count);
-		} while($count > 0);
-		$count = 0;
-		do {
-			$text = preg_replace('#\[list\](((?R)|.)+)\[\/list\]#iUs', '<ul>$1</ul>', $text, -1, $count);
+			$text = preg_replace('#\[list\](.+)\[\/list\]#iUs', '<ul>$1</ul>', $text, -1, $count);
 		} while($count > 0);
 		$text = preg_replace('#\[\*\]#iUs', '<li>', $text);
+		
 		$count = 0;
 		do {
-			$text = preg_replace('#\[spoiler\=(.+)\](((?R)|.)+)\[\/spoiler\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">$1</div><div class="spoiler-content">$2</div>', $text, -1, $count);
+			$text = preg_replace('#\[color\=(.+)\](.+)\[\/color\]#iUs', '<span style="color:$1;">$2</span>', $text, -1, $count);
 		} while($count > 0);
+		$text = preg_replace('#\[\*\]#iUs', '<li>', $text);
+		
+		// regex does really badly on spoilers and quotes
+		$advanced = array(
+			"spoiler" => array('<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">', '</div><div class="spoiler-content">', '</div>')
+		,	"quote" => array('<div class="quote">', '</div><div class="quote-by">By: ', '</div>')
+		);
+		
+		$save = array();
+		
+		foreach($advanced as $adv => $replace)
+		{
+			do
+			{
+				$start = stripos($text, "[" . $adv . "=", 0);
+				$pos = $start+2+strlen($adv);
+				$pass = true;
+				if($start !== false)
+				{
+					do
+					{
+						$close = stripos($text, "]", $pos);
+						if($close !== false)
+						{
+							$temp = substr(strtolower($text), $start+2+strlen($adv), $close-$start-2-strlen($adv));
+							$count1 = substr_count($temp, "[");
+							$count2 = substr_count($temp, "]");
+							$pos = $close+3+strlen($adv);
+							$pass = ($count1 == $count2 ? true : false);
+						}
+					}
+					while(!$pass && $pos < strlen($text) && $close !== false);
+				}
+				
+				if($pass && $start !== false && $close !== false)
+				{
+					$temp = substr($text, $start+2+strlen($adv), $close-$start-2-strlen($adv));
+					$text = substr($text, 0, $start) . "[" . $adv . "]" . substr($text, $close+1);
+					if($adv != "quote")
+					{
+						$save[$adv][] = array($replace[0] . $temp . $replace[1], $replace[2]);
+					}
+					else
+					{
+						$save[$adv][] = array($replace[0], $replace[1] . $temp . $replace[2]);
+					}
+				}
+			}
+			while($start !== false);
+		}
+
+		// We need to do this function call after all [tag=...] are replaced with [tag] because replaceMatch can get confused otherwise.
+		foreach($save as $adv => $a)
+		{
+			foreach($a as $s)
+			{
+				$text = self::replaceMatch($text, $adv, $s[0], $s[1], true);
+			}
+		}
 		
 		// Comment Syntax
 		//$text = preg_replace('#(?<![:&])\#([\w]+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
 		//$text = preg_replace('#\@([\w]+?)#iUs', '<a href="' . URL::unifaction_social(). '/$1">@$1</a>', $text);
+		
+		//Benchmark::get();
+		//Benchmark::graph();
 		
 		// Return Text
 		return $text;
