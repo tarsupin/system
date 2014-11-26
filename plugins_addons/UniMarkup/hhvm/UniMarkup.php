@@ -137,7 +137,7 @@ abstract class UniMarkup {
 		
 		$count = 0;
 		do {
-			$text = preg_replace('#\[color\=(.+)\](.+)\[\/color\]#iUs', '<span style="color:$1;">$2</span>', $text, -1, $count);
+			$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '<span style="color:$1;">$2</span>', $text, -1, $count);
 		} while($count > 0);
 		$text = preg_replace('#\[\*\]#iUs', '<li>', $text);
 		
@@ -227,16 +227,14 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '$1', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '$1', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '$1', $text);
-		$text = preg_replace('#\[url\](.+)\[\/url\]#iUs', '$1', $text);
 		$text = preg_replace('#\[url\=(.+)\](.+)\[\/url\]#iUs', '$2', $text);
-		$text = preg_replace('#\[link\](.+)\[\/link\]#iUs', '$1', $text);
 		$text = preg_replace('#\[link\=(.+)\](.+)\[\/link\]#iUs', '$2', $text);
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '$2', $text);
 		$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '$2', $text);
 		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '', $text); 
-		$text = preg_replace('#\[quote\=(.+)\](((?R)|.)+)\[\/quote\]#iUs', '', $text);
-		$text = preg_replace('#\[list\](((?R)|.)+)\[\/list\]#iUs', '', $text);
-		$text = preg_replace('#\[spoiler\=(.+)\](((?R)|.)+)\[\/spoiler\]#iUs', '', $text);
+		$text = preg_replace('#\[quote\=(.+)\](.+)\[\/quote\]#iUs', '$2', $text);
+		$text = preg_replace('#\[spoiler\=(.+)\](.+)\[\/spoiler\]#iUs', '$2', $text);
+		$text = preg_replace('#\[list\](.+)\[\/list\]#iUs', '$1', $text);
 		
 		// Return Text
 		return $text;
