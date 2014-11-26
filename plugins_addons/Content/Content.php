@@ -172,7 +172,14 @@ abstract class Content {
 		
 		Metadata::addHeader('<link rel="stylesheet" href="' . CDN . '/css/content-system.css" /><script src="' . CDN . '/scripts/content-system.js"></script>');
 		
-		Metadata::addHeader('<meta property="og:image" content="' . self::$contentData['thumbnail'] . '"/>');
+		Metadata::addHeader('
+		<meta property="og:title" content="' . self::$contentData['title'] . '"/>
+		<meta property="og:site_name" content="UniFaction"/>
+		<meta property="og:type" content="article"/>
+		<meta property="og:url" content="' . SITE_URL . '/' . self::$contentData['url_slug'] . '"/>
+		<meta property="og:description" content="' . self::$contentData['description'] . '"/>
+		<meta property="og:image" content="' . str_replace("-thumb", "-full", self::$contentData['thumbnail']) . '"/>
+		');
 		
 		// Add Facebook Method
 		Metadata::addFooter('

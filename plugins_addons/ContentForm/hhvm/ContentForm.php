@@ -1063,9 +1063,20 @@ class ContentForm {
 		if($imageUpload->validate())
 		{
 			$image = new Image($imageUpload->tempPath, $imageUpload->width, $imageUpload->height, $imageUpload->extension);
+			$fullImage = $image;
 			
 			if(FormValidate::pass())
 			{
+				// Create a "full" image size
+				$fullImage->autoCrop(800, 450);
+				
+				// Prepare the filename for this image
+				$imageUpload->filename = $this->contentID . '-full';
+				
+				// Save the image
+				$fullImage->save($imageDir . '/' . $imageUpload->filename . '.jpg');
+				
+				
 				// Resize the image to the appropriate size (320 x 180)
 				$image->autoCrop(320, 180);
 				

@@ -315,7 +315,7 @@ abstract class Me {
 		}
 		
 		// Try to get the user data from the cookie
-		if(!$authData = User::getDataByHandle($_COOKIE[$varName], "auth_token"))
+		if(!$authData = User::get((int) $_COOKIE[$varName], "auth_token"))
 		{
 			return false;
 		}
@@ -327,7 +327,7 @@ abstract class Me {
 		}
 		
 		// Cookie checks have passed, log in
-		return self::login($userID, true);
+		return self::login((int) $userID, true);
 	}
 	
 	

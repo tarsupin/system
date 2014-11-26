@@ -5,7 +5,7 @@ echo '
 <body>
 
 <!-- Content here gets displayed in the right panel, even with a dynamic AJAX loader -->
-<div id="move-content-wrapper" style="display:none;"><script type="text/javascript" src="http://ap.lijit.com/www/delivery/fpi.js?z=272446&u=unifaction&width=300&height=250"></script></div>
+<div id="move-content-wrapper" style="display:none;"></div>
 
 <div id="container">
 <div id="header-wrap">
