@@ -11,7 +11,15 @@ echo '
 <!-- Mobile Menu -->
 <div id="mobile-menu" class="modal-bg" onclick="toggleMenu()" style="position:absolute; top:0px; left:0px; display:none; width:100%; z-index:500; height:100%;"><div style="padding:10px; z-index:600; margin-bottom:80px;">';
 
-$widgetList = WidgetLoader::get("MobilePanel");
+// Default to using the side panel if no mobile panel exists
+if(!isset(WidgetLoader::$slots['MobilePanel']) and isset(WidgetLoader::$slots['SidePanel']))
+{
+	$widgetList = WidgetLoader::get("SidePanel");
+}
+else
+{
+	$widgetList = WidgetLoader::get("MobilePanel");
+}
 
 foreach($widgetList as $widgetContent)
 {
