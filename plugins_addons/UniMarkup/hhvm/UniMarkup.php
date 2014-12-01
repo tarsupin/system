@@ -60,6 +60,7 @@ abstract class UniMarkup {
 	,	string $replace1	// <str> Replacement for the start tag.
 	,	string $replace2	// <str> Replacement for the end tag.
 	,	bool $unique = false	// <bool> Whether to call the method recursively.
+	,	bool $remove = false	// <bool> Whether to remove the content.
 	): string				// RETURNS <str> the positions of start and end tag.
 	
 	// $text = self::replaceMatch($text, 'b', '<span style="font-weight:bold;">', '</span>');
@@ -85,7 +86,7 @@ abstract class UniMarkup {
 
 		if($pass && $start !== false && $end !== false)
 		{
-			$text = substr($text, 0, $start) . $replace1 . substr($text, $start+2+strlen($tag), $end-$start-2-strlen($tag)) . $replace2 . substr($text, $end+3+strlen($tag));
+			$text = substr($text, 0, $start) . $replace1 . ($remove ? '' : substr($text, $start+2+strlen($tag), $end-$start-2-strlen($tag))) . $replace2 . substr($text, $end+3+strlen($tag));
 			if(!$unique)
 			{
 				return self::replaceMatch($text, $tag, $replace1, $replace2);
@@ -240,13 +241,12 @@ abstract class UniMarkup {
 			$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '$2', $text, -1, $count);
 		} while($count > 0);
 		
-		do {
-			$text = preg_replace('#\[spoiler\=(.+)\](.+)\[\/spoiler\]#iUs', '', $text, -1, $count);
-		} while($count > 0);
+		// Spoilers and quotes need a different method since the content (and with it nested opening tags) is deleted
+		$text = preg_replace('#\[spoiler\=(.+)\]#iUs', '[spoiler]', $text, -1, $count);
+		$text = preg_replace('#\[quote\=(.+)\]#iUs', '[quote]', $text, -1, $count);
 		
-		do {
-			$text = preg_replace('#\[quote\=(.+)\](.+)\[\/quote\]#iUs', '', $text, -1, $count);
-		} while($count > 0);
+		$text = self::replaceMatch($text, 'spoiler', '', '', false, true);
+		$text = self::replaceMatch($text, 'quote', '', '', false, true);
 		
 		// Return Text
 		return $text;
