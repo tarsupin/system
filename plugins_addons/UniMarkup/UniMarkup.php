@@ -310,7 +310,7 @@ abstract class UniMarkup {
 		
 		// Draw Image
 		$html .= '
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "img")\'><span class="icon-image"></span>';
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "img")\'><span class="icon-image"></span></a>';
 		
 		// Draw URL
 		$html .= '
@@ -318,7 +318,7 @@ abstract class UniMarkup {
 		
 		// Draw List
 		$html .= '
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "list")\'><span class="icon-list"></span>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "list")\'><span class="icon-list"></span></a>
 		&nbsp;&nbsp;';
 		
 		// Draw Quote
