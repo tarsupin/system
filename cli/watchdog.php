@@ -8,7 +8,6 @@ $value = shell_exec("service hhvm status");
 
 if(!strpos($value, "is running"))
 {
-	echo "Just ran hhvm.";
 	passthru("service hhvm restart");
 }
 
@@ -17,7 +16,6 @@ $value = shell_exec("service nginx status");
 
 if(!strpos($value, "is running"))
 {
-	echo "Just ran nginx.";
 	passthru("service nginx restart");
 }
 
@@ -26,6 +24,5 @@ $value = shell_exec("service memcached status");
 
 if(!strpos($value, "is running"))
 {
-	echo "Just ran memcached.";
 	passthru("service memcached restart");
 }

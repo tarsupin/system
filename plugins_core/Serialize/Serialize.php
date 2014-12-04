@@ -140,18 +140,18 @@ abstract class Serialize {
 			return $object;
 		}
 		
-		// Change the array
+		// Change the object
 		foreach($keyChanges as $key => $val)
 		{
-			if(isset($array[$key]))
+			if(isset($object[$key]))
 			{
-				$array[$val] = $array[$key];
+				$object[$val] = $object[$key];
 				
-				unset($array[$key]);
+				unset($object[$key]);
 			}
 		}
 		
-		return $array;
+		return $object;
 	}
 	
 	

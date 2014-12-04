@@ -144,7 +144,7 @@ class Schedule {
 	public function save (
 	): string				// RETURNS <str> JSON-minified string that can be used to restore a schedule.
 	
-	// $schedule->save();
+	// $jsonSave = $schedule->save();
 	{
 		$save = new stdClass();
 		
@@ -458,7 +458,7 @@ class Schedule {
 		int $timestamp = 0		// <int> The timestamp to compare the schedule with (default is current time).
 	): array <str, mixed>						// RETURNS <str:mixed>
 	
-	// $schedule->nextEvent($timestamp = {current time})
+	// $nextEvent = $schedule->nextEvent($timestamp = {current time})
 	{
 		// Prepare Values
 		$tracker = new TimeTracker(($timestamp === 0 ? time() : $timestamp));
@@ -649,7 +649,7 @@ class Schedule {
 		// Check if the end time has passed
 		if($this->timeEnd > 0 and $tracker->timestamp > $this->timeEnd)
 		{
-			return false;
+			return array();
 		}
 		
 		return $tracker;

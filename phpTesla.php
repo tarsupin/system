@@ -167,6 +167,8 @@ switch($url[0])
 		if(isset($_GET['slg']))
 		{
 			Me::softLog((int) $_GET['slg'], $url_relative);
+			
+			Cookie::set('last_slg_' . SITE_HANDLE, time() - 36000, SITE_HANDLE, 365);
 		}
 		
 		// Check if the user is logged in
@@ -181,10 +183,6 @@ switch($url[0])
 					
 					Me::softLog(1, $url_relative);
 				}
-			}
-			else
-			{
-				Cookie::set('last_slg_' . SITE_HANDLE, time() - 36000, SITE_HANDLE, 365);
 			}
 		}
 }
