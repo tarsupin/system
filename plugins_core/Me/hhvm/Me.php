@@ -111,7 +111,8 @@ abstract class Me {
 	// Me::softLog([$chooseID], [$returnTo]);
 	{
 		// If a Chosen ID is set and is already active, ignore this process
-		if($chooseID and isset($_SESSION[SITE_HANDLE]['id']))
+		//if($chooseID and isset($_SESSION[SITE_HANDLE]['id']))
+		if(isset($_SESSION[SITE_HANDLE]['id']))
 		{
 			if($_SESSION[SITE_HANDLE]['id'] == $chooseID) { return; }
 		}
