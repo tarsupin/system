@@ -15,7 +15,12 @@ echo str_replace("is-" . SITE_HANDLE, "is-" . SITE_HANDLE . " core-active", '
 			<li class="core-link is-blogfrog"><a href="http://blogfrog.social.test/' . Me::$slg . '"><span class="icon-pen core-icon"></span><span class="core-txt">BlogFrog</span></a></li>
 			<li class="core-link is-credits"><a href="http://unijoule.test/' . Me::$slg . '"><span class="icon-coin core-icon"></span><span class="core-txt">UniJoule</span></a></li>
 			<li class="core-link is-avatar"><a href="http://avatar.test/' . Me::$slg . '"><span class="icon-user core-icon"></span><span class="core-txt">Avatar</span></a></li>
-			<li class="core-link"><a href="http://unifaction.test/games' . Me::$slg . '"><span class="icon-gamepad core-icon"></span><span class="core-txt">Games</span></a></li>
+			<li class="core-link is-avatar"><a href="http://unicreatures.test/' . Me::$slg . '"><span class="icon-gamepad core-icon"></span><span class="core-txt">UniCreatures</span></a></li>
 		</ul>
 	</div>
 </div>');
+
+/*
+
+			<li class="core-link"><a href="http://unifaction.test/games' . Me::$slg . '"><span class="icon-gamepad core-icon"></span><span class="core-txt">Games</span></a></li>
+*/
