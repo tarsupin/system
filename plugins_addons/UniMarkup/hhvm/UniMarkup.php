@@ -187,8 +187,12 @@ abstract class UniMarkup {
 						$save[$adv][] = array($replace[0], $replace[1] . $temp . $replace[2]);
 					}
 				}
+				else
+				{
+					break;
+				}
 			}
-			while($start !== false);
+			while(true);
 		}
 
 		// We need to do this function call after all [tag=...] are replaced with [tag] because replaceMatch can get confused otherwise.
