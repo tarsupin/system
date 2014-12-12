@@ -147,9 +147,9 @@ abstract class Alert {
 			case "getSuccess":
 			case "getError":
 			case "getWarning":
-				$func = str_replace("save", "", strtolower($func));
+				$func = str_replace("get", "", strtolower($func));
 				$valName = $func . "List";
-				return (isset(self::$valName[$args[0]]) ? self::$valName[$args[0]] : "");
+				return (isset(self::${$valName}[$args[0]]) ? self::${$valName}[$args[0]] : "");
 		}
 		
 		return "";
