@@ -72,6 +72,16 @@ abstract class Notifications {
 	
 	// Notifications::createMultiple($uniIDList, $url, $message);
 	{
+		// Check that the list contains multiple entries
+		if($uniIDList == array())
+		{
+			return true;
+		}
+		if(!isset($uniIDList[1]))
+		{
+			return self::create($uniIDList[0], $url, $message);
+		}
+	
 		// Prepare the Packet with list of notifications
 		$packet = array("uni_id_list" => $uniIDList, "url" => $url, "message" => $message);
 		
