@@ -28,7 +28,6 @@ There are two important UniMarkup methods to use.
 [note]		// Note: Provides a side-note with smaller text.
 [code]		// Code: Provides a block of text that maintains spacing rules by code.
 [url]		// Link: Creates a URL link to another page.
-[link]		// Link: Creates a URL link to another page.
 [size]		// Sets the size of text.
 [color]		// Color: Assigns an HTML color or word color to the section.
 [img]		// Image: Posts an image.
@@ -52,49 +51,6 @@ $text = UniMarkup::strip($text);
 
 abstract class UniMarkup {
 	
-/****** Replace matching tags ******/
-	private static function replaceMatch
-	(
-		string $text		// <str> The text with UniMarkup to parse through.
-	,	string $tag		// <str> The tag to check for.
-	,	string $replace1	// <str> Replacement for the start tag.
-	,	string $replace2	// <str> Replacement for the end tag.
-	,	bool $unique = false	// <bool> Whether to call the method recursively.
-	,	bool $remove = false	// <bool> Whether to remove the content.
-	): string				// RETURNS <str> the positions of start and end tag.
-	
-	// $text = self::replaceMatch($text, 'b', '<span style="font-weight:bold;">', '</span>');
-	{
-		$startTag = "[" . $tag . "]";
-		$endTag = "[/" . $tag . "]";
-		$start = stripos($text, $startTag);
-		$pos = $start+2+strlen($tag);
-		$pass = true;
-		if($start !== false)
-		{
-			do
-			{
-				$end = stripos($text, $endTag, $pos);
-				$temp = substr(strtolower($text), $start+2+strlen($tag), $end-$start-2-strlen($tag));
-				$count1 = substr_count($temp, $startTag);
-				$count2 = substr_count($temp, $endTag);
-				$pos = $end+3+strlen($tag);
-				$pass = ($count1 == $count2 ? true : false);
-			}
-			while(!$pass && $pos < strlen($text));
-		}
-
-		if($pass && $start !== false && $end !== false)
-		{
-			$text = substr($text, 0, $start) . $replace1 . ($remove ? '' : substr($text, $start+2+strlen($tag), $end-$start-2-strlen($tag))) . $replace2 . substr($text, $end+3+strlen($tag));
-			if(!$unique)
-			{
-				return self::replaceMatch($text, $tag, $replace1, $replace2);
-			}
-		}
-		return $text;
-	}
-	
 /****** Run UniMarkup on a block of text ******/
 # This code was modified from the original source at: http://thesinkfiles.hubpages.com/hub/Regex-for-BBCode-in-PHP
 	public static function parse
@@ -104,11 +60,9 @@ abstract class UniMarkup {
 	
 	// $text = UniMarkup::parse($text);
 	{
-		//Benchmark::get();
-	
 		// NoCode
 		$text =  preg_replace_callback(
-			'#\[nocode\](.+)\[\/nocode\]#iUs',
+			'#\[nocode\]((?>(?R)|.)+)\[\/nocode\]#iUs',
 			create_function(
 				'$matches',
 				'return str_replace(array("[","]"),array("&#91;","&#93;"),$matches[1]);'
@@ -125,11 +79,10 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '<span style="font-size:0.8em;">$1</span>', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '<pre class="code">$1</pre>', $text);
 		$text = preg_replace('#\[url\=(.+)\](.+)\[\/url\]#iUs', '<a href="$1" rel="nofollow">$2</a>', $text);
-		$text = preg_replace('#\[link\=(.+)\](.+)\[\/link\]#iUs', '<a href="$1" rel="nofollow">$2</a>', $text);
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '<span style="font-size:$1px;">$2</span>', $text);
 		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '<img src="$1" alt="Image" />', $text);
 		
-		// Quotes, lists, colors and spoilers are often nested. List, color and spoiler parsing is not order sensitive, so the ?R pattern is not needed here.
+		// The following tags are often nested. List, color and spoiler parsing is not order sensitive, so the ?R pattern is not needed here.
 		do {
 			$text = preg_replace('#\[list\](.+)\[\/list\]#iUs', '<ul>$1</ul>', $text, -1, $count);
 		} while($count > 0);
@@ -143,73 +96,13 @@ abstract class UniMarkup {
 			$text = preg_replace('#\[spoiler\=(.+)\](.+)\[\/spoiler\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">$1</div><div class="spoiler-content">$2</div>', $text, -1, $count);
 		} while($count > 0);
 		
-		// $1 and $2 are out of order and regex does really badly with nested patterns + long quotes, so a different method is needed
-		$advanced = array(
-			"quote" => array('<div class="quote">', '</div><div class="quote-by">By: ', '</div>')
-		);
-		
-		$save = array();
-		
-		foreach($advanced as $adv => $replace)
-		{
-			do
-			{
-				$start = stripos($text, "[" . $adv . "=", 0);
-				$pos = $start+2+strlen($adv);
-				$pass = true;
-				if($start !== false)
-				{
-					do
-					{
-						$close = stripos($text, "]", $pos);
-						if($close !== false)
-						{
-							$temp = substr(strtolower($text), $start+2+strlen($adv), $close-$start-2-strlen($adv));
-							$count1 = substr_count($temp, "[");
-							$count2 = substr_count($temp, "]");
-							$pos = $close+3+strlen($adv);
-							$pass = ($count1 == $count2 ? true : false);
-						}
-					}
-					while(!$pass && $pos < strlen($text) && $close !== false);
-				}
-				
-				if($pass && $start !== false && $close !== false)
-				{
-					$temp = substr($text, $start+2+strlen($adv), $close-$start-2-strlen($adv));
-					$text = substr($text, 0, $start) . "[" . $adv . "]" . substr($text, $close+1);
-					if($adv != "quote")
-					{
-						$save[$adv][] = array($replace[0] . $temp . $replace[1], $replace[2]);
-					}
-					else
-					{
-						$save[$adv][] = array($replace[0], $replace[1] . $temp . $replace[2]);
-					}
-				}
-				else
-				{
-					break;
-				}
-			}
-			while(true);
-		}
-
-		// We need to do this function call after all [tag=...] are replaced with [tag] because replaceMatch can get confused otherwise.
-		foreach($save as $adv => $a)
-		{
-			foreach($a as $s)
-			{
-				$text = self::replaceMatch($text, $adv, $s[0], $s[1], true);
-			}
-		}
+		do {
+			$text = preg_replace('#\[quote\=(.+)\]((?>(?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text, -1, $count);
+		} while($count > 0);
 		
 		// Comment Syntax
-		//$text = preg_replace('#(?<![:&])\#([\w]+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
-		//$text = preg_replace('#\@([\w]+?)#iUs', '<a href="' . URL::unifaction_social(). '/$1">@$1</a>', $text);
-		
-		//Benchmark::get();
-		//Benchmark::graph();
+		$text = preg_replace('#(?>^|\s)\#(\w+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
+		$text = preg_replace('#(?>^|\s)\@(\w+?)#iUs', '<a href="' . URL::unifaction_social(). '/$1">@$1</a>', $text);
 		
 		// Return Text
 		return $text;
@@ -232,25 +125,21 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '$1', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '$1', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '$1', $text);
-		$text = preg_replace('#\[url\=(.+)\](.+)\[\/url\]#iUs', '$2', $text);
-		$text = preg_replace('#\[link\=(.+)\](.+)\[\/link\]#iUs', '$2', $text);
-		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '$2', $text);
-		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '', $text);
+		$text = preg_replace('#\[url\=.+\](.+)\[\/url\]#iUs', '$1', $text);
+		$text = preg_replace('#\[size\=.+\](.+)\[\/size\]#iUs', '$1', $text);
+		$text = preg_replace('#\[img\].+\[\/img\]#iUs', '', $text);
 		
 		do {
 			$text = preg_replace('#\[list\](.+)\[\/list\]#iUs', '$1', $text, -1, $count);
 		} while($count > 0);
 		
 		do {
-			$text = preg_replace('#\[color\=([\#a-z0-9A-Z]+)\](.+)\[\/color\]#iUs', '$2', $text, -1, $count);
+			$text = preg_replace('#\[color\=[\#a-z0-9A-Z]+\](.+)\[\/color\]#iUs', '$1', $text, -1, $count);
 		} while($count > 0);
 		
-		// Spoilers and quotes need a different method since the content (and with it nested opening tags) is deleted
-		$text = preg_replace('#\[spoiler\=(.+)\]#iUs', '[spoiler]', $text, -1, $count);
-		$text = preg_replace('#\[quote\=(.+)\]#iUs', '[quote]', $text, -1, $count);
-		
-		$text = self::replaceMatch($text, 'spoiler', '', '', false, true);
-		$text = self::replaceMatch($text, 'quote', '', '', false, true);
+		// loop is not necessary because the outermost matches are captured and the content removed
+		$text = preg_replace('#\[spoiler\=.+\](?>(?R)|.)+\[\/spoiler\]#iUs', '', $text);
+		$text = preg_replace('#\[quote\=.+\](?>(?R)|.)+\[\/quote\]#iUs', '', $text);
 		
 		// Return Text
 		return $text;
@@ -278,26 +167,26 @@ abstract class UniMarkup {
 		// Draw Color Options
 		$html .= '
 		<span class="hover-wrap icon-paint"><div class="hover-div color-draw">
-				<div style="background-color:#000000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#000000")\'></div>
-				<div style="background-color:#808080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#808080")\'></div>
-				<div style="background-color:#c0c0c0;" onclick=\'UniMarkup("' . $elementID . '", "color", "#c0c0c0")\'></div>
-				<div style="background-color:#ffffff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ffffff")\'></div>
-				
-				<div style="background-color:#ff0000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ff0000")\'></div>
-				<div style="background-color:#ff00ff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ff00ff")\'></div>
-				<div style="background-color:#0000ff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#0000ff")\'></div>
-				<div style="background-color:#00ff00;" onclick=\'UniMarkup("' . $elementID . '", "color", "#00ff00")\'></div>
-				
-				<div style="background-color:#800000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#800000")\'></div>
-				<div style="background-color:#800080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#800080")\'></div>
-				<div style="background-color:#000080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#000080")\'></div>
-				<div style="background-color:#008000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#008000")\'></div>
-				
-				<div style="background-color:#00ffff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#00ffff")\'></div>
-				<div style="background-color:#008080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#008080")\'></div>
-				<div style="background-color:#808000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#808000")\'></div>
-				<div style="background-color:#ffff00;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ffff00")\'></div>
-			</div></span>
+			<div style="background-color:#000000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#000000")\'></div>
+			<div style="background-color:#808080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#808080")\'></div>
+			<div style="background-color:#c0c0c0;" onclick=\'UniMarkup("' . $elementID . '", "color", "#c0c0c0")\'></div>
+			<div style="background-color:#ffffff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ffffff")\'></div>
+			
+			<div style="background-color:#ff0000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ff0000")\'></div>
+			<div style="background-color:#ff00ff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ff00ff")\'></div>
+			<div style="background-color:#0000ff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#0000ff")\'></div>
+			<div style="background-color:#00ff00;" onclick=\'UniMarkup("' . $elementID . '", "color", "#00ff00")\'></div>
+			
+			<div style="background-color:#800000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#800000")\'></div>
+			<div style="background-color:#800080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#800080")\'></div>
+			<div style="background-color:#000080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#000080")\'></div>
+			<div style="background-color:#008000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#008000")\'></div>
+			
+			<div style="background-color:#00ffff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#00ffff")\'></div>
+			<div style="background-color:#008080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#008080")\'></div>
+			<div style="background-color:#808000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#808000")\'></div>
+			<div style="background-color:#ffff00;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ffff00")\'></div>
+		</div></span>
 		&nbsp;&nbsp;';
 		
 		/*
