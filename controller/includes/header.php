@@ -5,7 +5,7 @@ echo '
 <body>
 
 <!-- Content here gets displayed in the right panel, even with a dynamic AJAX loader -->
-<div id="move-content-wrapper" style="display:none;"></div>
+<div id="move-content-wrapper" style="display:none;">' . (isset($config['load-ad']) ? $config['load-ad'] : '') . '</div>
 
 <div id="container">
 <div id="header-wrap">
