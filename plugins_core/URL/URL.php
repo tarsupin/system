@@ -122,23 +122,26 @@ abstract class URL {
 		
 		// Some webmasters may use directories (e.g. "C:/www/mysite/") instead of a host (e.g. "mysite.test")
 		// If we're on a localhost system, check for this behavior and remove if necessary
-		if(ENVIRONMENT == "localhost")
+		if(ENVIRONMENT == "local")
 		{
-			$defSegments = explode("/", rtrim(SYS_PATH, "/"));
-			$lastSegment = $defSegments[count($defSegments) - 1];
+			$defSegments = explode("/", rtrim(str_replace("\\", "/", APP_PATH), "/"));
 			
-			if(in_array($lastSegment, $segments))
+			for($a = count($defSegments);$a >= 0;$a--)
 			{
-				for($i = 0;$i < count($segments);$i++)
+				$lastSegment = $defSegments[$a - 1];
+				
+				// Remove the segment
+				if(($key = array_search($lastSegment, $segments)) === false)
 				{
-					array_shift($segments);
-					
-					if(!isset($segments[$i]) || $segments[$i] != $lastSegment)
-					{
-						break;
-					}
+					break;
 				}
+				
+				unset($segments[$key]);
 			}
+			
+			// Reset the URL values as necessary
+			$segments = array_values($segments);
+			$urlString = implode("/", $segments);
 		}
 		
 		return array($segments, $urlString);

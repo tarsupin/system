@@ -321,6 +321,11 @@ abstract class Security {
 	// $hash = Security::randHash(25)		// Returns 25 random characters
 	// $hash = Security::randHash(25, 62);	// Returns 25 random characters (of base 62 characters)
 	{
+		if($base == 64 and function_exists("openssl_random_pseudo_bytes"))
+		{
+			return substr(str_replace("=", "", base64_encode(openssl_random_pseudo_bytes($length))), 0, $length);
+		}
+		
 		$result = "";
 		
 		for($a = 0;$a < $length;$a++)
