@@ -40,7 +40,7 @@ abstract class Notifications {
 		if($returnNum != 5) { $packet['return_num'] = $returnNum; }
 		
 		// Connect to this API from UniFaction
-		return Connect::to("sync_notifications", "GetNotificationsAPI", $packet);
+		return (bool) Connect::to("sync_notifications", "GetNotificationsAPI", $packet);
 	}
 	
 	
@@ -58,7 +58,7 @@ abstract class Notifications {
 		$packet = array("uni_id" => $uniID, "url" => $url, "message" => $message);
 		
 		// Run the API
-		return Connect::to("sync_notifications", "AddNotificationAPI", $packet);
+		return (bool) Connect::to("sync_notifications", "AddNotificationAPI", $packet);
 	}
 	
 	
@@ -86,7 +86,7 @@ abstract class Notifications {
 		$packet = array("uni_id_list" => $uniIDList, "url" => $url, "message" => $message);
 		
 		// Run the API
-		return Connect::to("sync_notifications", "AddNotificationAPI", $packet);
+		return (bool) Connect::to("sync_notifications", "AddNotificationAPI", $packet);
 	}
 	
 }
