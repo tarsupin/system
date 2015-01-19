@@ -285,8 +285,8 @@ abstract class Debug {
 		}
 		
 		// Save debugging information to a specific filename
-		$value2 = Sanitize::variable($value2);
-		return File::write(APP_PATH . "/debug-" . $value2 . ".txt", print_r($value1, true));
+		$value1 = Sanitize::variable($value1);
+		return File::write(APP_PATH . "/debug-" . $value1 . ".txt", print_r($value2, true));
 	}
 	
 	

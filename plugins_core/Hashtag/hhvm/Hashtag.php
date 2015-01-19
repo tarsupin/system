@@ -196,36 +196,17 @@ abstract class Hashtag {
 	// $tags = Hashtag::digHashtags("This was the bomb. #epicsauce #nofilter");	// Returns array("epicauce", "nofilter")
 	// $tags = Hashtag::digHashtags($comment);
 	{
-		// Prepare Values
-		$hashtags = array();
+		preg_match_all('#(?>^|\s)\#([\w-]+?)#iUs', $comment, $matches);
+		$matches = $matches[1];
 		
-		// Need to parse here
-		$input = Parse::positionsOf($comment, "#");
+		$hashtags = array_unique($matches);
 		
-		foreach($input as $pos)
+		while(count($hashtags) > 7)
 		{
-			// Make sure the hashtag isn't preceeded by an & sign
-			if($pos > 0 && $comment[$pos - 1] == "&")
-			{
-				continue;
-			}
-			
-			// Get the hashtag
-			$getTags = Sanitize::whileValid(substr($comment, $pos + 1, 22), "variable", '-');
-			
-			if(strlen($getTags) > 0)
-			{
-				$hashtags[] = $getTags;
-				
-				// Don't allow more than seven hashtags to be sent at once
-				if(count($hashtags) >= 7)
-				{
-					break;
-				}
-			}
+			array_pop($hashtags);
 		}
 		
-		return array_unique($hashtags);
+		return $hashtags;
 	}
 	
 	
@@ -237,26 +218,6 @@ abstract class Hashtag {
 	
 	// Hashtag::hasHashtags("This was the bomb. #epicsauce #nofilter");	// Returns true
 	{
-		// Need to parse here
-		$input = Parse::positionsOf($comment, "#");
-		
-		foreach($input as $pos)
-		{
-			// Make sure the hashtag isn't preceeded by an & sign
-			if($pos > 0 && $comment[$pos - 1] == "&")
-			{
-				continue;
-			}
-			
-			// Get the hashtag
-			$getTags = Sanitize::whileValid(substr($comment, $pos + 1, 22), "variable", '-');
-			
-			if(strlen($getTags) > 0)
-			{
-				return true;
-			}
-		}
-		
-		return false;
+		return (bool) preg_match('#(?>^|\s)\#([\w-]+?)#iUs', $comment);
 	}
 }

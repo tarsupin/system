@@ -253,20 +253,7 @@ abstract class Comment {
 	
 	// Comment::hasUsers("@joe and @bob, you guys are awesome!");	// Returns true
 	{
-		// Need to parse here
-		$input = Parse::positionsOf($comment, "@");
-		
-		foreach($input as $pos)
-		{
-			$getUser = Sanitize::whileValid(substr($comment, $pos + 1, 22), "variable", '-');
-			
-			if(strlen($getUser) > 0)
-			{
-				return true;
-			}
-		}
-		
-		return false;
+		return (bool) preg_match('#(^|\s)\@(\w{4,22}?)#iUs', $comment);
 	}
 	
 	
@@ -278,29 +265,17 @@ abstract class Comment {
 	
 	// $users = Comment::getUsers("@joe and @bob, You were great!");	// Returns array("joe", "bob")
 	{
-		// Prepare Values
-		$users = array();
+		preg_match_all('#(?>^|\s)\@(\w{4,22}?)#iUs', $comment, $matches);
+		$matches = $matches[1];
 		
-		// Need to parse here
-		$input = Parse::positionsOf($comment, "@");
+		$users = array_unique($matches);
 		
-		foreach($input as $pos)
+		while(count($users) > 5)
 		{
-			$getUser = Sanitize::whileValid(substr($comment, $pos + 1, 22), "variable", '-');
-			
-			if(strlen($getUser) > 0)
-			{
-				$users[] = $getUser;
-				
-				// Don't allow more than five users to be referred at once
-				if(count($users) >= 5)
-				{
-					break;
-				}
-			}
+			array_pop($users);
 		}
 		
-		return $users;
+		return $users;		
 	}
 }
 

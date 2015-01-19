@@ -101,8 +101,8 @@ abstract class UniMarkup {
 		} while($count > 0);
 		
 		// Comment Syntax
-		$text = preg_replace('#(?>^|\s)\#(\w+?)#iUs', '<a href="' . URL::hashtag_unifaction_com(). '/$1">#$1</a>', $text);
-		$text = preg_replace('#(?>^|\s)\@(\w+?)#iUs', '<a href="' . URL::unifaction_social(). '/$1">@$1</a>', $text);
+		$text = preg_replace('#(^|\s)\#([\w-]+?)#iUs', '$1<a href="' . URL::hashtag_unifaction_com(). '/$2">#$2</a>', $text);
+		$text = preg_replace('#(^|\s)\@(\w{4,22}?)#iUs', '$1<a href="' . URL::unifaction_social(). '/$2">@$2</a>', $text);
 		
 		// Return Text
 		return $text;
@@ -117,6 +117,11 @@ abstract class UniMarkup {
 	
 	// $text = UniMarkup::strip($text);
 	{
+		// loop is not necessary because the outermost matches are captured and the content removed
+		// done first because it eliminates some content
+		$text = preg_replace('#\[spoiler\=.+\](?>(?R)|.)+\[\/spoiler\]#iUs', '', $text);
+		$text = preg_replace('#\[quote\=.+\](?>(?R)|.)+\[\/quote\]#iUs', '', $text);
+		
 		// Strip the UniMarkup
 		$text = preg_replace('#\[b\](.+)\[\/b\]#iUs', '$1', $text);
 		$text = preg_replace('#\[u\](.+)\[\/u\]#iUs', '$1', $text);
@@ -136,10 +141,6 @@ abstract class UniMarkup {
 		do {
 			$text = preg_replace('#\[color\=[\#a-z0-9A-Z]+\](.+)\[\/color\]#iUs', '$1', $text, -1, $count);
 		} while($count > 0);
-		
-		// loop is not necessary because the outermost matches are captured and the content removed
-		$text = preg_replace('#\[spoiler\=.+\](?>(?R)|.)+\[\/spoiler\]#iUs', '', $text);
-		$text = preg_replace('#\[quote\=.+\](?>(?R)|.)+\[\/quote\]#iUs', '', $text);
 		
 		// Return Text
 		return $text;
