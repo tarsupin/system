@@ -40,7 +40,7 @@ abstract class Notifications {
 		if($returnNum != 5) { $packet['return_num'] = $returnNum; }
 		
 		// Connect to this API from UniFaction
-		return (bool) Connect::to("sync_notifications", "GetNotificationsAPI", $packet);
+		return Connect::to("sync_notifications", "GetNotificationsAPI", $packet);
 	}
 	
 	

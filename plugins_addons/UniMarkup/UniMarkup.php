@@ -25,10 +25,13 @@ There are two important UniMarkup methods to use.
 [i]			// Italicizes the text.
 [s]			// Strikes the text out.
 [center]	// Centers the text (on a new line).
+[left]		// Left aligns the text (on a new line).
+[right]		// Right aligns the text (on a new line).
 [note]		// Note: Provides a side-note with smaller text.
 [code]		// Code: Provides a block of text that maintains spacing rules by code.
 [url]		// Link: Creates a URL link to another page.
 [size]		// Sets the size of text.
+[font]		// Sets the font of text.
 [color]		// Color: Assigns an HTML color or word color to the section.
 [img]		// Image: Posts an image.
 [quote]		// Quote: Provides a quote block, generally for quoting another user.
@@ -76,10 +79,14 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[i\](.+)\[\/i\]#iUs', '<span style="font-style:italic;">$1</span>', $text);
 		$text = preg_replace('#\[s\](.+)\[\/s\]#iUs', '<span style="text-decoration:line-through;">$1</span>', $text);
 		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '<div style="text-align:center;">$1</div>', $text);
+		$text = preg_replace('#\[left\](.+)\[\/left\]#iUs', '<div style="text-align:left;">$1</div>', $text);
+		$text = preg_replace('#\[right\](.+)\[\/right\]#iUs', '<div style="text-align:right;">$1</div>', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '<span style="font-size:0.8em;">$1</span>', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '<pre class="code">$1</pre>', $text);
 		$text = preg_replace('#\[url\=(.+)\](.+)\[\/url\]#iUs', '<a href="$1" rel="nofollow">$2</a>', $text);
+		$text = preg_replace('#\[url\](.+)\[\/url\]#iUs', '<a href="$1" rel="nofollow">$1</a>', $text);
 		$text = preg_replace('#\[size\=(.+)\](.+)\[\/size\]#iUs', '<span style="font-size:$1px;">$2</span>', $text);
+		$text = preg_replace('#\[font\=(.+)\](.+)\[\/font\]#iUs', '<span style="font-family:$1;">$2</span>', $text);
 		$text = preg_replace('#\[img\](.+)\[\/img\]#iUs', '<img src="$1" alt="Image" />', $text);
 		
 		// The following tags are often nested. List, color and spoiler parsing is not order sensitive, so the ?R pattern is not needed here.
@@ -95,9 +102,15 @@ abstract class UniMarkup {
 		do {
 			$text = preg_replace('#\[spoiler\=(.+)\](.+)\[\/spoiler\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">$1</div><div class="spoiler-content">$2</div>', $text, -1, $count);
 		} while($count > 0);
+		do {
+			$text = preg_replace('#\[spoiler\](.+)\[\/spoiler\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">Spoiler</div><div class="spoiler-content">$1</div>', $text, -1, $count);
+		} while($count > 0);
 		
 		do {
 			$text = preg_replace('#\[quote\=(.+)\]((?>(?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text, -1, $count);
+		} while($count > 0);		
+		do {
+			$text = preg_replace('#\[quote\]((?>(?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$1</div><div class="quote-by">By: ?</div>', $text, -1, $count);
 		} while($count > 0);
 		
 		// Comment Syntax
@@ -120,7 +133,9 @@ abstract class UniMarkup {
 		// loop is not necessary because the outermost matches are captured and the content removed
 		// done first because it eliminates some content
 		$text = preg_replace('#\[spoiler\=.+\](?>(?R)|.)+\[\/spoiler\]#iUs', '', $text);
+		$text = preg_replace('#\[spoiler\](?>(?R)|.)+\[\/spoiler\]#iUs', '', $text);
 		$text = preg_replace('#\[quote\=.+\](?>(?R)|.)+\[\/quote\]#iUs', '', $text);
+		$text = preg_replace('#\[quote\](?>(?R)|.)+\[\/quote\]#iUs', '', $text);
 		
 		// Strip the UniMarkup
 		$text = preg_replace('#\[b\](.+)\[\/b\]#iUs', '$1', $text);
@@ -128,10 +143,14 @@ abstract class UniMarkup {
 		$text = preg_replace('#\[i\](.+)\[\/i\]#iUs', '$1', $text);
 		$text = preg_replace('#\[s\](.+)\[\/s\]#iUs', '$1', $text);
 		$text = preg_replace('#\[center\](.+)\[\/center\]#iUs', '$1', $text);
+		$text = preg_replace('#\[left\](.+)\[\/left\]#iUs', '$1', $text);
+		$text = preg_replace('#\[right\](.+)\[\/right\]#iUs', '$1', $text);
 		$text = preg_replace('#\[note\](.+)\[\/note\]#iUs', '$1', $text);
 		$text = preg_replace('#\[code\](.+)\[\/code\]#iUs', '$1', $text);
 		$text = preg_replace('#\[url\=.+\](.+)\[\/url\]#iUs', '$1', $text);
+		$text = preg_replace('#\[url\](.+)\[\/url\]#iUs', '$1', $text);
 		$text = preg_replace('#\[size\=.+\](.+)\[\/size\]#iUs', '$1', $text);
+		$text = preg_replace('#\[font\=.+\](.+)\[\/font\]#iUs', '$1', $text);
 		$text = preg_replace('#\[img\].+\[\/img\]#iUs', '', $text);
 		
 		do {
@@ -160,78 +179,83 @@ abstract class UniMarkup {
 		
 		// Draw Text Formatting Options
 		$html .= '
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "b")\'><span class="icon-bold"></span></a>
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "u")\'><span class="icon-underline"></span></a>
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "i")\'><span class="icon-italic"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "b")\'><span class="icon-bold" title="Bold [CRTL + B]"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "u")\'><span class="icon-underline" title="Underline [CRTL + U]"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "i")\'><span class="icon-italic" title="Italic [CRTL + I]"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "s")\'><span class="icon-strikethrough" style="font-size:1.3em;" title="Strikethrough [CRTL + S]"></span></a>
 		&nbsp;&nbsp;';
 		
 		// Draw Color Options
 		$html .= '
-		<span class="hover-wrap icon-paint"><div class="hover-div color-draw">
-			<div style="background-color:#000000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#000000")\'></div>
-			<div style="background-color:#808080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#808080")\'></div>
-			<div style="background-color:#c0c0c0;" onclick=\'UniMarkup("' . $elementID . '", "color", "#c0c0c0")\'></div>
-			<div style="background-color:#ffffff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ffffff")\'></div>
+		<span class="hover-wrap icon-paint" title="Color"><div class="hover-div color-draw">
+			<div style="background-color:black;" onclick=\'UniMarkup("' . $elementID . '", "color", "black")\'></div>
+			<div style="background-color:gray;" onclick=\'UniMarkup("' . $elementID . '", "color", "gray")\'></div>
+			<div style="background-color:silver;" onclick=\'UniMarkup("' . $elementID . '", "color", "silver")\'></div>
+			<div style="background-color:white;" onclick=\'UniMarkup("' . $elementID . '", "color", "white")\'></div>
 			
-			<div style="background-color:#ff0000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ff0000")\'></div>
-			<div style="background-color:#ff00ff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ff00ff")\'></div>
-			<div style="background-color:#0000ff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#0000ff")\'></div>
-			<div style="background-color:#00ff00;" onclick=\'UniMarkup("' . $elementID . '", "color", "#00ff00")\'></div>
+			<div style="background-color:red;" onclick=\'UniMarkup("' . $elementID . '", "color", "red")\'></div>
+			<div style="background-color:magenta;" onclick=\'UniMarkup("' . $elementID . '", "color", "magenta")\'></div>
+			<div style="background-color:blue;" onclick=\'UniMarkup("' . $elementID . '", "color", "blue")\'></div>
+			<div style="background-color:lime;" onclick=\'UniMarkup("' . $elementID . '", "color", "lime")\'></div>
 			
-			<div style="background-color:#800000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#800000")\'></div>
-			<div style="background-color:#800080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#800080")\'></div>
-			<div style="background-color:#000080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#000080")\'></div>
-			<div style="background-color:#008000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#008000")\'></div>
+			<div style="background-color:maroon;" onclick=\'UniMarkup("' . $elementID . '", "color", "maroon")\'></div>
+			<div style="background-color:purple;" onclick=\'UniMarkup("' . $elementID . '", "color", "purple")\'></div>
+			<div style="background-color:navy;" onclick=\'UniMarkup("' . $elementID . '", "color", "navy")\'></div>
+			<div style="background-color:green;" onclick=\'UniMarkup("' . $elementID . '", "color", "green")\'></div>
 			
-			<div style="background-color:#00ffff;" onclick=\'UniMarkup("' . $elementID . '", "color", "#00ffff")\'></div>
-			<div style="background-color:#008080;" onclick=\'UniMarkup("' . $elementID . '", "color", "#008080")\'></div>
-			<div style="background-color:#808000;" onclick=\'UniMarkup("' . $elementID . '", "color", "#808000")\'></div>
-			<div style="background-color:#ffff00;" onclick=\'UniMarkup("' . $elementID . '", "color", "#ffff00")\'></div>
-		</div></span>
-		&nbsp;&nbsp;';
+			<div style="background-color:aqua;" onclick=\'UniMarkup("' . $elementID . '", "color", "aqua")\'></div>
+			<div style="background-color:teal;" onclick=\'UniMarkup("' . $elementID . '", "color", "teal")\'></div>
+			<div style="background-color:olive;" onclick=\'UniMarkup("' . $elementID . '", "color", "olive")\'></div>
+			<div style="background-color:yellow;" onclick=\'UniMarkup("' . $elementID . '", "color", "yellow")\'></div>
+			<div style="width:100%; text-align:center;"><a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "color")\'>Other Color</a></div>
+		</div></span>';
 		
-		/*
 		// Draw Font Options
 		$html .= '
-		<span class="icon-pen"></span>
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "size")\'><span class="icon-size" title="Size" style="font-size:1.3em;"></span></a>
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "font")\'><span class="icon-pen" title="Font"></span></a>
 		&nbsp;&nbsp;';
-		*/
 		
 		// Draw Center Paragraph 
 		$html .= '
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "center")\'><span class="icon-paragraph-center"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "left")\'><span class="icon-paragraph-left" title="Left"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "center")\'><span class="icon-paragraph-center" title="Center"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "right")\'><span class="icon-paragraph-right" title="Right"></span></a>
 		&nbsp;&nbsp;';
 		
 		// Draw Image
 		$html .= '
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "img")\'><span class="icon-image"></span></a>';
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "img")\'><span class="icon-image" title="Image [CRTL + P]"></span></a>';
 		
 		// Draw URL
 		$html .= '
-		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "url")\'><span class="icon-link"></span></a>';
-		
-		// Draw List
-		$html .= '
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "list")\'><span class="icon-list"></span></a>
-		&nbsp;&nbsp;';
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "url")\'><span class="icon-link" title="Link [CRTL + L]"></span></a>';
 		
 		// Draw Quote
 		$html .= '
-		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "quote")\'><span class="icon-quote"></span></a>';
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "quote")\'><span class="icon-quote" title="Quote [CRTL + Q]"></span></a>
+		&nbsp;&nbsp;';
+		
+		// Draw List
+		$html .= '
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "list")\'><span class="icon-list" title="List"></span></a>
+		&nbsp;&nbsp;';
 		
 		// Draw Spoiler
 		$html .= '
-		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "spoiler")\'><span class="icon-eye"></span></a>';
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "spoiler")\'><span class="icon-eye" title="Spoiler [CRTL + H]"></span></a>
+		&nbsp;&nbsp;';
 		
 		// Draw Code
 		$html .= '
-		<a href=\'javascript:UniMarkup("' . $elementID . '", "code")\'><span class="icon-console"></span></a>';
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "code")\'><span class="icon-console" title="Code"></span></a>
+		<a href=\'javascript:UniMarkup("' . $elementID . '", "nocode")\'><span class="icon-text-edit" title="NoCode"></span></a>
+		&nbsp;&nbsp;';
 		
 		// Draw User and Hashtags
 		$html .= '
-		&nbsp;&nbsp;
-		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "user")\'><span class="icon-user"></span></a>
-		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "tag")\'><span class="icon-tag"></span></a>';
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "user")\'><span class="icon-user" title="User"></span></a>
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "tag")\'><span class="icon-tag" title="Hashtag"></span></a>';
 		
 		$html .= '
 		</div>';

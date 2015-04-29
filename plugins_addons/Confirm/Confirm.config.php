@@ -45,7 +45,7 @@ class Confirm_config {
 	// $plugin->isInstalled();
 	{
 		// Make sure the newly installed tables exist
-		return DatabaseAdmin::columnsExist("confirm_values", array("confirm_type", "confirm_val"));
+		return DatabaseAdmin::columnsExist("confirm_values", array("confirm_val"));
 	}
 	
 }
