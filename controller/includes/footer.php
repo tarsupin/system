@@ -53,7 +53,6 @@ echo '
 </div>
 
 <div id="footer-panel">
-	<div id="time-box" class="footer-display"></div>
 	<div id="notif-box" class="footer-display"></div>
 	<div id="friend-box" class="footer-display"></div>
 	<div id="myDisplay-box" class="footer-display"></div>

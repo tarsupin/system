@@ -15,4 +15,13 @@ class Notifications_config {
 	
 	public $data = array();
 	
+	
+	/****** Check if the plugin was successfully installed ******/
+	public static function isInstalled (
+	)			// <bool> TRUE if successfully installed, FALSE if not.
+	
+	// $plugin->isInstalled();
+	{
+		return true;
+	}
 }

@@ -15,7 +15,8 @@ Notifications::create($uniID, $url, $message);
 
 Notifications::get($uniID, [$page], [$returnNum]);
 
-+Notifications::createGlobal($message, $url, [$sync]);
+Notifications::createGlobal($message, [$url]);
+
 +Notifications::notifyStaff($category, $message, [$minClearance], [$maxClearance], [$url], [$senderID], [$sync]);
 
 */
@@ -84,6 +85,22 @@ abstract class Notifications {
 	
 		// Prepare the Packet with list of notifications
 		$packet = array("uni_id_list" => $uniIDList, "url" => $url, "message" => $message);
+		
+		// Run the API
+		return (bool) Connect::to("sync_notifications", "AddNotificationAPI", $packet);
+	}
+	
+/****** Create a global notification ******/
+	public static function createGlobal
+	(
+		string $message			// <str> The message (what the notification says); 150 characters.
+	,	string $url = ""			// <str> The url that you can follow (if you click the notification).
+	): bool						// RETURNS <bool> TRUE on success, FALSE on failure.
+	
+	// Notifications::createGlobal($url, $message);
+	{
+		// Prepare the Packet details on the notification
+		$packet = array("uni_id" => 0, "url" => $url, "message" => $message);
 		
 		// Run the API
 		return (bool) Connect::to("sync_notifications", "AddNotificationAPI", $packet);
