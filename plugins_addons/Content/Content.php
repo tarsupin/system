@@ -372,7 +372,7 @@ abstract class Content {
 		// Display the Body Text
 		if(self::$contentData['body'])
 		{
-			echo self::$contentData['body'];
+			echo html_entity_decode(nl2br(UniMarkup::parse(self::$contentData['body'])));
 		}
 		else
 		{

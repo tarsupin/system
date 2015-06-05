@@ -100,17 +100,17 @@ abstract class UniMarkup {
 		} while($count > 0);
 		
 		do {
-			$text = preg_replace('#\[spoiler\=(.+)\](.+)\[\/spoiler\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">$1</div><div class="spoiler-content">$2</div>', $text, -1, $count);
+			$text = preg_replace('#\[spoiler\=(.+)\](.+)\[\/spoiler\]#iUs', '<div class="spoiler"><div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">$1</div><div class="spoiler-content">$2</div></div>', $text, -1, $count);
 		} while($count > 0);
 		do {
-			$text = preg_replace('#\[spoiler\](.+)\[\/spoiler\]#iUs', '<div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">Spoiler</div><div class="spoiler-content">$1</div>', $text, -1, $count);
+			$text = preg_replace('#\[spoiler\](.+)\[\/spoiler\]#iUs', '<div class="spoiler"><div class="spoiler-header" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'block\' ? \'none\' : \'block\');">Spoiler</div><div class="spoiler-content">$1</div></div>', $text, -1, $count);
 		} while($count > 0);
 		
 		do {
-			$text = preg_replace('#\[quote\=(.+)\]((?>(?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$2</div><div class="quote-by">By: $1</div>', $text, -1, $count);
-		} while($count > 0);		
+			$text = preg_replace('#\[quote\=(.+)\](.+)\[\/quote\]#iUs', '<div class="quote"><div class="quote-by" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'none\' ? \'block\' : \'none\');">By: $1</div><div class="quote-content">$2</div></div>', $text, -1, $count);
+		} while($count > 0);
 		do {
-			$text = preg_replace('#\[quote\]((?>(?R)|.)+)\[\/quote\]#iUs', '<div class="quote">$1</div><div class="quote-by">By: ?</div>', $text, -1, $count);
+			$text = preg_replace('#\[quote\](.+)\[\/quote\]#iUs', '<div class="quote"><div class="quote-by" onclick="var el=this.nextSibling; el.style.display = (el.style.display == \'none\' ? \'block\' : \'none\');">By: ?</div><div class="quote-content">$1</div></div>', $text, -1, $count);
 		} while($count > 0);
 		
 		// Comment Syntax

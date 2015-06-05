@@ -45,7 +45,7 @@ class Confirm {
 		$this->confirmValue = $confirmValue;
 		
 		// Run the validation
-		$this->validate();
+		return $this->validate();
 	}
 	
 	
