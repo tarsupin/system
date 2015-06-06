@@ -4,14 +4,14 @@
 ------ About the TimeTracker Plugin ------
 ------------------------------------------
 
-The TimeTracker is designed to keep track of several units of time simultaneously and keep them syncronized when you change a value.
+The TimeTracker is designed to keep track of several units of time simultaneously and keep them synchronized when you change a value.
 
-For example, lets say you set a TimeTracker to the timestamp of 28800 using $tracker->setTimestamp(28800). The TimeTracker would automatically syncronize all of its units to January 1st, 1970 at 12 AM.
+For example, lets say you set a TimeTracker to the timestamp of 28800 using $tracker->setTimestamp(28800). The TimeTracker would automatically synchronize all of its units to January 1st, 1970 at 12 AM.
 	
 	echo $tracker->year;		// prints "1970"
 	echo $tracker->month;		// prints "1"
 	
-Now, if you set the month to "March" using $tracker->setMonth("March"), it would syncronize the timestamp to the value that corresponds with March 1st, 1970 at 12 AM.
+Now, if you set the month to "March" using $tracker->setMonth("March"), it would synchronize the timestamp to the value that corresponds with March 1st, 1970 at 12 AM.
 	
 	echo $tracker->timestamp;	// prints "5126400"
 	
@@ -262,7 +262,7 @@ class TimeTracker {
 	
 	
 	
-/****** Syncronize the time units to keep them consistent with timestamp updates ******/
+/****** Synchronize the time units to keep them consistent with timestamp updates ******/
 	private function syncUnits (
 	)			// RETURNS <this>
 	
@@ -282,7 +282,7 @@ class TimeTracker {
 		,	$trackSecond
 								) = explode("|", $dateInfo);
 		
-		// Syncronize Time Units
+		// Synchronize Time Units
 		$this->year = $trackYear + 0;
 		$this->month = $trackMonth + 0;
 		$this->day = $trackDay + 0;

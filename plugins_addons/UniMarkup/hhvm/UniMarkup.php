@@ -114,8 +114,8 @@ abstract class UniMarkup {
 		} while($count > 0);
 		
 		// Comment Syntax
-		$text = preg_replace('#(^|\s)\#([\w-]+?)#iUs', '$1<a href="' . URL::hashtag_unifaction_com(). '/$2">#$2</a>', $text);
 		$text = preg_replace('#(^|\s)\@(\w{4,22}?)#iUs', '$1<a href="' . URL::unifaction_social(). '/$2">@$2</a>', $text);
+		//$text = preg_replace('#(^|\s)\#([\w-]+?)#iUs', '$1<a href="' . URL::hashtag_unifaction_com(). '/$2">#$2</a>', $text);
 		
 		// Return Text
 		return $text;
@@ -254,8 +254,9 @@ abstract class UniMarkup {
 		
 		// Draw User and Hashtags
 		$html .= '
-		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "user")\'><span class="icon-user" title="User"></span></a>
-		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "tag")\'><span class="icon-tag" title="Hashtag"></span></a>';
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "user")\'><span class="icon-user" title="User"></span></a>';
+		/*$html .= '
+		<a href=\'javascript:UniMarkupAdvanced("' . $elementID . '", "tag")\'><span class="icon-tag" title="Hashtag"></span></a>';*/
 		
 		$html .= '
 		</div>';

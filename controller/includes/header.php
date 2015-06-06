@@ -10,8 +10,8 @@ echo '
 <div id="container">
 <div id="header-wrap">
 	<a href="' . URL::unifaction_com() . '"><img id="nav-logo" src="' . CDN . '/images/unifaction-logo.png" /></a>
-	<ul id="header-right">' .
-		Search::searchEngineBar();
+	<ul id="header-right">';
+		//Search::searchEngineBar();
 	
 	// See the person that you're viewing
 	if(You::$id && You::$id != Me::$id)
@@ -28,17 +28,20 @@ echo '
 		echo '
 		<li id="login-menu"><a href="#"><img id="nav-propic" class="circimg-small" src="' . ProfilePic::image(Me::$id, "small") . '" /></a>
 			<ul style="line-height:22px; min-width:180px;">
-				<li><a href="' . URL::unifaction_social() . '/' . Me::$vals['handle'] . Me::$slg . '">My Unity Wall</a></li>
-				<li><a href="' . URL::blogfrog_social() . '/' . Me::$vals['handle'] . Me::$slg . '">My BlogFrog</a></li>
-				<li><a href="' . URL::unifaction_social() . '/friends' . Me::$slg . '">My Friends</a></li>
-				<li><a href="' . URL::unijoule_com() . Me::$slg . '">My UniJoule</a></li>
-				<li><a href="' . URL::inbox_unifaction_com() . Me::$slg . '">My Inbox</a></li>
+				<li><a href="' . URL::unifaction_social() . '/friends' . Me::$slg . '">My Friends</a></li>				
+				<li><a href="' . URL::unifaction_com() . '/user-panel/account/master-edit">My Settings</a></li>
 				<li><a href="' . URL::profilepic_unifaction_com() . '/' . Me::$slg . '">Update Profile Pic</a></li>
-				<li><a href="' . URL::unifaction_com() . '/user-panel">My Settings</a></li>
 				<li><a href="' . URL::unifaction_com() . '/multi-accounts">Switch User</a></li>
 				<li><a href="/logout">Log Out</a></li>
 			</ul>
 		</li>';
+		
+		/*
+				<li><a href="' . URL::unifaction_social() . '/' . Me::$vals['handle'] . Me::$slg . '">My Unity Wall</a></li>
+				<li><a href="' . URL::blogfrog_social() . '/' . Me::$vals['handle'] . Me::$slg . '">My BlogFrog</a></li>
+				<li><a href="' . URL::unijoule_com() . Me::$slg . '">My UniJoule</a></li>
+				<li><a href="' . URL::inbox_unifaction_com() . Me::$slg . '">My Inbox</a></li>
+		*/
 	}
 	
 	// If you're a guest
