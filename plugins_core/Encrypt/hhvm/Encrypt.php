@@ -92,7 +92,10 @@ abstract class Encrypt {
 		// Vary the encryption data for final pass pad
 		// This prevents the final decryption string from possessing any patterns, such as if there were two identical
 		// sets of data sent. Even if you knew the strings were identical, you can't match them because of this step.
-		$finalPad = Security::randHash(10);
+		do
+		{
+			$finalPad = Security::randHash(10);
+		} while(!self::checkPadChars($finalPad));
 		$encData = $finalPad . Security::pad($encData, $finalPad);
 		
 		// Create a padding string
@@ -153,6 +156,27 @@ abstract class Encrypt {
 	// self::_setEnc_open("myKey", "Data to encrypt");
 	{
 		return "open|" . base64_encode($encData);
+	}
+
+	
+/****** Check characters before padding ******/
+	private static function checkPadChars
+	(
+		string $hash			// <str> The random string to check.
+	,	int $base = 64		// <int> The base value to pad with.
+	): bool					// RETURNS <bool> TRUE if there are no problematic characters, FALSE otherwise.
+	
+	// self::checkPadChars($hash);
+	{
+		$length = strlen($hash);
+		for($i=0; $i<$length; $i++)
+		{
+			if(Security::$padArray[$hash[$i]] >= $base)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 }
